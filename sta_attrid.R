@@ -1,9 +1,10 @@
 # 统计IO数据
 rm(list = ls())
-dir_code <- 'D:/Git/0427_xiaosong'
-dir_data <- 'D:/Data/attrid'
+dir_code <- 'D:/Git/attrid'
+dir_data <- 'D:/Data/attrid/sta_csv'
 dir_data1 <- 'D:/Data/Disk Number'
 require('ggplot2')
+source('D:/Git/R_Function/Rfun.R')
 
 # 1. 读取故障单
 load(file.path(dir_data1,'data_mcf_rsv2014.Rda'))
@@ -12,7 +13,8 @@ data.mcf$dup <- !duplicated(data.mcf$ip)
 flist <- subset(data.mcf, f_time < as.POSIXct('2014-08-01') & f_time >= as.POSIXct('2014-06-01'))
 
 # 2. 读取attrid并统计
-attr_name <- c(26,40,41,50,51,9,902,9020,903,905,907,927,928,929,930,999)
+# attr_name <- c(26,40,41,50,51,9,902,9020,903,905,907,927,928,929,930,999)
+attr_name <- 9020
 attr_name <- paste('attr',attr_name,sep='')
 
 sta_attr <- list()
@@ -27,6 +29,11 @@ for (x in attr_name) {
   }
   sta_attr[[x]] <- attr
 }
+
+# 2.5 对所有902数据进行分块
+attr <- attr[order(attr$svrid),]
+part_svrid <- attr$svrid[seq(1,nrow(attr),5000)]
+write.table(part_svrid,file = file.path(dir_data,'part_svrid'),quote = F,row.names = F,col.names = F)
 
 # 3. 求故障单与attrid的交
 its <- matrix(0,2,length(attr_name))
@@ -55,11 +62,41 @@ sta_dev$diff_disk[sta_dev$dev_class_id != 'C1'] <- sta_dev$diff[sta_dev$dev_clas
 sta_dev$all_disk[sta_dev$dev_class_id != 'C1'] <- sta_dev$all[sta_dev$dev_class_id != 'C1']*12
 
 # 4. 指定机型中每个机型选取3000台无故障机
-num_need <- 3000
+num_need <- 1000
 good_list <- list()
 for (d in dev_need){
   tmp <- cmdb_dif$svr_asset_id[cmdb_dif$dev_class_id == d]
   len <- length(tmp)
-  good_list[[d]] <- tmp[ceiling(runif(min(3000,len),1,len))]
+  good_list[[d]] <- tmp[ceiling(runif(min(num_need,len),1,len))]
 }
 good_svr <- as.character(unlist(good_list))
+write.csv(good_svr,file = file.path(dir_data,'good_svrid.csv'),row.names = F)
+
+# 5. 所有数据中每个机型选择10台故障机,10台无故障机看数据
+bad_svrid <- tapply(cmdb_its$svr_asset_id,factor(cmdb_its$dev_class_id),function(x)x[round(runif(10,1,length(x)))])
+bad_svrid <- data.frame(svrid = as.character(unlist(bad_svrid)))
+bad_svrid$dev_class_id <- cmdb$dev_class_id[match(bad_svrid$svrid,cmdb$svr_asset_id)]
+bad_svrid$class <- 'bad'
+
+good_svrid <- tapply(cmdb_dif$svr_asset_id,factor(cmdb_dif$dev_class_id),function(x)x[round(runif(10,1,length(x)))])
+good_svrid <- data.frame(svrid = as.character(unlist(good_svrid)))
+good_svrid$dev_class_id <- cmdb$dev_class_id[match(good_svrid$svrid,cmdb$svr_asset_id)]
+good_svrid$class <- 'good'
+
+attr_svrid <- rbind(bad_svrid,good_svrid)
+row.names(attr_svrid) <- NULL
+attr_svrid <- attr_svrid[!duplicated(attr_svrid$svrid),]
+write.csv(attr_svrid,file = file.path(dir_data,'attr_svrid.csv'),row.names = F)
+
+# 6. 提取所有故障机svrid
+tmp <- as.character(cmdb_its$svr_asset_id)
+write.csv(tmp,file = file.path(dir_data,'bad_svrid.csv'),row.names = F)
+
+# 7. 对取出的无故障机进行处理
+tmp <- read.csv(file.path(dir_data,'attr_902_bad'))
+names(tmp) <- c('date','svrid','attrid','timepoint','value')
+tmp1 <- table(tmp$svrid)
+tmp1 <- data.frame(svrid = names(tmp1),
+                   count = as.numeric(tmp1))
+
+
