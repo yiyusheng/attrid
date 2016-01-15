@@ -12,237 +12,13 @@ source(file.path('D:/Git/attrid','attr_config.R'))
 #@@@ Function @@@#
 source('D:/Git/R_Function/Rfun.R')
 source(file.path(dir_code,'attr_function.R'))
+source(file.path(dir_code,'AFR_io_function.R'))
 
 #@@@ LOAD DATA @@@#
 load(file.path(dir_data,'load_ftr_attrid.Rda'))
+source(file.path(dir_code,'AFR_io_prepare.R'))
 
-#@@@ LOCAL Function @@@#
-AFR <- function(tmp.f,tmp.cmdb,lastYear,diskCount){
-  divAll <- c(0,(seq(1,(lastYear-1)) - 1/12),lastYear)
-  divF <- seq(0,lastYear)
-  
-  cutF <- tableX(cut(tmp.f$failShiptime,divF))
-  cutLeft <- tableX(cut(tmp.cmdb$shiptimeToLeft,divAll))
-  cutF$idx <- as.numeric(gsub("\\(|,.*","",cutF$item))
-  cutLeft$idx <- as.numeric(gsub("\\(|,.*","",cutLeft$item))
-  cutLeft <- cutLeft[order(cutLeft$idx),]
-  cutLeft$idx <- seq(0,(lastYear-1))
-  cutMerge <- merge(cutF,cutLeft,by = 'idx')
-  cutMerge$rate.x <- NULL
-  cutMerge$rate.y <- NULL
-  cutMerge$AFR <- cutMerge$count.x/cutMerge$count.y/diskCount
-  return(cutMerge)
-}
 
-AFR_plot <- function(cutMerge,title,yl){ 
-  if (yl == -1){
-    p1 <- ggplot(cutMerge,aes(x = item.x,y = AFR*100*6)) + geom_bar(stat = 'identity') +
-      xlab('Ship Time (years)') + ylab('Annual Failure Rate (%)') + 
-      ggtitle(title) + 
-      theme(axis.text = element_text(size = 18),
-            axis.title = element_text(size = 20),
-            legend.text = element_text(size = 18),
-            legend.title = element_text(size = 20),
-            plot.title = element_text(size = 26, face = 'bold'),
-            legend.position = c(0,1),
-            legend.justification = c(0,1),
-            legend.background = element_rect(fill = alpha('grey',0.5)))
-  } else if (yl == -2){
-    p1 <- ggplot(cutMerge,aes(x = item.x,y = AFR*100*6,fill = class)) + 
-      geom_bar(stat = 'identity',position = 'dodge') +
-      xlab('Ship Time (years)') + ylab('Annual Failure Rate (%)') + 
-      ggtitle(title) + guides(fill = guide_legend(title=NULL)) + 
-#       scale_alpha(guide = F) +
-      theme(axis.text = element_text(size = 18),
-            axis.title = element_text(size = 20),
-            legend.text = element_text(size = 30),
-            legend.title = element_text(size = 20),
-            plot.title = element_text(size = 26, face = 'bold'),
-            legend.position = c(0,1),
-            legend.justification = c(0,1),
-            legend.background = element_rect(fill = alpha('grey',0.5)))
-  } else {
-    p1 <- ggplot(cutMerge,aes(x = item.x,y = AFR*100*6)) + geom_bar(stat = 'identity') +
-      xlab('Ship Time (years)') + ylab('Annual Failure Rate (%)') + 
-      ggtitle(title) + 
-      ylim(c(0,yl)) +
-      theme(axis.text = element_text(size = 18),
-            axis.title = element_text(size = 20),
-            legend.text = element_text(size = 18),
-            legend.title = element_text(size = 20),
-            plot.title = element_text(size = 26, face = 'bold'),
-            legend.position = c(0,1),
-            legend.justification = c(0,1),
-            legend.background = element_rect(fill = alpha('grey',0.5)))
-  }
-  print(p1)
-  ggsave(file=file.path(dir_data,'ship_time',paste(title,'.png',sep='')), plot=p1, width = 16, height = 12, dpi = 100)
-}
-
-AFR_value <- function(p3.f,p3.cmdb,p3.io,attr,levelCount,lastYears,diskCount){
-  # 求区间
-  div902 <- quantile(p3.io$mean_902/diskCount,seq(0,1,1/levelCount))
-  div903 <- quantile(p3.io$mean_903/diskCount,seq(0,1,1/levelCount))
-  div999 <- quantile(p3.io$mean_999,seq(0,1,1/levelCount))
-  divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
-  divF <- seq(0,lastYears)
-  # 给每台机器添加区间
-  p3.io$lv902 <- cut(p3.io$mean_902/diskCount,div902)
-  p3.io$lv903 <- cut(p3.io$mean_903/diskCount,div903)
-  p3.io$lv999 <- cut(p3.io$mean_999,div999)
-  
-  mergecol <- c('svrid','lv902','lv903','lv999')
-  p3.cmdb <- merge(p3.cmdb,p3.io[,mergecol],by.x = 'svr_asset_id',by.y = 'svrid')
-  p3.f <- subset(p3.f,svr_id %in% cmdbio$svr_asset_id)
-  p3.f <- merge(p3.f,p3.io[,mergecol],by.x = 'svr_id',by.y = 'svrid')
-  
-  p3.cmdb$lvUsetime <- as.character(cut(p3.cmdb$shiptimeToLeft,divAll))
-  p3.f$lvUsetime <- as.character(cut(p3.f$failShiptime,divF))
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(0,0.917]'] <- '(0,1]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(0.917,1.92]'] <- '(1,2]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(1.92,2.92]'] <- '(2,3]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(2.92,3.92]'] <- '(3,4]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(3.92,4.92]'] <- '(4,5]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(4.92,5.92]'] <- '(5,6]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(5.92,7]'] <- '(6,7]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(4.92,6]'] <- '(5,6]'
-  p3.cmdb$lvUsetime[p3.cmdb$lvUsetime == '(3.92,5]'] <- '(4,5]'
-  
-  col.table <- c(paste('lv',attr,sep=''),'lvUsetime')
-  cutP3f <- colTableX(p3.f,col.table)
-  cutP3cmdb <- colTableX(p3.cmdb,col.table)
-  cutMerge <- merge(cutP3f,cutP3cmdb,by = 'item',all = T)
-  cutMerge <- cbind(cutMerge,splitToDF(cutMerge$item,header = c('value','shipTime')))
-  cutMerge <- subset(cutMerge,shipTime != 'NA' & value != 'NA',c('value','shipTime','count.x','count.y'))
-  cutMerge <- factorX(cutMerge)
-  cutMerge$value <- factor(cutMerge$value,
-                           levels = levels(cutMerge$value)[
-                             order(as.numeric(gsub("\\(|,.*","",levels(cutMerge$value))))])
- 
-  cutMerge$AFR <- cutMerge$count.x/cutMerge$count.y/diskCount
-#   cutMerge <- cutMerge[order(cutMerge$shipTime),]
-  return(cutMerge)
-}
-
-AFR_value_plot <- function(cutMerge,title,yl,
-                           subdir = '',valueFilter = '',cylim = -1){
-  plotCol <- c('value','shipTime','AFR')
-  if (valueFilter[1] != ''){
-    cutMerge <- subset(cutMerge,!(value %in% valueFilter))
-  }
-  if (cylim != -1){
-    cutMerge <- subset(cutMerge,count.y >= cylim)
-  }
-  cutMerge <- factorX(cutMerge)
-  naFill <- cbind(expand.grid(value = levels(cutMerge$value),shipTime = cutMerge$shipTime),AFR = NA)
-  cutMerge <- rbind(subset(cutMerge,,plotCol),naFill)
-  if (yl == -1){
-    p1 <- ggplot(cutMerge,aes(x = shipTime,y = AFR*100*6,fill = factor(value))) + 
-      geom_bar(stat = 'identity',position = 'dodge') + 
-      xlab('Ship Time (years)') + ylab('Annual Failure Rate (%)') + 
-      ggtitle(title) + guides(fill = guide_legend(title=NULL)) + 
-      theme(plot.title = element_text(size = 26, face = 'bold'),
-            axis.text = element_text(size = 18),
-            axis.title = element_text(size = 20),
-            legend.text = element_text(size = 25),
-            legend.title = element_text(size = 20),
-            legend.position = c(0,1),
-            legend.justification = c(0,1),
-            legend.background = element_rect(fill = alpha('grey',0.5)))
-  } else {
-    p1 <- ggplot(cutMerge,aes(x = shipTime,y = AFR*100*6,fill = factor(value))) + 
-      geom_bar(stat = 'identity',position = 'dodge') +
-      xlab('Ship Time (years)') + ylab('Annual Failure Rate (%)') + 
-      ggtitle(title) + guides(fill = guide_legend(title=NULL)) + 
-      ylim(c(0,yl)) +
-      theme(plot.title = element_text(size = 26, face = 'bold'),
-            axis.text = element_text(size = 18),
-            axis.title = element_text(size = 20),
-            legend.text = element_text(size = 25),
-            legend.title = element_text(size = 20),
-            legend.position = c(0,1),
-            legend.justification = c(0,1),
-            legend.background = element_rect(fill = alpha('grey',0.5)))
-  }
-  print(p1)
-  ggsave(file=file.path(dir_data,'ship_time',subdir,paste(title,'.png',sep='')), plot=p1, width = 16, height = 12, dpi = 100)
-}
-
-#对任何一个字段
-AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
-  # 求区间
-  f <- factorX(f)
-  cmdb <- factorX(cmdb)
-  if (dev != ''){
-    f <- subset(f,dClass == dev)
-    cmdb <- subset(cmdb,dClass == dev)
-  }
-  divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
-  divF <- seq(0,lastYears)
-  cmdb$lvUsetime <- as.character(cut(cmdb$shiptimeToLeft,divAll))
-  f$lvUsetime <- as.character(cut(f$failShiptime,divF))
-  cmdb$lvUsetime[cmdb$lvUsetime == '(0,0.917]'] <- '(0,1]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(0.917,1.92]'] <- '(1,2]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(1.92,2.92]'] <- '(2,3]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(2.92,3.92]'] <- '(3,4]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,4.92]'] <- '(4,5]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,5.92]'] <- '(5,6]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(5.92,7]'] <- '(6,7]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,6]'] <- '(5,6]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,5]'] <- '(4,5]'
-  
-  col.table <- c(attr,'lvUsetime')
-  cutP3f <- colTableX(f,col.table)
-  cutP3cmdb <- colTableX(cmdb,col.table)
-  cutMerge <- merge(cutP3f,cutP3cmdb,by = 'item',all = T)
-  cutMerge <- cbind(cutMerge,splitToDF(cutMerge$item,header = c('value','shipTime')))
-  cutMerge <- subset(cutMerge,shipTime != 'NA' & value != 'NA',c('value','shipTime','count.x','count.y'))
-  cutMerge <- factorX(cutMerge)
-  cutMerge$value <- factor(cutMerge$value,
-                           levels = levels(cutMerge$value)[
-                             order(as.numeric(gsub("\\(|,.*","",levels(cutMerge$value))))])
-  cutMerge <- subset(cutMerge,value != '')
-  levels(cutMerge$value)[levels(cutMerge$value) == '-1'] <- defValue
-  cutMerge$AFR <- cutMerge$count.x/cutMerge$count.y/diskCount
-    cutMerge <- cutMerge[order(cutMerge$value),]
-  return(cutMerge)
-}
-#########################################################################################################
-# P1.处理故障单的上架时间，添加故障时已服役时间;
-# 给所有机器添加观察窗口的左右边界的时间与上架时间之间的时间间隔
-data.fFewDev <- subset(data.f,ip %in% cmdb$ip)
-data.f <- subset(data.fAllDev,ip %in% cmdb$ip)
-data.f$use_time <- cmdb$use_time[match(data.f$svr_id,cmdb$svr_asset_id)]
-data.f$failShiptime <- floor(data.f$f_time - data.f$use_time)
-units(data.f$failShiptime) <- 'days'
-data.f$failShiptime <- as.numeric(data.f$failShiptime)/365
-
-cmdb$shiptimeToLeft <- floor(as.POSIXct('2014-06-01') - cmdb$use_time)
-cmdb$shiptimeToRight <- floor(as.POSIXct('2014-08-01') - cmdb$use_time)
-units(cmdb$shiptimeToLeft) <- 'days'
-units(cmdb$shiptimeToRight) <- 'days'
-cmdb$shiptimeToLeft <- as.numeric(cmdb$shiptimeToLeft)/365
-cmdbio <- subset(cmdb,svr_asset_id %in% mean_io$svrid)
-# ggplot(cmdbio,aes(shiptimeToLeft))+geom_bar()
-# 数据准备
-tmp.cmdb <- cmdbio
-tmp.f <- subset(data.f,svr_id %in% cmdbio$svr_asset_id)
-tmp.f <- factorX(tmp.f)
-tmp.io <- mean_io
-tmp.io$dev_class_id <- cmdb$dev_class_id[match(tmp.io$svrid,cmdb$svr_asset_id)]
-tmp.io$dClass
-lastYears <- 7
-# 给每个机器做标记
-class_C <- 'C1'
-class_B <- c('B5','B6','B1')
-class_TS <- c('TS1','TS3','TS4','TS5','TS6')
-cmdb$dClass <- ''
-cmdb$dClass[cmdb$dev_class_id %in% class_C] <- 'C'
-cmdb$dClass[cmdb$dev_class_id %in% class_B] <- 'B'
-cmdb$dClass[cmdb$dev_class_id %in% class_TS] <- 'TS'
-disk_ip$dClass <- cmdb$dClass[match(disk_ip$ip,cmdb$ip)]
-tmp.io$dClass <- cmdb$dClass[match(tmp.io$svrid,cmdb$svr_asset_id)]
-tmp.f$dClass <- cmdb$dClass[match(tmp.f$svr_id,cmdb$svr_asset_id)]
 #########################################################################################################
 # # # P2.计算年故障率
 # cm1 <- AFR(subset(tmp.f,dev_class_id == 'C1'),subset(tmp.cmdb,dev_class_id == 'C1'),
@@ -260,27 +36,76 @@ tmp.f$dClass <- cmdb$dClass[match(tmp.f$svr_id,cmdb$svr_asset_id)]
 # # naFill <- cbind(expand.grid(item.x = levels(cm$item.x),class = levels(factor(cm$class))),AFR = NA)
 # # AFR_plot(rbind(subset(cm,,plotCol),naFill),'Ship Time and Annual Failure Rate',-2)
 # # 
-# # # P3.分IO计算年故障率,将3个IO字段各自根据分位点分成N档，把档次标出
-# # # C类
-# # cmv902C <- AFR_value(subset(tmp.f,dev_class_id == 'C1'),subset(tmp.cmdb,dev_class_id == 'C1'),
-# #                   subset(tmp.io,dev_class_id == 'C1'),'902',3,lastYears,1)
-# # cmv903C <- AFR_value(subset(tmp.f,dev_class_id == 'C1'),subset(tmp.cmdb,dev_class_id == 'C1'),
-# #                      subset(tmp.io,dev_class_id == 'C1'),'903',3,lastYears,1)
-# # cmv999C <- AFR_value(subset(tmp.f,dev_class_id == 'C1'),subset(tmp.cmdb,dev_class_id == 'C1'),
-# #                      subset(tmp.io,dev_class_id == 'C1'),'999',3,lastYears,1)
-# # AFR_value_plot(cmv902C,'Ship Time and IO read (non-storage servers)',25)
-# # AFR_value_plot(cmv903C,'Ship Time and IO Write (non-storage servers)',20)
-# # AFR_value_plot(cmv999C,'Ship Time and IO Time (non-storage servers)',30)
-# # # TS类
-# # cmv902T <- AFR_value(subset(tmp.f,dev_class_id != 'C1'),subset(tmp.cmdb,dev_class_id != 'C1'),
-# #                      subset(tmp.io,dev_class_id != 'C1'),'902',3,lastYears,12)
-# # cmv903T <- AFR_value(subset(tmp.f,dev_class_id != 'C1'),subset(tmp.cmdb,dev_class_id != 'C1'),
-# #                      subset(tmp.io,dev_class_id != 'C1'),'903',3,lastYears,12)
-# # cmv999T <- AFR_value(subset(tmp.f,dev_class_id != 'C1'),subset(tmp.cmdb,dev_class_id != 'C1'),
-# #                      subset(tmp.io,dev_class_id != 'C1'),'999',3,lastYears,12)
-# # AFR_value_plot(cmv902T,'Ship Time and IO read (storage servers)',25)
-# # AFR_value_plot(cmv903T,'Ship Time and IO Write (storage servers)',20)
-# # AFR_value_plot(cmv999T,'Ship Time and IO Time (storage servers)',30)
+# P3.分IO计算年故障率,将3个IO字段各自根据分位点分成N档，把档次标出
+#C类
+tmp.fC <- subset(tmp.f,dev_class_id == 'C1')
+tmp.cmdbC <- subset(tmp.cmdb,dev_class_id == 'C1')
+tmp.ioC <- subset(tmp.io,dev_class_id == 'C1')
+cmv902C <- AFR_value(tmp.fC,tmp.cmdbC,tmp.ioC,'902',3,lastYears,1)
+cmv903C <- AFR_value(tmp.fC,tmp.cmdbC,tmp.ioC,'903',3,lastYears,1)
+cmv999C <- AFR_value(tmp.fC,tmp.cmdbC,tmp.ioC,'999',3,lastYears,1)
+AFR_value_plot(cmv902C,'Ship Time and IO read (non-storage servers)',25)
+AFR_value_plot(cmv903C,'Ship Time and IO Write (non-storage servers)',20)
+AFR_value_plot(cmv999C,'Ship Time and IO Time (non-storage servers)',30)
+# TS类
+tmp.fTS <- subset(tmp.f,dev_class_id != 'C1')
+tmp.cmdbTS <- subset(tmp.cmdb,dev_class_id != 'C1')
+tmp.ioTS <- subset(tmp.io,dev_class_id != 'C1')
+cmv902T <- AFR_value(tmp.fTS,tmp.cmdbTS,tmp.ioTS,'902',3,lastYears,12)
+cmv903T <- AFR_value(tmp.fTS,tmp.cmdbTS,tmp.ioTS,'903',3,lastYears,12)
+cmv999T <- AFR_value(tmp.fTS,tmp.cmdbTS,tmp.ioTS,'999',3,lastYears,12)
+AFR_value_plot(cmv902T,'Ship Time and IO read (storage servers)',25)
+AFR_value_plot(cmv903T,'Ship Time and IO Write (storage servers)',20)
+AFR_value_plot(cmv999T,'Ship Time and IO Time (storage servers)',30)
+
+# 数据整合与准备
+tmpP3.io <- subset(tmp.io,mean_902 > 0 & mean_903 > 0)
+tmpP3.cmdb <- tmp.cmdb
+tmpP3.f <- tmp.f
+tmpP3.io$total902 <- log2(tmpP3.io$mean_902*86400*365)
+tmpP3.io$total903 <- log2(tmpP3.io$mean_903*86400*365)
+tmpP3.io$total9023 <- log2(tmpP3.io$mean_902*86400*365 + tmpP3.io$mean_903*86400*365)
+tmpP3.cmdb$total902 <- tmpP3.io$total902[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
+tmpP3.cmdb$total903 <- tmpP3.io$total903[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
+tmpP3.cmdb$total9023 <- tmpP3.io$total9023[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
+# C类
+tmpP3.fC <- subset(tmpP3.f,dClass == 'C',c('ip','svr_id','dClass','dev_class_id','failShiptime'))
+tmpP3.cmdbC <- subset(tmpP3.cmdb,dClass == 'C',c('svr_asset_id','dev_class_id','ip',
+                                               'shiptimeToLeft','dClass','total902','total903','total9023'))
+tmpP3.cmdbC <- subset(tmpP3.cmdbC,!is.na(total902) & !is.na(total903) & !is.na(total9023))
+cut902 <- c(10,20,30,50)
+cut903 <- c(26,31,34,42)
+cut9023 <- c(26,30,39,40,44)
+tmpP3.cmdbC$sep902 <- as.numeric(gsub('^\\(|,.*$','',cut(tmpP3.cmdbC$total902,cut902)))
+tmpP3.cmdbC$sep903 <- as.numeric(gsub('^\\(|,.*$','',cut(tmpP3.cmdbC$total903,cut903)))
+tmpP3.cmdbC$sep9023 <- as.numeric(gsub('^\\(|,.*$','',cut(tmpP3.cmdbC$total9023,cut9023)))
+
+tmpP3.fC$sep902 <- tmpP3.cmdbC$sep902[match(tmpP3.fC$ip,tmpP3.cmdbC$ip)]
+tmpP3.fC$sep903 <- tmpP3.cmdbC$sep903[match(tmpP3.fC$ip,tmpP3.cmdbC$ip)]
+tmpP3.fC$sep9023 <- tmpP3.cmdbC$sep9023[match(tmpP3.fC$ip,tmpP3.cmdbC$ip)]
+tmpP3.fC <- subset(tmpP3.fC,!is.na(sep902) & !is.na(sep903) & !is.na(sep9023))
+
+AFR.totalC <- AFR_attr(tmpP3.fC,tmpP3.cmdbC,'sep9023',6,1)
+AFR_value_plot(AFR.totalC,'Ship Time and Read Total (Non-Storage Server)',-1,subdir = '0114io')
+
+# TS类
+tmpP3.fTS <- subset(tmpP3.f,dClass == 'TS',c('ip','svr_id','dClass','dev_class_id','failShiptime'))
+tmpP3.cmdbTS <- subset(tmpP3.cmdb,dClass == 'TS',c('svr_asset_id','dev_class_id','ip',
+                                                 'shiptimeToLeft','dClass','total902','total903'))
+
+tmpP3.cmdbTS <- subset(tmpP3.cmdbTS,!is.na(total902) & !is.na(total903))
+cut902 <- c(10,20,30,50)
+cut903 <- c(26,31,34,42)
+tmpP3.cmdbTS$sep902 <- as.numeric(gsub('^\\(|,.*$','',cut(tmpP3.cmdbTS$total902,cut902)))
+tmpP3.cmdbTS$sep903 <- as.numeric(gsub('^\\(|,.*$','',cut(tmpP3.cmdbTS$total903,cut903)))
+
+tmpP3.fTS$sep902 <- tmpP3.cmdbTS$sep902[match(tmpP3.fTS$ip,tmpP3.cmdbTS$ip)]
+tmpP3.fTS$sep903 <- tmpP3.cmdbTS$sep903[match(tmpP3.fTS$ip,tmpP3.cmdbTS$ip)]
+tmpP3.fTS <- subset(tmpP3.fTS,!is.na(sep902) & !is.na(sep903))
+
+AFR.totalTS <- AFR_attr(tmpP3.fTS,tmpP3.cmdbTS,'sep902',6,12)
+AFR_value_plot(AFR.totalTS,'Ship Time and Read Total (Storage Server)',-1,subdir = '0114io')
+
 # 
 # # P4.对存储系统配置进行分析（接口，容量，model数，Type,城市，raid)
 # # P4.1A 处理接口A

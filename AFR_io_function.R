@@ -107,6 +107,48 @@ AFR_value <- function(p3.f,p3.cmdb,p3.io,attr,levelCount,lastYears,diskCount){
   return(cutMerge)
 }
 
+
+
+#对任何一个字段
+AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
+  # 求区间
+  f <- factorX(f)
+  cmdb <- factorX(cmdb)
+  if (dev != ''){
+    f <- subset(f,dClass == dev)
+    cmdb <- subset(cmdb,dClass == dev)
+  }
+  divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
+  divF <- seq(0,lastYears)
+  cmdb$lvUsetime <- as.character(cut(cmdb$shiptimeToLeft,divAll))
+  f$lvUsetime <- as.character(cut(f$failShiptime,divF))
+  cmdb$lvUsetime[cmdb$lvUsetime == '(0,0.917]'] <- '(0,1]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(0.917,1.92]'] <- '(1,2]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(1.92,2.92]'] <- '(2,3]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(2.92,3.92]'] <- '(3,4]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,4.92]'] <- '(4,5]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,5.92]'] <- '(5,6]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(5.92,7]'] <- '(6,7]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,6]'] <- '(5,6]'
+  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,5]'] <- '(4,5]'
+  
+  col.table <- c(attr,'lvUsetime')
+  cutP3f <- colTableX(f,col.table)
+  cutP3cmdb <- colTableX(cmdb,col.table)
+  cutMerge <- merge(cutP3f,cutP3cmdb,by = 'item',all = T)
+  cutMerge <- cbind(cutMerge,splitToDF(cutMerge$item,header = c('value','shipTime')))
+  cutMerge <- subset(cutMerge,shipTime != 'NA' & value != 'NA',c('value','shipTime','count.x','count.y'))
+  cutMerge <- factorX(cutMerge)
+  cutMerge$value <- factor(cutMerge$value,
+                           levels = levels(cutMerge$value)[
+                             order(as.numeric(gsub("\\(|,.*","",levels(cutMerge$value))))])
+  cutMerge <- subset(cutMerge,value != '')
+  levels(cutMerge$value)[levels(cutMerge$value) == '-1'] <- defValue
+  cutMerge$AFR <- cutMerge$count.x/cutMerge$count.y/diskCount
+  cutMerge <- cutMerge[order(cutMerge$shipTim,cutMerge$value),]
+  return(cutMerge)
+}
+
 AFR_value_plot <- function(cutMerge,title,yl,
                            subdir = '',valueFilter = '',cylim = -1){
   plotCol <- c('value','shipTime','AFR')
@@ -149,44 +191,4 @@ AFR_value_plot <- function(cutMerge,title,yl,
   }
   print(p1)
   ggsave(file=file.path(dir_data,'ship_time',subdir,paste(title,'.png',sep='')), plot=p1, width = 16, height = 12, dpi = 100)
-}
-
-#对任何一个字段
-AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
-  # 求区间
-  f <- factorX(f)
-  cmdb <- factorX(cmdb)
-  if (dev != ''){
-    f <- subset(f,dClass == dev)
-    cmdb <- subset(cmdb,dClass == dev)
-  }
-  divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
-  divF <- seq(0,lastYears)
-  cmdb$lvUsetime <- as.character(cut(cmdb$shiptimeToLeft,divAll))
-  f$lvUsetime <- as.character(cut(f$failShiptime,divF))
-  cmdb$lvUsetime[cmdb$lvUsetime == '(0,0.917]'] <- '(0,1]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(0.917,1.92]'] <- '(1,2]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(1.92,2.92]'] <- '(2,3]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(2.92,3.92]'] <- '(3,4]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,4.92]'] <- '(4,5]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,5.92]'] <- '(5,6]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(5.92,7]'] <- '(6,7]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(4.92,6]'] <- '(5,6]'
-  cmdb$lvUsetime[cmdb$lvUsetime == '(3.92,5]'] <- '(4,5]'
-  
-  col.table <- c(attr,'lvUsetime')
-  cutP3f <- colTableX(f,col.table)
-  cutP3cmdb <- colTableX(cmdb,col.table)
-  cutMerge <- merge(cutP3f,cutP3cmdb,by = 'item',all = T)
-  cutMerge <- cbind(cutMerge,splitToDF(cutMerge$item,header = c('value','shipTime')))
-  cutMerge <- subset(cutMerge,shipTime != 'NA' & value != 'NA',c('value','shipTime','count.x','count.y'))
-  cutMerge <- factorX(cutMerge)
-  cutMerge$value <- factor(cutMerge$value,
-                           levels = levels(cutMerge$value)[
-                             order(as.numeric(gsub("\\(|,.*","",levels(cutMerge$value))))])
-  cutMerge <- subset(cutMerge,value != '')
-  levels(cutMerge$value)[levels(cutMerge$value) == '-1'] <- defValue
-  cutMerge$AFR <- cutMerge$count.x/cutMerge$count.y/diskCount
-  cutMerge <- cutMerge[order(cutMerge$value),]
-  return(cutMerge)
 }

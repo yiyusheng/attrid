@@ -19,97 +19,104 @@ ioC1 <- subset(tmp.io,mean_902 != 0 & mean_903 != 0)
 ioC1$mean_902 <- log2(ioC1$mean_902*86400*365)
 ioC1$mean_903 <- log2(ioC1$mean_903*86400*365)
 ioC1$mean_9023 <- log2(2^ioC1$mean_902 + 2^ioC1$mean_903)
-ioC1$rwRate <- (2^ioC1$mean_902)/(2^ioC1$mean_9023)
+ioC1$rwRate <- (2^ioC1$mean_903)/(2^ioC1$mean_9023)*100
 
 
-div902 <- seq(10,50,3)
+# C1.1 分字段处理 + 生成故障单字段
+div902 <- seq(10,44,1)
 ioC1$cut902 <- cut(ioC1$mean_902,div902)
 ioC1$sep902 <- as.numeric(gsub('^\\(|,.*$','',ioC1$cut902))
-div903 <- seq(26,50,2)
+div903 <- seq(26,43,0.5)
 ioC1$cut903 <- cut(ioC1$mean_903,div903)
 ioC1$sep903 <- as.numeric(gsub('^\\(|,.*$','',ioC1$cut903))
-div9023 <- seq(26,44,2)
+div9023 <- seq(26,44,0.5)
 ioC1$cut9023 <- cut(ioC1$mean_9023,div9023)
 ioC1$sep9023 <- as.numeric(gsub('^\\(|,.*$','',ioC1$cut9023))
-
+divRate <- c(seq(0,100,5))
+ioC1$cutRate <- cut(ioC1$rwRate,divRate)
+ioC1$sepRate <- as.numeric(gsub('^\\(|,.*$','',ioC1$cutRate))
 
 fC1 <- subset(tmp.f, svr_id %in% ioC1$svrid)
 fC1$sep902 <- ioC1$sep902[match(fC1$svr_id,ioC1$svrid)]
 fC1$sep903 <- ioC1$sep903[match(fC1$svr_id,ioC1$svrid)]
 fC1$sep9023 <- ioC1$sep9023[match(fC1$svr_id,ioC1$svrid)]
+fC1$sepRate <- ioC1$sepRate[match(fC1$svr_id,ioC1$svrid)]
 
+# C1.2 单字段分机型处理
 ioC1C <- subset(ioC1,dClass == 'C')
 ioC1TS <- subset(ioC1,dClass == 'TS')
 fC1C <- subset(fC1,dClass == 'C')
 fC1TS <- subset(fC1,dClass == 'TS')
 
-AFR902C <- data.frame(sep = div902,
-                    count = sapply(div902,function(x)sum(ioC1C$sep902 == x)),
-                    fcount = sapply(div902,function(x)sum(fC1C$sep902 == x)))
-AFR903C <- data.frame(sep = div903,
-                     count = sapply(div903,function(x)sum(ioC1C$sep903== x)),
-                     fcount = sapply(div903,function(x)sum(fC1C$sep903 == x)))
-AFR9023C <- data.frame(sep = div9023,
-                      count = sapply(div9023,function(x)sum(ioC1C$sep9023== x)),
-                      fcount = sapply(div9023,function(x)sum(fC1C$sep9023 == x)))
-AFR902C$AFR <- AFR902C$fcount/AFR902C$count*6
-AFR903C$AFR <- AFR903C$fcount/AFR903C$count*6
-AFR9023C$AFR <- AFR9023C$fcount/AFR9023C$count*6
-AFR902C <- subset(AFR902C,count > 100)
-AFR903C <- subset(AFR903C,count > 100)
-AFR9023C <- subset(AFR9023C,count > 100)
+ioAFR <- function(div,ioC,fC,attr){
+  AFR <- data.frame(sep = div,
+                    count = sapply(div,function(x)sum(ioC[[attr]] == x)),
+                    fcount = sapply(div,function(x)sum(fC[[attr]] == x)))
+  AFR$AFR <- AFR$fcount/AFR$count*6
+#   AFR <- subset(AFR,count > 100)
+  AFR
+}
+AFR902C <- ioAFR(div902,ioC1C,fC1C,'sep902')
+AFR903C <- ioAFR(div903,ioC1C,fC1C,'sep903')
+AFR9023C <- ioAFR(div9023,ioC1C,fC1C,'sep9023')
+AFRRateC <- ioAFR(divRate,ioC1C,fC1C,'sepRate')
 
-AFR902TS <- data.frame(sep = div902,
-                      count = sapply(div902,function(x)sum(ioC1TS$sep902== x)),
-                      fcount = sapply(div902,function(x)sum(fC1TS$sep902 == x)))
-AFR903TS <- data.frame(sep = div903,
-                      count = sapply(div903,function(x)sum(ioC1TS$sep903== x)),
-                      fcount = sapply(div903,function(x)sum(fC1TS$sep903 == x)))
-AFR9023TS <- data.frame(sep = div9023,
-                       count = sapply(div9023,function(x)sum(ioC1TS$sep9023== x)),
-                       fcount = sapply(div9023,function(x)sum(fC1TS$sep9023 == x)))
-AFR902TS$AFR <- AFR902TS$fcount/AFR902TS$count*6
-AFR903TS$AFR <- AFR903TS$fcount/AFR903TS$count*6
-AFR9023TS$AFR <- AFR9023TS$fcount/AFR9023TS$count*6
-AFR902TS <- subset(AFR902TS,count > 100)
-AFR903TS <- subset(AFR903TS,count > 100)
-AFR9023TS <- subset(AFR9023TS,count > 100)
+AFR902TS <- ioAFR(div902,ioC1TS,fC1TS,'sep902')
+AFR903TS <- ioAFR(div903,ioC1TS,fC1TS,'sep903')
+AFR9023TS <- ioAFR(div9023,ioC1TS,fC1TS,'sep9023')
+AFRRateTS <- ioAFR(divRate,ioC1TS,fC1TS,'sepRate')
 
-tmp <- AFR902C
+# C1.3 读写两字段处理
+rwTable <- colTableX(ioC1TS,c('sep902','sep903'))
+rwTable <- cbind(rwTable,splitToDF(rwTable$item))
+rwTable$rate <- NULL
+names(rwTable) <- c('item','count','Read','Write')
+rwTable$Read <- as.numeric(levels(rwTable$Read)[rwTable$Read])
+rwTable$Write <- as.numeric(levels(rwTable$Write)[rwTable$Write])
+
+rwTablef <- colTableX(fC1TS,c('sep902','sep903'))
+rwTablef <- cbind(rwTablef,splitToDF(rwTablef$item))
+rwTablef$rate <- NULL
+names(rwTablef) <- c('item','count','Read','Write')
+rwTablef$Read <- as.numeric(levels(rwTablef$Read)[rwTablef$Read])
+rwTablef$Write <- as.numeric(levels(rwTablef$Write)[rwTablef$Write])
+
+rwTable$fcount <- 0
+rwTable$fcount <- rwTablef$count[match(rwTable$item,rwTablef$item)]
+# rwTable$fcount[is.na(rwTable$fcount)] <- 0
+rwTable$AFR <- rwTable$fcount/rwTable$count*6
+
+rwTable <- rwTable[,c('Read','Write','fcount','count','AFR')]
+ggplot(subset(rwTable,count > 100),aes(x = Read,y = Write, fill = AFR)) + geom_tile()
+
+AFR9023 <- ioAFR(div9023,ioC1,fC1,'sep9023')
+tmp <- subset(AFR9023TS,count > 10)
 ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
+ggplot(ioC1TS,aes(x = sep9023,fill = dev_class_id)) + geom_bar()
+ggplot(subset(tmp),aes(x = sep,y = AFR*6/12)) + geom_line()
 
-tmp <- AFR903C
-ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
+# C2 存储型机器根据总量分类，以年读写总量8T分界
+ioC2.TS.L <- subset(ioC1,dClass == 'TS' & sep9023 >= 33)
+ioC2.TS.S <- subset(ioC1,dClass == 'TS' & sep9023 < 33)
+fC2.TS.L <- subset(fC1,dClass == 'TS' & sep9023 >= 33)
+fC2.TS.S <- subset(fC1,dClass == 'TS' & sep9023 < 33)
 
-tmp <- AFR9023C
-ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
 
-tmp <- AFR902TS
-ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
 
-tmp <- AFR903TS
-ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
 
-tmp <- AFR9023TS
-ggplot(tmp,aes(x = sep,y = count)) + geom_bar(stat = 'identity')
-ggplot(tmp,aes(x = sep,y = AFR)) + geom_line()
+
 # write.table(AFR902C,file.path(dir_data,'AFR902C.csv'),quote = F,row.names = F,sep = ',')
 # write.table(AFR903C,file.path(dir_data,'AFR903C.csv'),quote = F,row.names = F,sep = ',')
 # write.table(AFR902TS,file.path(dir_data,'AFR902TS.csv'),quote = F,row.names = F,sep = ',')
 # write.table(AFR903TS,file.path(dir_data,'AFR903TS.csv'),quote = F,row.names = F,sep = ',')
 # 读写占比计算
-ioC1$rwRateRnd <- round(ioC1$rwRate*20)/20
-rwRateTable <- colTableX(ioC1,c('rwRateRnd','sep9023'))
-rwRateTable <- cbind(rwRateTable,splitToDF(rwRateTable$item))
-rwRateTable$item <- NULL
-rwRateTable$rate <- NULL
-names(rwRateTable) <- c('count','rate','total')
-rwRateTable$rate <- as.numeric(levels(rwRateTable$rate)[rwRateTable$rate])
-rwRateTable$total <- as.numeric(levels(rwRateTable$total)[rwRateTable$total])
-ggplot(subset(rwRateTable,count > 100),aes(x = rate,y = total,fill = log2(count))) + geom_tile()
+# ioC1$rwRateRnd <- round(ioC1$rwRate*100)/100
+# rwRateTable <- colTableX(ioC1,c('rwRateRnd','sep9023'))
+# rwRateTable <- cbind(rwRateTable,splitToDF(rwRateTable$item))
+# rwRateTable$item <- NULL
+# rwRateTable$rate <- NULL
+# names(rwRateTable) <- c('count','rate','total')
+# rwRateTable$rate <- as.numeric(levels(rwRateTable$rate)[rwRateTable$rate])
+# rwRateTable$total <- as.numeric(levels(rwRateTable$total)[rwRateTable$total])
+# ggplot(subset(rwRateTable,count > 100),aes(x = rate,y = total,fill = log2(count))) + geom_tile()
 
