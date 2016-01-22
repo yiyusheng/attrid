@@ -53,9 +53,16 @@ ioAFR <- function(div,ioC,fC,attr){
                     count = sapply(div,function(x)sum(ioC[[attr]] == x)),
                     fcount = sapply(div,function(x)sum(fC[[attr]] == x)))
   AFR$AFR <- AFR$fcount/AFR$count*6
-#   AFR <- subset(AFR,count > 100)
+  AFR <- subset(AFR,count > 100)
   AFR
 }
+#所有机器
+AFR902 <- ioAFR(div902,ioC1,fC1,'sep902')
+AFR903 <- ioAFR(div903,ioC1,fC1,'sep903')
+AFR9023 <- ioAFR(div9023,ioC1,fC1,'sep9023')
+AFRRate <- ioAFR(divRate,ioC1,fC1,'sepRate')
+
+#分机型
 AFR902C <- ioAFR(div902,ioC1C,fC1C,'sep902')
 AFR903C <- ioAFR(div903,ioC1C,fC1C,'sep903')
 AFR9023C <- ioAFR(div9023,ioC1C,fC1C,'sep9023')
@@ -65,6 +72,19 @@ AFR902TS <- ioAFR(div902,ioC1TS,fC1TS,'sep902')
 AFR903TS <- ioAFR(div903,ioC1TS,fC1TS,'sep903')
 AFR9023TS <- ioAFR(div9023,ioC1TS,fC1TS,'sep9023')
 AFRRateTS <- ioAFR(divRate,ioC1TS,fC1TS,'sepRate')
+
+# 读写比例画图
+ggplot(subset(AFRRateC,sep>= 35),aes(x=sep,y=AFR)) + geom_bar(stat='identity')
+ggplot(subset(AFRRateTS,sep< 95),aes(x=sep,y=AFR/12)) + geom_bar(stat='identity')
+ggplot(subset(AFRRate),aes(x=sep,y=AFR/12)) + geom_bar(stat='identity')
+# 读画图
+ggplot(subset(AFR902C,sep > 15 & sep < 34),aes(x=sep,y=AFR)) + geom_bar(stat='identity')
+ggplot(subset(AFR902TS),aes(x=sep,y=AFR/12)) + geom_bar(stat='identity')
+ggplot(subset(AFR902),aes(x=sep,y=AFR)) + geom_bar(stat='identity')
+# 写画图
+
+
+
 
 # C1.3 读写两字段处理
 rwTable <- colTableX(ioC1TS,c('sep902','sep903'))

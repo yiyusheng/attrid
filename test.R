@@ -8,15 +8,55 @@ source('D:/Git/R_Function/Rfun.R')
 source(file.path(dir_code,'attr_function.R'))
 
 #@@@ LOAD DATA @@@#
-load(file.path(dir_data,'load_ftr_attrid.Rda'))
+# load(file.path(dir_data,'load_ftr_attrid.Rda'))
 ############################################################################################
-# T1. data1中三字段分位点
-load(file.path(dir_data,'data1Quan.Rda'))
-q902 <- data.frame(quan = seq(0,100,0.1),value = q902,cl = 'Read')
-q903 <- data.frame(quan = seq(0,100,0.1),value = q903,cl = 'write')
-q999 <- data.frame(quan = seq(0,100,0.1),value = q999,cl = 'Util')
-q <- rbind(q902,q903,q999)
-row.names(q) <- NULL
-ggplot(q,aes(x = quan,y = log2(value),group = cl,color = cl)) + geom_line()
+# # T1. data1中三字段分位点
+# load(file.path(dir_data,'data1Quan.Rda'))
+# q902 <- data.frame(quan = seq(0,100,0.1),value = q902,cl = 'Read')
+# q903 <- data.frame(quan = seq(0,100,0.1),value = q903,cl = 'write')
+# q999 <- data.frame(quan = seq(0,100,0.1),value = q999,cl = 'Util')
+# q <- rbind(q902,q903,q999)
+# row.names(q) <- NULL
+# ggplot(q,aes(x = quan,y = log2(value),group = cl,color = cl)) + geom_line()
 
-# T2.
+# T2. 频谱图
+load(file.path(dir_data,'failIOSample.Rda'))
+# svrid_cpl <- tapply(failIO$svrid,factor(failIO$svrid),length)
+# svrid_full <- names(svrid_cpl)[as.numeric(svrid_cpl) == 17280]
+# failIOSample <- factorX(subset(failIO,svrid %in% sample(svrid_full,100)))
+# save(failIOSample,file = file.path(dir_data,'failIOSample.Rda'))
+failIO <- failIOSample
+
+data <- failIO$a902[failIO$svrid == levels(failIO$svrid)[4]]   #数据选择
+data <- subset(failIO,svrid %in% levels(failIO$svrid)[4])
+
+#FT之后三个字段最高的三种频率
+maxFreq <- function(sid){
+  L <- 3
+#   sprintf(print(sid))
+  data <- subset(failIO,svrid == sid)
+  #计算
+  fftR <- abs(fft(data$a902))[2:(N/2)]
+  fftW <- abs(fft(data$a903))[2:(N/2)]
+  fftU <- abs(fft(data$a999))[2:(N/2)]
+  #数据整理
+  df <- data.frame(f = f[2:(N/2)],fftR,fftW,fftU);
+  Freq <- c(df$f[order(df$fftR,decreasing = T)][1:L],
+            df$f[order(df$fftW,decreasing = T)][1:L],
+            df$f[order(df$fftU,decreasing = T)][1:L],
+            df$fftR[order(df$fftR,decreasing = T)][1:L],
+            df$fftW[order(df$fftW,decreasing = T)][1:L],
+            df$fftU[order(df$fftU,decreasing = T)][1:L])
+}
+
+#参数设置与计算
+fs <- 1/300;N <- 17280;
+n <- 0:(N-1);t <- n/fs;
+f <- n*fs/N
+sidSet <- levels(failIO$svrid)[1:10]
+R <- data.frame(svrid = sidSet,t(sapply(sidSet,maxFreq)))
+R[,2:10] <- 1/R[,2:10]/86400
+row.names(R) <- NULL
+
+load(file.path(dir_data,'fourierTransMThH.Rda'))
+R1 <- subset(frT,svrid %in% R$svrid)
