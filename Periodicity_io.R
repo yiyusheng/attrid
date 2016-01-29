@@ -73,4 +73,4 @@ count <- 20
 r <- ioplot(as.character(smpSvrid[5]))
 staSmp[count,c('period','corr')] <- c(F,T)
 
-# P3
+# P3.使用SVM判断周期性
