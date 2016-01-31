@@ -200,3 +200,18 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
     }
   }
 }
+
+# F10.返回多个值时用list[]分别接收
+# from https://raw.githubusercontent.com/ggrothendieck/gsubfn/master/R/list.R
+list <- structure(NA,class="result")
+"[<-.result" <- function(x,...,value) {
+  args <- as.list(match.call())
+  args <- args[-c(1:2,length(args))]
+  length(value) <- length(args)
+  for(i in seq(along=args)) {
+    a <- args[[i]]
+    if(!missing(a)) eval.parent(substitute(a <- v,list(a=a,v=value[[i]])))
+  }
+  x
+}
+

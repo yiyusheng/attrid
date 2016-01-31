@@ -95,3 +95,61 @@ m1
 summary(m1)
 pred1<-fitted(m1)
 table(pred1,dataSim[,3])
+
+# T4.时域与频域数据观察
+# load(file.path(dir_data,'failIO.Rda'))
+# svrCount <- tapply(failIO$svrid,factor(failIO$svrid),length)
+# svrCount <- data.frame(svrid = names(svrCount),count = as.numeric(svrCount))
+# data <- subset(failIO,svrid %in% sample(svrCount$svrid[svrCount$count == 17280],30))
+# data <- factorX(data)
+# row.names(data) <- NULL
+# save(data,file = file.path(dir_data,'freqFieldWatch.Rda'))
+load(file.path(dir_data,'freqFieldWatch.Rda'))
+fs <- 1/300
+N <- 17280
+
+mtplot <- function(sid){
+  x <- subset(data,svrid == sid,c('a902','timeNew'))
+  names(x) <- c('value','time')
+  x <- x[x$value <= quantile(x$value,0.99),]
+  x$value[x$value < 0] <- 0
+  N <- length(x$value);n <- 0:(N-1);t <- n/fs;
+  f <- n*fs/N;fft <- abs(fft(x$value))
+  f <- f[2:(N/2)];fft <- fft[2:(N/2)]
+  dataV <- data.frame(time = x$time,value = x$value)
+  dataF <- data.frame(freq = f,fft)
+  p1 <- ggplot(dataV,aes(x = time,y = value)) + geom_line() + ggtitle(sid)
+  p2 <- ggplot(dataF,aes(x = freq,y = fft)) + geom_line(stat = 'identity')
+  multiplot(p1,p2,cols = 2)
+  dataF <- dataF[order(dataF$fft,decreasing = T),];
+  dataF$days <- 1/dataF$freq/86400
+  dataF$round <- round(dataF$days)
+  dataF$absR <- abs(dataF$days - dataF$round)
+  dataF$realPeriod <- dataF$absR <= 0.05
+  dataF$fftRate <- dataF$fft/sum(dataF$fft)*100
+  dataFS <- subset(dataF,days > 1/3 & days < 10 & fft > 0 & realPeriod == T)
+  return(list(dataV,dataFS,dataF))
+}
+
+sid <- levels(data$svrid)
+list[rV,rFS,rF] <- mtplot(sid[7]);print(rFS[1:5,c('fft','round','fftRate','absR')])
+
+# T5. 傅里叶变换学习
+xs <- seq(-2*pi,2*pi,pi/100)
+wave.1 <- sin(3*xs)
+wave.2 <- sin(10*xs)
+par(mfrow = c(1, 2))
+plot(xs,wave.1,type="l",ylim=c(-1,1)); abline(h=0,lty=3)
+plot(xs,wave.2,type="l",ylim=c(-1,1)); abline(h=0,lty=3)
+
+wave.3 <- 0.5 * wave.1 + 0.25 * wave.2
+plot(xs,wave.3,type="l"); title("Eg complex wave"); abline(h=0,lty=3)
+
+wave.4 <- wave.3
+wave.4[wave.3>0.5] <- 0.5
+plot(xs,wave.4,type="l",ylim=c(-1.25,1.25)); title("overflowed, non-linear complex wave"); abline(h=0,lty=3)
+
+repeat.xs     <- seq(-2*pi,0,pi/100)
+wave.3.repeat <- 0.5*sin(3*repeat.xs) + 0.25*sin(10*repeat.xs)
+plot(xs,wave.3,type="l"); title("Repeating pattern")
+points(repeat.xs,wave.3.repeat,type="l",col="red"); abline(h=0,v=c(-2*pi,0),lty=3)
