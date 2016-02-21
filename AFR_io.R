@@ -308,3 +308,49 @@ load(file = file.path(dir_data,'smart_1208.Rda'))
 reg_ip <- "((\\d+\\.){3}\\d+)(.*)"
 smart <- factorX(subset(smart_1208,grepl(reg_ip,ip) & modelNum != ''))
 a <- unique(smart$modelNum)
+
+# P10.对读写负载的占比对故障率的影响研究
+tmp.io$total <- tmp.io$mean_902 + tmp.io$mean_903
+tmp.io$Rperc <- tmp.io$mean_902/tmp.io$total*100
+div_rate <- c(0,30,70,100)
+# div_rate <- c(0,20,40,60,80,100)
+tmp.io$cut_rate <- cut(tmp.io$Rperc,div_rate,include.lowest = T)
+tmp.io$lb_rate <- factor(gsub('^\\(|^\\[|,.*$','',tmp.io$cut_rate))
+levels(tmp.io$lb_rate) = c('Write Workload Dominant','Balance','Read Workload Dominant')
+tmp.f$lb_rate <- tmp.io$lb_rate[match(tmp.f$svr_id,tmp.io$svrid)]
+
+#分机型处理
+AFR_attr_notime <- function(f,io,attr,diskCount,dev = ""){
+  if(dev != ""){
+    f <- subset(f,dClass == dev)
+    io <- subset(io,dClass == dev)
+  }
+  eval(parse(text = sprintf('tio <- tableX(io$%s)',attr)))
+  eval(parse(text = sprintf('tf <- tableX(f$%s)',attr)))
+  tiof <- merge(tio,tf,by = 'item',all = T)
+  names(tiof) <- c('item','count_io','rate_io','count_f','rate_f')
+  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*6
+  if(dev == 'C'){
+    tiof$class <- 'Non-Storage Servers'
+  }else if(dev == 'TS'){
+    tiof$class <- 'Storage Servers'
+  }
+  tiof <- tiof[,c('item','class','AFR','count_f','count_io','rate_f','rate_io')]
+}
+AFR_rateC <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',1,dev = 'C')
+AFR_rateTS <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',12,dev = 'TS')
+AFR_rate <- rbind(AFR_rateC,AFR_rateTS)
+p <- ggplot(AFR_rate,aes(x = item,y = AFR,fill = class)) + geom_bar(stat = 'identity',position = 'dodge') +
+  xlab('I/O Workload Distribution') + ylab('Annual Failure Rate (%)') + ggtitle('I/O Workload Distribution and AFR') +
+  guides(fill = guide_legend(title=NULL)) + 
+  theme(axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 20),
+        plot.title = element_text(size = 26, face = 'bold'),
+        legend.position = c(.6,.8),
+        legend.justification = c(0,0),
+        legend.background = element_rect(fill = alpha('grey',0.5)))
+print(p)
+ggsave(file=file.path(dir_data,'IO_workload_distribution',paste('IO_workload_distribution','.png',sep='')), 
+       plot=p, width = 16, height = 12, dpi = 100)

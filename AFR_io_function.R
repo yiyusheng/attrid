@@ -109,7 +109,7 @@ AFR_value <- function(p3.f,p3.cmdb,p3.io,attr,levelCount,lastYears,diskCount){
 
 
 
-#对任何一个字段
+#对任何一个字段，不同时间段的故障率
 AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
   # 求区间
   f <- factorX(f)
