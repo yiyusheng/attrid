@@ -20,21 +20,17 @@ source(file.path(dir_code,'AFR_io_prepare.R'))
 
 
 #########################################################################################################
-# # # P2.计算年故障率
-# cm1 <- AFR(subset(tmp.f,dev_class_id == 'C1'),subset(tmp.cmdb,dev_class_id == 'C1'),
-#           lastYears,1)
-# cm2 <- AFR(subset(tmp.f,dev_class_id != 'C1'),subset(tmp.cmdb,dev_class_id != 'C1'),
-#           lastYears,12)
-# # 
-# cmColNeed <- c('idx','item.x','count.x','count.y','AFR')
-# cm1 <- cm1[,cmColNeed]
-# cm1$class <- 'non-storage servers'
-# cm2 <- cm2[,cmColNeed]
-# cm2$class <- 'storage servers'
-# cm <- rbind(cm1,cm2)
-# # plotCol <- c('item.x','class','AFR')
-# # naFill <- cbind(expand.grid(item.x = levels(cm$item.x),class = levels(factor(cm$class))),AFR = NA)
-# # AFR_plot(rbind(subset(cm,,plotCol),naFill),'Ship Time and Annual Failure Rate',-2)
+# # P2.计算年故障率
+cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',1,dev = 'C')
+cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',12,dev = 'TS')
+cm3 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',12,dev = 'TS1T')
+cm4 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',12,dev = 'TS2T')
+cmDev <- AFR_attr_notime(tmp.f,tmp.cmdb,'dev_class_id','dev_class_id',1)
+cm <- rbind(cm1,cm2)
+cm <- factorX(subset(cm,!is.na(AFR) & item != '6'))
+plotCol <- c('item','class','AFR')
+naFill <- cbind(expand.grid(item = levels(cm$item),class = levels(factor(cm$class))),AFR = NA)
+AFR_plot(rbind(subset(cm,,plotCol),naFill),'Ship Time and Annual Failure Rate',-2)
 # # 
 # P3.分IO计算年故障率,将3个IO字段各自根据分位点分成N档，把档次标出
 #C类
@@ -319,27 +315,11 @@ tmp.io$lb_rate <- factor(gsub('^\\(|^\\[|,.*$','',tmp.io$cut_rate))
 levels(tmp.io$lb_rate) = c('Write Workload Dominant','Balance','Read Workload Dominant')
 tmp.f$lb_rate <- tmp.io$lb_rate[match(tmp.f$svr_id,tmp.io$svrid)]
 
-#分机型处理
-AFR_attr_notime <- function(f,io,attr,diskCount,dev = ""){
-  if(dev != ""){
-    f <- subset(f,dClass == dev)
-    io <- subset(io,dClass == dev)
-  }
-  eval(parse(text = sprintf('tio <- tableX(io$%s)',attr)))
-  eval(parse(text = sprintf('tf <- tableX(f$%s)',attr)))
-  tiof <- merge(tio,tf,by = 'item',all = T)
-  names(tiof) <- c('item','count_io','rate_io','count_f','rate_f')
-  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*6
-  if(dev == 'C'){
-    tiof$class <- 'Non-Storage Servers'
-  }else if(dev == 'TS'){
-    tiof$class <- 'Storage Servers'
-  }
-  tiof <- tiof[,c('item','class','AFR','count_f','count_io','rate_f','rate_io')]
-}
 AFR_rateC <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',1,dev = 'C')
 AFR_rateTS <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',12,dev = 'TS')
 AFR_rate <- rbind(AFR_rateC,AFR_rateTS)
+
+#画图
 p <- ggplot(AFR_rate,aes(x = item,y = AFR,fill = class)) + geom_bar(stat = 'identity',position = 'dodge') +
   xlab('I/O Workload Distribution') + ylab('Annual Failure Rate (%)') + ggtitle('I/O Workload Distribution and AFR') +
   guides(fill = guide_legend(title=NULL)) + 
