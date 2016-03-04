@@ -239,37 +239,88 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 
 # T5.分析902与903的波动
 
-# T5.1 计算波动
-data$a902l <- data$a902
-data$a903l <- data$a903
-data$fluc902 <- 0
-data$fluc903 <- 0
-data$fluc902[1:(nrow(data)-1)] <- data$a902l[2:nrow(data)] - data$a902l[1:(nrow(data)-1)]
-data$fluc903[1:(nrow(data)-1)] <- data$a903l[2:nrow(data)] - data$a903l[1:(nrow(data)-1)]
-data$svrid_day <- paste(data$svrid,data$time,sep='_')
-r <- by(data[,c('a902l','a903l','fluc902','fluc903')],data$svrid_day,function(x){
-  idx902 <- which(abs(x$fluc902) == max(abs(x$fluc902)))[1]
-  idx903 <- which(abs(x$fluc903) == max(abs(x$fluc903)))[1]
-  list(idx902,maxV902 = x$a902l[idx902],maxF902 = x$fluc902[idx902],
-       idx903,maxV903 = x$a903l[idx903],maxF903 = x$fluc903[idx903])
-  })
+# # T5.1 计算每天最大波动
+# data$a902l <- data$a902
+# data$a903l <- data$a903
+# data$fluc902 <- 0
+# data$fluc903 <- 0
+# data$fluc902[1:(nrow(data)-1)] <- data$a902l[2:nrow(data)] - data$a902l[1:(nrow(data)-1)]
+# data$fluc903[1:(nrow(data)-1)] <- data$a903l[2:nrow(data)] - data$a903l[1:(nrow(data)-1)]
+# 
+# system.time(r <- by(data[,c('svrid','time','a902l','a903l','fluc902','fluc903')],factor(data$svrid),function(xx){
+#   rr <- by(xx,xx$time,function(x){
+#     idx902 <- which(abs(x$fluc902) == max(abs(x$fluc902)))[1]
+#     idx903 <- which(abs(x$fluc903) == max(abs(x$fluc903)))[1]
+#     list(svrid = as.character(x$svrid[1]),time = x$time[1],count = nrow(x),
+#          cv902 = sd(x$a902)/mean(x$a902),idx902 = idx902,maxV902 = x$a902l[idx902],maxF902 = x$fluc902[idx902],
+#          cv903 = sd(x$a903)/mean(x$a903),idx903 = idx903,maxV903 = x$a903l[idx903],maxF903 = x$fluc903[idx903])
+#   })
+#   rr <- data.frame(matrix(unlist(rr),byrow = T,nrow = length(rr)))
+# }))
+# fluc <- do.call('rbind',r)
+# row.names(fluc) <- NULL
+# names(fluc) <- c('svrid','time','count',
+#                  'cv902','idx902','maxV902','maxF902',
+#                  'cv903','idx903','maxV903','maxF903')
 
-fluc <- strsplit(names(r),'_')
-fluc <- data.frame(matrix(unlist(fluc),byrow = T,nrow = length(fluc)))
-fluc.data <- data.frame(matrix(unlist(r),byrow = T,nrow = length(r)))
-names(fluc) <- c('svrid','time')
-names(fluc.data) <- c('idx902','maxV902','maxF902',
-                      'idx903','maxV903','maxF903')
-fluc <- cbind(fluc,fluc.data)
+
+
+# fluc <- strsplit(names(r),'_')
+# fluc <- data.frame(matrix(unlist(fluc),byrow = T,nrow = length(fluc)))
+# fluc.data <- data.frame(matrix(unlist(r),byrow = T,nrow = length(r)))
+# names(fluc) <- c('svrid','time')
+# names(fluc.data) <- c('idx902','maxV902','maxF902',
+#                       'idx903','maxV903','maxF903')
+# fluc <- cbind(fluc,fluc.data)
 # 对于因为下降导致的最大差异，找下降到的那个值
-fluc$maxV902[fluc$maxF902 < 0] <- fluc$maxV902[fluc$maxF902 < 0] + fluc$maxF902[fluc$maxF902 < 0]
-fluc$maxV903[fluc$maxF903 < 0] <- fluc$maxV903[fluc$maxF903 < 0] + fluc$maxF903[fluc$maxF903 < 0]
+# fluc$maxV902[fluc$maxF902 < 0] <- fluc$maxV902[fluc$maxF902 < 0] + fluc$maxF902[fluc$maxF902 < 0]
+# fluc$maxV903[fluc$maxF903 < 0] <- fluc$maxV903[fluc$maxF903 < 0] + fluc$maxF903[fluc$maxF903 < 0]
 
-# T5.2分析波动
-flucLg <- fluc
-flucLg[,c(4,5,7,8)] <- apply(flucLg[,c(4,5,7,8)],2,function(x){
-  x[x <= 1 & x >= -1] <- 1
-  x
-})
+# T5.2 原数据采样之后进行波动分析（无合适结果）
+# flucLg <- fluc
+# flucLg[,c(4,5,7,8)] <- apply(flucLg[,c(4,5,7,8)],2,function(x){
+#   x[x <= 1 & x >= -1] <- 1
+#   x
+# })
+# load(file.path(dir_data,'oriDiff.Rda'))
+# flucSmp <- ioReturn
+# flucSmp[,1:4] <- apply(flucSmp[,1:4],2,function(x){
+#   x[x <= 1 & x >= -1] <- 1
+#   x
+# })
+# flucSmp$a902l <- log2(abs(flucSmp$a902))*sign(flucSmp$a902)
+# flucSmp$d902l <- log2(abs(flucSmp$d902))*sign(flucSmp$d902)
+# flucSmp$a903l <- log2(abs(flucSmp$a903))*sign(flucSmp$a903)
+# flucSmp$d903l <- log2(abs(flucSmp$d903))*sign(flucSmp$d903)
+# flucSmp$m902 <- abs(flucSmp$d902)/abs(flucSmp$a902)
+# flucSmp$m903 <- abs(flucSmp$d903)/abs(flucSmp$a903)
+# a <- flucSmp[1:10000,]
+# #分机型
+# flucSmpC <- subset(flucSmp,class == 'C')
+# flucSmpTS <- subset(flucSmp,class == 'TS')
+# 
+# p1 <- ggplot(flucSmpC[sample(nrow(flucSmpTS),100000),],aes(x = a902,y=d902))+geom_point(alpha = 0.3)
+# print(p1)
+# 
+# p2 <- ggplot(flucSmpC[sample(nrow(flucSmpTS),100000),],aes(x = a903l,y=d903l))+geom_point(alpha = 0.3)
+# print(p2)
+# 
+# p3 <- ggplot(flucSmpC[sample(nrow(flucSmpTS),100000) & flucSmpC > 1,],aes(x = m902,y=m902))+geom_point(alpha = 0.3)
+# print(p3)
+
+# T6.计算每天每台机器硬盘利用率连续超过100的数据点数.
+# 因为样本数据中超过100的数量太少，取超过5的999作为例子
+r <- by(data[,c('svrid','time','a999')],data$svrid),function(x){
+  rr <- by(x[,c('svrid','a999')],x$svrid,function(xx){
+    idx <- which(xx$a999 > 5)
+    l <- length(idx)
+    diff <- idx[2:l] - idx[1:(l-1)]
+    idx1 <- c(which(diff != 1),l)
+    l1 <- length(idx1)
+    diff1 <- idx1[2:l1] - idx1[1:(l1-1)]
+    diff1 <- diff1 - 1
+    rrr <- max(diff1)
+  })
+}
 
 # TEST

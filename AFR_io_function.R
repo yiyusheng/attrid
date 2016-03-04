@@ -120,8 +120,8 @@ AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
   f <- factorX(f)
   cmdb <- factorX(cmdb)
   if (dev != ''){
-    f <- subset(f,dClass == dev)
-    cmdb <- subset(cmdb,dClass == dev)
+    f <- subset(f,grepl(dev,dClass))
+    cmdb <- subset(cmdb,grepl(dev,dClass))
   }
   divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
   divF <- seq(0,lastYears)
@@ -164,7 +164,7 @@ AFR_attr_notime <- function(f,io,attr1,attr2,diskCount,dev = ""){
   eval(parse(text = sprintf('tf <- tableX(f$%s)',attr1)))
   tiof <- merge(tio,tf,by = 'item',all = T)
   names(tiof) <- c('item','count_io','rate_io','count_f','rate_f')
-  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*6
+  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*6*100
   if(dev == 'C'){
     tiof$class <- 'Non-Storage Servers'
   }else if(dev == 'TS'){
@@ -177,6 +177,14 @@ AFR_attr_notime <- function(f,io,attr1,attr2,diskCount,dev = ""){
     tiof$class <- attr2
   }
   tiof <- tiof[,c('item','class','AFR','count_f','count_io','rate_f','rate_io')]
+  
+  item_num <- as.numeric(fct2ori(tiof$item))
+  if(all(!is.na(item_num))){
+    tiof$item <- item_num
+    tiof <- tiof[order(tiof$item),]
+    row.names(tiof) <- NULL
+  }
+  tiof
 }
 
 AFR_value_plot <- function(cutMerge,title,yl,
