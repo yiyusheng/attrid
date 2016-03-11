@@ -40,6 +40,7 @@ mean_io <- subset(mean_io,svrid %in% factor(cmdbio$svr_asset_id))
 tmp.cmdb <- cmdbio
 tmp.f <- subset(data.f,svr_id %in% cmdbio$svr_asset_id)
 tmp.f$total <- tmp.cmdb$total[match(tmp.f$ip,tmp.cmdb$ip)]
+tmp.f$shTime <- tmp.cmdb$shTime[match(tmp.f$ip,tmp.cmdb$ip)]
 tmp.f <- factorX(tmp.f)
 tmp.io <- mean_io
 tmp.io$dev_class_id <- cmdb$dev_class_id[match(tmp.io$svrid,cmdb$svr_asset_id)]

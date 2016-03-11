@@ -215,3 +215,25 @@ list <- structure(NA,class="result")
   x
 }
 
+## F11.为了进行log2处理，把小于1大于0的值设为1,大于-1小于0的值设为-1
+# 后一个函数将(-Inf,Inf)的值用log2映射到(-Inf,Inf),其中[-1,1]映射为0.
+mdf4log2 <- function(x){
+  x[x < 1 & x >= 0] <- 1
+  x[x > -1 & x < 0] <- -1
+  x
+}
+log4neg <- function(x){
+  x <- mdf4log2(x)
+  x[x > 0] <- log2(x[x > 0])
+  x[x < 0] <- log2(abs(x[x < 0])) * -1
+  x
+}
+
+# F12.将df的item以括号后第一个数字的顺序排序,用于方便的画图
+item_order <- function(df,attr = 'item'){
+  od <- as.numeric(gsub('^\\[|^\\(|,.*$','',df[[attr]]))
+  df[attr] <- factor(df[[attr]],levels = df[[attr]][order(od)])
+  df <- df[order(od),] 
+  row.names(df) <- NULL
+  df
+}

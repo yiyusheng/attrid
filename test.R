@@ -10,6 +10,94 @@ source(file.path(dir_code,'attr_function.R'))
 #@@@ LOAD DATA @@@#
 load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # load(file.path(dir_data,'load_ftr_attrid.Rda'))
+
+#@@@ FUNCTION @@@#
+# F1.对每台机器的某个属性画图，一周一个图
+mtwplot <- function(sid,attr){
+  sidp <- gsub('.*_','',sid)
+  print(sid)
+  x <- subset(data,svrid == sidp,c(attr,'timeNew'))
+  if(length(attr) == 1){
+    names(x) <- c('value','time')
+    x$value[x$value < 0|is.na(x$value)] <- 0
+    dataV <- data.frame(time = x$time,value = x$value)
+  }else{
+    names(x) <- c('value1','value2','time')
+    x$value1[x$value1 < 0|is.na(x$value1)] <- 0
+    x$value2[x$value2 < 0|is.na(x$value2)] <- 0
+    dataV <- melt(x,id.vars = 'time')
+    dataV$value[dataV$value < 1 & dataV$value > 0] <- 1
+    dataV$value[dataV$value == 0] <- 0.5
+    dataV$value <- log2(dataV$value)
+    dataV$variable <- as.character(dataV$variable)
+    dataV$variable[dataV$variable == 'value1'] <- attr[1]
+    dataV$variable[dataV$variable == 'value2'] <- attr[2]
+    dataV$variable <- factor(dataV$variable)
+  }
+  
+  p <- list()
+  for(i in 1:9){
+    if(attr[1] == 'a999'){
+      p[[i]] <- ggplot(subset(dataV,time >= cut[i] & time < cut[i+1]),aes(x = time,y = value)) + 
+        geom_line() + ggtitle(paste(sid,'Week',i,sep='_'))
+    }else if(length(attr) != 1){
+      p[[i]] <- ggplot(subset(dataV,time >= cut[i] & time < cut[i+1]),aes(x = time,y = value,color = variable)) + 
+        geom_line() + ggtitle(paste(sid,'Week',i,sep='_'))
+      }
+    else{
+      dv <- subset(dataV,time >= cut[i] & time < cut[i+1])
+      dv$value[dv$value <= 1] <- 1
+      p[[i]] <- ggplot(dv,aes(x = time,y = log2(value))) + 
+        geom_line() + ggtitle(paste(sid,'Week',i,sep='_')) + ylab('value')
+    }
+  }
+  if(attr[1] == 'a999'){
+    tarDir <- 'test200-util'
+  }else if(attr[1] == 'a902'){
+    tarDir <- 'test200-read'
+  }else if(attr[1] == 'a903'){
+    tarDir <- 'test200-write'
+  }else if(length(attr) == 2){
+    tarDir <- 'test700-speed'
+  }
+  png(filename = file.path(dir_data,'FailIOCoarse',tarDir,'Week',paste(sid,'-Week.jpg',sep = '')),
+      width = 1200, height = 1200, bg = "white")
+  multiplot(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]],p[[6]],p[[7]],p[[8]],p[[9]],cols = 1)
+  dev.off()
+  p
+}
+
+# F2.对数值和fft作图
+mtplot <- function(sid){
+  sidp <- gsub('.*_','',sid)
+  print(sid)
+  x <- subset(data,svrid == sidp,c('a999','timeNew'))
+  names(x) <- c('value','time')
+  x$value[x$value < 0] <- 0
+  dataVo <- data.frame(time = x$time,value = x$value)
+  x <- x[x$value <= quantile(x$value,0.99),]
+  N <- length(x$value);n <- 0:(N-1);t <- n/fs;
+  f <- n*fs/N;fft <- abs(fft(x$value))
+  f <- f[2:(N/2)];fft <- fft[2:(N/2)]
+  dataV <- data.frame(time = x$time,value = x$value)
+  dataF <- data.frame(freq = f,fft)
+  p1 <- ggplot(dataV,aes(x = time,y = value)) + 
+    geom_line() + ggtitle(paste(sid,'time field',sep='_'))
+  p2 <- ggplot(dataF,aes(x = freq,y = fft)) + 
+    geom_line(stat = 'identity') + ggtitle(paste(sid,'freq field',sep='_'))
+  png(filename = file.path(dir_data,'FailIOCoarse','test200-util',paste(sid,'.jpg',sep = '')),
+      width = 800, height = 600, bg = "white")
+  multiplot(p1,p2,cols = 2)
+  dev.off()
+  dataF <- dataF[order(dataF$fft,decreasing = T),];
+  dataF$days <- 1/dataF$freq/86400
+  dataF$round <- round(dataF$days)
+  dataF$absR <- abs(dataF$days - dataF$round)
+  dataF$realPeriod <- dataF$absR <= 0.05
+  dataF$fftRate <- dataF$fft/sum(dataF$fft)*100
+  dataFS <- subset(dataF,days > 1/3 & days < 10 & fft > 0 & realPeriod == T)
+  return(list(dataVo,dataFS,dataF))
+}
 ############################################################################################
 # # T1. data1中三字段分位点
 # load(file.path(dir_data,'data1Quan.Rda'))
@@ -153,74 +241,11 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # fs <- 1/300
 # N <- 17280
 # 
-# #对数值和fft作图
-# mtplot <- function(sid){
-#   sidp <- gsub('.*_','',sid)
-#   print(sid)
-#   x <- subset(data,svrid == sidp,c('a999','timeNew'))
-#   names(x) <- c('value','time')
-#   x$value[x$value < 0] <- 0
-#   dataVo <- data.frame(time = x$time,value = x$value)
-#   x <- x[x$value <= quantile(x$value,0.99),]
-#   N <- length(x$value);n <- 0:(N-1);t <- n/fs;
-#   f <- n*fs/N;fft <- abs(fft(x$value))
-#   f <- f[2:(N/2)];fft <- fft[2:(N/2)]
-#   dataV <- data.frame(time = x$time,value = x$value)
-#   dataF <- data.frame(freq = f,fft)
-#   p1 <- ggplot(dataV,aes(x = time,y = value)) + 
-#     geom_line() + ggtitle(paste(sid,'time field',sep='_'))
-#   p2 <- ggplot(dataF,aes(x = freq,y = fft)) + 
-#     geom_line(stat = 'identity') + ggtitle(paste(sid,'freq field',sep='_'))
-#   png(filename = file.path(dir_data,'FailIOCoarse','test200-util',paste(sid,'.jpg',sep = '')),
-#       width = 800, height = 600, bg = "white")
-#   multiplot(p1,p2,cols = 2)
-#   dev.off()
-#   dataF <- dataF[order(dataF$fft,decreasing = T),];
-#   dataF$days <- 1/dataF$freq/86400
-#   dataF$round <- round(dataF$days)
-#   dataF$absR <- abs(dataF$days - dataF$round)
-#   dataF$realPeriod <- dataF$absR <= 0.05
-#   dataF$fftRate <- dataF$fft/sum(dataF$fft)*100
-#   dataFS <- subset(dataF,days > 1/3 & days < 10 & fft > 0 & realPeriod == T)
-#   return(list(dataVo,dataFS,dataF))
-# }
 # 
 # #对每周的数值作图，共8周又5天
 # cut <- c(as.POSIXct('2014-06-01'),as.POSIXct('2014-06-08'),as.POSIXct('2014-06-15'),
 #          as.POSIXct('2014-06-22'),as.POSIXct('2014-06-29'),as.POSIXct('2014-07-06'),as.POSIXct('2014-07-13'),
 #          as.POSIXct('2014-07-20'),as.POSIXct('2014-07-27'),as.POSIXct('2014-08-01'))
-# mtwplot <- function(sid,attr){
-#   sidp <- gsub('.*_','',sid)
-#   print(sid)
-#   x <- subset(data,svrid == sidp,c(attr,'timeNew'))
-#   names(x) <- c('value','time')
-#   x$value[x$value < 0|is.na(x$value)] <- 0
-#   dataV <- data.frame(time = x$time,value = x$value)
-#   p <- list()
-#   for(i in 1:9){
-#     if(attr == 'a999'){
-#       p[[i]] <- ggplot(subset(dataV,time >= cut[i] & time < cut[i+1]),aes(x = time,y = value)) + 
-#         geom_line() + ggtitle(paste(sid,'Week',i,sep='_'))
-#     }else{
-#       dv <- subset(dataV,time >= cut[i] & time < cut[i+1])
-#       dv$value[dv$value <= 1] <- 1
-#       p[[i]] <- ggplot(dv,aes(x = time,y = log2(value))) + 
-#         geom_line() + ggtitle(paste(sid,'Week',i,sep='_')) + ylab('value')
-#     }
-#   }
-#   if(attr == 'a999'){
-#     tarDir <- 'test200-util'
-#   }else if(attr == 'a902'){
-#     tarDir <- 'test200-read'
-#   }else if(attr == 'a903'){
-#     tarDir <- 'test200-write'
-#   }
-#   png(filename = file.path(dir_data,'FailIOCoarse',tarDir,'Week',paste(sid,'-Week.jpg',sep = '')),
-#       width = 1200, height = 1200, bg = "white")
-#   multiplot(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]],p[[6]],p[[7]],p[[8]],p[[9]],cols = 1)
-#   dev.off()
-#   return()
-# }
 # 
 # sidset <- paste(1:length(levels(data$svrid)),levels(data$svrid),sep='_')
 # # data200 <- lapply(sidset,mtplot)
@@ -310,17 +335,64 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 
 # T6.计算每天每台机器硬盘利用率连续超过100的数据点数.
 # 因为样本数据中超过100的数量太少，取超过5的999作为例子
-r <- by(data[,c('svrid','time','a999')],data$svrid),function(x){
-  rr <- by(x[,c('svrid','a999')],x$svrid,function(xx){
-    idx <- which(xx$a999 > 5)
-    l <- length(idx)
-    diff <- idx[2:l] - idx[1:(l-1)]
-    idx1 <- c(which(diff != 1),l)
-    l1 <- length(idx1)
-    diff1 <- idx1[2:l1] - idx1[1:(l1-1)]
-    diff1 <- diff1 - 1
-    rrr <- max(diff1)
-  })
-}
+# r <- by(data[,c('svrid','time','a999')],data$svrid),function(x){
+#   rr <- by(x[,c('svrid','a999')],x$svrid,function(xx){
+#     idx <- which(xx$a999 > 5)
+#     l <- length(idx)
+#     diff <- idx[2:l] - idx[1:(l-1)]
+#     idx1 <- c(which(diff != 1),l)
+#     l1 <- length(idx1)
+#     diff1 <- idx1[2:l1] - idx1[1:(l1-1)]
+#     diff1 <- diff1 - 1
+#     rrr <- max(diff1)
+#   })
+# }
+
+# T7.统计902，903，9023与999的关系
+# load(file.path(dir_data,'spdUtilSta.Rda'))
+# list[su9023C,su9023TS,su902C,su902TS,su903C,su903TS] <- split(spdUtilSta,spdUtilSta$class)
+# su9023C <- su9023C[order(su9023C$cutA),]
+# ggplot(su9023C,aes(cutA,cut999,size = log2(value))) + geom_point()
+
+# T8.可视化902，903，9023除以999之后的值与原值的对比。
+# load(file.path(dir_data,'failIO.Rda'))
+# svrCount <- tapply(failIO$svrid,factor(failIO$svrid),length)
+# svr902 <- tapply(failIO$a902,factor(failIO$svrid),)
+# svrCount <- data.frame(svrid = names(svrCount),count = as.numeric(svrCount))
+# data <- subset(failIO,svrid %in% sample(svrCount$svrid[svrCount$count == 17280 & quantile(a902,0.5) > 0],1000))
+# data <- factorX(data)
+# row.names(data) <- NULL
+# save(data,file = file.path(dir_data,'freqFieldWatch700.Rda'))
+load(file.path(dir_data,'freqFieldWatch700.Rda'))
+
+#对每周的数值作图，共8周又5天
+cut <- c(as.POSIXct('2014-06-01'),as.POSIXct('2014-06-08'),as.POSIXct('2014-06-15'),
+         as.POSIXct('2014-06-22'),as.POSIXct('2014-06-29'),as.POSIXct('2014-07-06'),as.POSIXct('2014-07-13'),
+         as.POSIXct('2014-07-20'),as.POSIXct('2014-07-27'),as.POSIXct('2014-08-01'))
+
+
+sidset <- paste(1:length(levels(data$svrid)),levels(data$svrid),sep='_')
+
+#整理999与9023
+data$a902[data$a902 < 0] <- 0
+data$a903[data$a903 < 0] <- 0
+data$a999[data$a999 < 0] <- 0
+data$a999[data$a999 > 100] <- 100
+data$a9023 <- data$a902 + data$a903
+data <- subset(data,!is.na(a902) & !is.na(a903) & !is.na(a999) & !is.na(a9023))
+
+#生成新的999，把999为0的值变为0.1到0.5之间的随机值
+#这样如果spd是0，那除了之后也是0，spd如果小，那除了之后就大。
+data$a999n <- data$a999
+len_zero <- sum(data$a999n == 0)
+data$a999n[data$a999n == 0] <- runif(len_zero,0.1,0.5)
+data$a923 <- data$a9023/data$a999/100
+
+# a <- lapply(sidset,mtwplot,c('a902'))
+# b <- lapply(sidset,mtwplot,c('a903'))
+c <- lapply(sidset,mtwplot,c('a923','a9023'))
+
+# T9.确认每台机器的服务率为0的时间占总时间的百分比
+load(file.path(dir_data,'ioFeature.Rda'))
 
 # TEST
