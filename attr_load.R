@@ -23,6 +23,8 @@ data.flist$dev_class_id <- cmdb$dev_class_id[match(data.flist$svr_id,cmdb$svr_as
 data.f <- subset(data.flist,f_time > as.POSIXct('2014/06/01') & 
                    f_time < as.POSIXct('2014/08/01') &
                    dev_class_id %in% c('C1','TS1','TS3','TS4','TS5','TS6'))
+data.fMore <- subset(data.flist,f_time > as.POSIXct('2013/01/01') & 
+                   f_time < as.POSIXct('2014/08/01'))
 data.fAllDev <- subset(data.flist,f_time > as.POSIXct('2014/06/01') & 
                          f_time < as.POSIXct('2014/08/01'))
 load(file = file.path(dir_data,'attr.Rda'))
@@ -86,31 +88,31 @@ save('disk_ip',file = file.path(dir_data,'disk_ip.Rda'))
 load(file = file.path(dir_data,'disk_ip.Rda'))
 
 # L1.x SAVE
-save(mean_io,cmdb,data.f,data.fAllDev,disk_ip,file = file.path(dir_data,'load_ftr_attrid.Rda'))
+save(mean_io,cmdb,data.f,data.fMore,data.fAllDev,disk_ip,file = file.path(dir_data,'load_ftr_attrid.Rda'))
 ################################################################################################################
 # L2 for ftr_cpuUse.R
-k131_902 <- read.csv(file.path(dir_data,'attr_902'))
-k131_903 <- read.csv(file.path(dir_data,'attr_903'))
-k131_999 <- read.csv(file.path(dir_data,'attr_999'))
-k131_902$date <- as.Date(k131_902$date)
-k131_903$date <- as.Date(k131_903$date)
-k131_999$date <- as.Date(k131_999$date)
-k131_902more <- read.csv(file.path(dir_data,'attr_902more'))
-k131_903more <- read.csv(file.path(dir_data,'attr_903more'))
-k131_999more <- read.csv(file.path(dir_data,'attr_999more'))
-k131_902more$date <- as.Date(k131_902more$date)
-k131_903more$date <- as.Date(k131_903more$date)
-k131_999more$date <- as.Date(k131_999more$date)
-k131_902more <- k131_902more[!duplicated(k131_902more[,c('svrid','date')]),]
-k131_903more <- k131_903more[!duplicated(k131_903more[,c('svrid','date')]),]
-k131_999more <- k131_999more[!duplicated(k131_999more[,c('svrid','date')]),]
-k131_902 <- rbind(k131_902,k131_902more)
-k131_903 <- rbind(k131_903,k131_903more)
-k131_999 <- rbind(k131_999,k131_999more)
-k131_svrid <- intersect(k131_902$svrid,k131_903$svrid)
-k131_svrid <- intersect(k131_svrid,k131_999$svrid)
-sta_999 <- data.frame(svrid = levels(k131_999$svrid),
-                      count = as.numeric(tapply(k131_999$svrid,k131_999$svrid,length)))
-sta_999$class <- 'Normal'
-sta_999$class[k131$svr_asset_id %in% data.f$svr_id] <- 'Failure'
-save(k131_902,k131_903,k131_999,k131_svrid,sta_999,file = file.path(dir_data,'attr.Rda'))
+# k131_902 <- read.csv(file.path(dir_data,'attr_902'))
+# k131_903 <- read.csv(file.path(dir_data,'attr_903'))
+# k131_999 <- read.csv(file.path(dir_data,'attr_999'))
+# k131_902$date <- as.Date(k131_902$date)
+# k131_903$date <- as.Date(k131_903$date)
+# k131_999$date <- as.Date(k131_999$date)
+# k131_902more <- read.csv(file.path(dir_data,'attr_902more'))
+# k131_903more <- read.csv(file.path(dir_data,'attr_903more'))
+# k131_999more <- read.csv(file.path(dir_data,'attr_999more'))
+# k131_902more$date <- as.Date(k131_902more$date)
+# k131_903more$date <- as.Date(k131_903more$date)
+# k131_999more$date <- as.Date(k131_999more$date)
+# k131_902more <- k131_902more[!duplicated(k131_902more[,c('svrid','date')]),]
+# k131_903more <- k131_903more[!duplicated(k131_903more[,c('svrid','date')]),]
+# k131_999more <- k131_999more[!duplicated(k131_999more[,c('svrid','date')]),]
+# k131_902 <- rbind(k131_902,k131_902more)
+# k131_903 <- rbind(k131_903,k131_903more)
+# k131_999 <- rbind(k131_999,k131_999more)
+# k131_svrid <- intersect(k131_902$svrid,k131_903$svrid)
+# k131_svrid <- intersect(k131_svrid,k131_999$svrid)
+# sta_999 <- data.frame(svrid = levels(k131_999$svrid),
+#                       count = as.numeric(tapply(k131_999$svrid,k131_999$svrid,length)))
+# sta_999$class <- 'Normal'
+# sta_999$class[k131$svr_asset_id %in% data.f$svr_id] <- 'Failure'
+# save(k131_902,k131_903,k131_999,k131_svrid,sta_999,file = file.path(dir_data,'attr.Rda'))

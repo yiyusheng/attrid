@@ -11,7 +11,7 @@ source(file.path(dir_code,'AFR_io_function.R'))
 #@@@ LOAD DATA @@@#
 load(file.path(dir_data,'load_ftr_attrid.Rda'))
 source(file.path(dir_code,'AFR_io_prepare.R'))
-
+#####################################################################################################
 #@@@ FUNCTION @@@#
 # F1.plot
 AFR_plot <- function(cm,title){ 
@@ -19,7 +19,7 @@ AFR_plot <- function(cm,title){
     geom_bar(stat = 'identity',position = 'dodge') +
     xlab('Disk Age (years)') + ylab('Annual Failure Rate (%)') + 
     scale_x_continuous(breaks = floor(min(cm$item)):ceiling(max(cm$item))) +
-    scale_y_continuous(breaks = seq(floor(min(cm$AFR)),ceiling(max(cm$AFR)),2)) +
+    scale_y_continuous(breaks = seq(floor(min(cm$AFR)),4,1)) +
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
     theme(panel.background = element_rect(color = 'black'),
@@ -57,13 +57,17 @@ cm <- factorX(subset(cm,!is.na(AFR) & item != '6'))
 cm <- classExchg(cm)
 cm$item <- cm$item + 1
 plotCol <- c('item','class','AFR')
-# naFill <- cbind(expand.grid(item = levels(factor(cm$item)),
-#                             class = levels(factor(cm$class))),AFR = 0)
+# naFill <- cbind(expand.grid(item = levels(factor(cm$item)),class = levels(factor(cm$class))),AFR = 0)
 # cm <- rbind(cm[,plotCol],naFill)
 # cm$item <- as.numeric(cm$item)
 title <- 'fig1'
 AFR_plot(cm,'fig1')
-sum(cm$count_f[cm$item < 4 & cm$class == 'Nserv'])/sum(cm$count_io[cm$item < 4 & cm$class == 'Nserv'])*600
-sum(cm$count_f[cm$item >= 4 & cm$class == 'Nserv'])/sum(cm$count_io[cm$item >= 4 & cm$class == 'Nserv'])*600
-sum(cm$count_f[cm$item < 4 & cm$class == 'Sserv'])/sum(cm$count_io[cm$item < 4 & cm$class == 'Sserv'])/12*600
-sum(cm$count_f[cm$item >= 4 & cm$class == 'Sserv'])/sum(cm$count_io[cm$item >= 4 & cm$class == 'Sserv'])/12*600
+
+
+sum(cm$count_f[cm$item < 4 & cm$class == 'Nserv'])/sum(cm$count_io[cm$item < 4 & cm$class == 'Nserv'])*100
+sum(cm$count_f[cm$item >= 4 & cm$class == 'Nserv'])/sum(cm$count_io[cm$item >= 4 & cm$class == 'Nserv'])*100
+sum(cm$count_f[cm$item < 4 & cm$class == 'Sserv'])/sum(cm$count_io[cm$item < 4 & cm$class == 'Sserv'])/12*100
+sum(cm$count_f[cm$item >= 4 & cm$class == 'Sserv'])/sum(cm$count_io[cm$item >= 4 & cm$class == 'Sserv'])/12*100
+sum(cm$count_f[cm$class == 'Nserv'])/sum(cm$count_io[cm$class == 'Nserv'])*100
+sum(cm$count_f[cm$class == 'Sserv'])/sum(cm$count_io[cm$class == 'Sserv'])/12*100
+

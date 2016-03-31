@@ -164,7 +164,7 @@ AFR_attr_notime <- function(f,io,attr1,attr2,diskCount,dev = ""){
   eval(parse(text = sprintf('tf <- tableX(f$%s)',attr1)))
   tiof <- merge(tio,tf,by = 'item',all = T)
   names(tiof) <- c('item','count_io','rate_io','count_f','rate_f')
-  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*6*100
+  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*100
   if(dev == 'C'){
     tiof$class <- 'Non-Storage Servers'
   }else if(dev == 'TS'){

@@ -1,11 +1,14 @@
 # data prepare for AFR_io
-data.fFewDev <- subset(data.f,ip %in% cmdb$ip)
+data.fAllDev <- subset(data.fMore,(f_time > as.POSIXct('2013-02-02') & f_time < as.POSIXct('2013-12-01')) | f_time > as.POSIXct('2014-01-01'))
+
 data.f <- subset(data.fAllDev,ip %in% cmdb$ip)
 data.f$use_time <- cmdb$use_time[match(data.f$svr_id,cmdb$svr_asset_id)]
 data.f$failShiptime <- floor(data.f$f_time - data.f$use_time)
 units(data.f$failShiptime) <- 'days'
 data.f$failShiptime <- as.numeric(data.f$failShiptime)/365
 data.f$fsTime <- floor(data.f$failShiptime)
+data.f$fsTimeN <- cut(data.f$failShiptime,c(0,1/2,1:7),include.lowest = T)
+data.f$fsTimeN <- gsub('^\\[|^\\(|,.*$','',data.f$fsTimeN)
 
 # 上架时间计算
 cmdb$shiptimeToLeft <- floor(as.POSIXct('2014-06-01') - cmdb$use_time)
@@ -14,6 +17,8 @@ units(cmdb$shiptimeToLeft) <- 'days'
 units(cmdb$shiptimeToRight) <- 'days'
 cmdb$shiptimeToLeft <- as.numeric(cmdb$shiptimeToLeft)/365
 cmdb$shTime <- floor(cmdb$shiptimeToLeft + (1/12))
+cmdb$shTimeN <- cut(cmdb$shiptimeToLeft,c(0,1/2,1:7),include.lowest = T)
+cmdb$shTimeN <- gsub('^\\[|^\\(|,.*$','',cmdb$shTimeN)
 cmdb$dClass <- ''
 
 # 给每个机器做标记
@@ -41,13 +46,15 @@ tmp.cmdb <- cmdbio
 tmp.f <- subset(data.f,svr_id %in% cmdbio$svr_asset_id)
 tmp.f$total <- tmp.cmdb$total[match(tmp.f$ip,tmp.cmdb$ip)]
 tmp.f$shTime <- tmp.cmdb$shTime[match(tmp.f$ip,tmp.cmdb$ip)]
+tmp.f$shTimeN <- tmp.cmdb$shTimeN[match(tmp.f$ip,tmp.cmdb$ip)]
 tmp.f <- factorX(tmp.f)
 tmp.io <- mean_io
 tmp.io$dev_class_id <- cmdb$dev_class_id[match(tmp.io$svrid,cmdb$svr_asset_id)]
-lastYears <- 7
+# lastYears <- 7
 
 disk_ip$dClass <- cmdbio$dClass[match(disk_ip$ip,cmdbio$ip)]
 tmp.io$dClass <- cmdbio$dClass[match(tmp.io$svrid,cmdbio$svr_asset_id)]
 tmp.f$dClass <- cmdbio$dClass[match(tmp.f$svr_id,cmdbio$svr_asset_id)]
 tmp.io$shTime <- cmdbio$shTime[match(tmp.io$svrid,cmdbio$svr_asset_id)]
+tmp.io$shTimeN <- cmdbio$shTimeN[match(tmp.io$svrid,cmdbio$svr_asset_id)]
 tmp.io$ip <- cmdbio$ip[match(tmp.io$svrid,cmdbio$svr_asset_id)]
