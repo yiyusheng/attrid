@@ -1,0 +1,152 @@
+# Plot for sc16
+rm(list = ls())
+#@@@ CONFIGURE @@@#
+source(file.path('D:/Git/attrid','attr_config.R'))
+
+#@@@ Function @@@#
+source('D:/Git/R_Function/Rfun.R')
+source(file.path(dir_code,'attr_function.R'))
+source(file.path(dir_code,'AFR_io_function.R'))
+
+#@@@ LOAD DATA @@@#
+load(file.path(dir_data,'load_ftr_attridN.Rda'))
+source(file.path(dir_code,'AFR_io_prepareN.R'))
+#speed + util + Dense特征
+load(file.path(dir_data,'ioFeature.Rda'))
+#100%util持续时间
+load(file.path(dir_data,'ioUtilMax.Rda'))
+
+#####################################################################################################
+#@@@ FUNCTION @@@#
+# F1.plot
+AFR_plot <- function(cm,title,ylimL,ylimR){ 
+  cm1 <- cm
+  p1 <- ggplot(cm1,aes(x = factor(itemN),y = AFR,fill = class)) + 
+    geom_bar(stat = 'identity',position = 'dodge') +
+    xlab('Coefficient of Variable') + ylab('Annual Failure Rate (%)') + 
+    scale_y_continuous(limits = c(ylimL,ylimR),oob = rescale_none,breaks = seq(ylimL,ylimR,0.2)) +
+    # scale_x_continuous(breaks = floor(min(cm1$maxCVd)):ceiling(max(cm1$maxCVd))) +
+    # scale_y_continuous(breaks = seq(0,8,1)) +
+    guides(fill = guide_legend(title=NULL)) + 
+    theme_bw() +
+    theme(panel.background = element_rect(color = 'black'),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(colour = 'grey', linetype = 'dotted'),
+#           panel.grid.major.x = element_blank(),
+          
+          plot.title = element_blank(),
+          axis.line = element_line(color = 'black'),
+          axis.text = element_text(size = 24),
+          axis.title = element_text(size = 26),
+          
+          legend.key.width = unit(1.5,units = 'line'),
+          legend.key.height = unit(1.5,units = 'line'),
+          legend.text = element_text(size = 26),
+          legend.position = 'top',
+          legend.background = element_rect(fill = alpha('grey',0.5))
+    )
+  print(p1)
+  ggsave(file=file.path(dir_data,'sc16',paste(title,'.eps',sep='')), plot=p1, width = 8, height = 6, dpi = 100)
+}
+
+#F2. AFR calculate
+ioAFR <- function(io,f,attr,diskCount = 1){
+  t1 <- melt(table(io[,attr]))
+  t2 <- melt(table(f[,attr]))
+  if(length(attr) == 1){
+    names(t1)[1] <- attr
+    names(t2)[1] <- attr
+  }
+  tMerge <- merge(t1,t2,by = attr,all = T)
+  names(tMerge) <- c(attr,'count','fCount')
+  tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*600
+  tMerge <- subset(tMerge,!is.na(AFR))
+}
+
+#F3. replace using Nserv and Sserv
+classExchg <- function(df){
+  df$class[grepl('[N|n]on',df$class)] <- 'Nserv'
+  df$class[!grepl('[N|n]on',df$class) & grepl('[S|s]torage',df$class)] <- 'Sserv'
+  df
+}
+#####################################################################################################
+ioFtr$cvUtil <- ioFtr$sdUtil/ioFtr$meanUtil
+attr <- 'maxUtil'
+
+ioF <- factorX(subset(ioFtr,svrid %in% tmp.cmdb$svr_asset_id,c('svrid',attr)))
+names(ioF) <- c('svrid','attr')
+
+maxU <- tapply(ioF$attr,ioF$svrid,max)
+# meanU <- tapply(ioF$attr,ioF$svrid,mean)
+# maxtopU <- tapply(ioF$attr,ioF$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
+
+divU <- seq(0,100,10)
+staU <- data.frame(svrid = names(meanU),
+                   maxoU = as.numeric(maxU),
+                   # meanoU = as.numeric(meanU),
+                   # maxtopoU = as.numeric(maxtopU),
+                   maxU = cut(as.numeric(maxU),divU,include.lowest = T)
+                   # meanU = cut(as.numeric(meanU),divU,include.lowest = T),
+                   # maxtopU = cut(as.numeric(maxtopU),divU,include.lowest = T)
+                   )
+
+tf <- merge(tmp.f,staU,by.x = 'svr_id',by.y = 'svrid')
+tcmdb <- merge(tmp.cmdb,staU,by.x = 'svr_asset_id',by.y = 'svrid')
+tfC <- subset(tf,grepl('C',dClass));tfTS <- subset(tf,grepl('TS',dClass))
+tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dClass))
+
+# tab1
+busyBound <- 100
+busyPerc <- data.frame(lowerC = nrow(tfC[tfC$maxoU < busyBound,])/nrow(tcmdbC[tcmdbC$maxoU < busyBound,])*6*100,
+                       higherC = nrow(tfC[tfC$maxoU >= busyBound,])/nrow(tcmdbC[tcmdbC$maxoU >= busyBound,])*6*100,
+                       lowerTS = nrow(tfTS[tfTS$maxoU < busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU < busyBound,])/12*6*100,
+                       higherTS = nrow(tfTS[tfTS$maxoU >= busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU >= busyBound,])/12*6*100)
+
+#持续时间与故障率
+ioU <- factorX(subset(ioUtilMax,svrid %in% tmp.cmdb$svr_asset_id))
+ioU$A1 <- ioU$maxLastCount
+ioU$A2 <- ioU$maxCount
+
+meanA1 <- tapply(ioU$A1,ioU$svrid,mean)
+maxA1 <- tapply(ioU$A1,ioU$svrid,max)
+maxtopA1 <- tapply(ioU$A1,ioU$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
+
+# meanA2 <- tapply(ioU$A2,ioU$svrid,mean)
+# maxA2 <- tapply(ioU$A2,ioU$svrid,max)
+# maxtopA2 <- tapply(ioU$A2,ioU$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
+# maxsumA2 <- tapply(ioU$A2,ioU$svrid,sum)
+
+maxsumA2[maxsumA2 == 0] <- 0.5
+maxsumA2 <- log2(maxsumA2)
+
+divU1 <- c(-1,0,1,2,3,6,12,60,120,288)
+divU2 <- c(seq(0,24,2),144,288)
+divU3 <- c(-1,seq(0,9,3),15)
+
+staU <- data.frame(svrid = names(meanU),
+                   meanoA1 = as.numeric(meanA1),
+                   maxoA1 = as.numeric(maxA1),
+                   maxtopoA1 = as.numeric(maxtopA1),
+                   
+                   meanA1 = cut(as.numeric(meanA1),divU1,include.lowest = T),
+                   maxA1 = cut(as.numeric(maxA1),divU1,include.lowest = T),
+                   maxtopA1 = cut(as.numeric(maxtopA1),divU1,include.lowest = T))
+                   
+                   # meanoA2 = as.numeric(meanA2),
+                   # maxoA2 = as.numeric(maxA2),
+                   # maxtopoA2 = as.numeric(maxtopA2),
+                   # maxsumoA2 = as.numeric(maxsumA2),
+                   # 
+                   # meanA2 = cut(as.numeric(meanA2),divU2,include.lowest = T),
+                   # maxA2 = cut(as.numeric(maxA2),divU2,include.lowest = T),
+                   # maxtopA2 = cut(as.numeric(maxtopA2),divU2,include.lowest = T),
+                   # maxsumA2 = cut(as.numeric(maxsumA2),divU3,include.lowest = T))
+
+tf <- merge(tmp.f,staU,by.x = 'svr_id',by.y = 'svrid')
+tcmdb <- merge(tmp.cmdb,staU,by.x = 'svr_asset_id',by.y = 'svrid')
+
+tfC <- subset(tf,grepl('C',dClass));tfTS <- subset(tf,grepl('TS',dClass))
+tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dClass))
+
+a <- ioAFR(tcmdbC,tfC,'maxoA1')
+b <- ioAFR(tcmdbTS,tfTS,'maxoA1')

@@ -11,8 +11,8 @@ source(file.path(dir_code,'attr_function.R'))
 source(file.path(dir_code,'AFR_io_function.R'))
 
 #@@@ LOAD DATA @@@#
-load(file.path(dir_data,'load_ftr_attrid.Rda'))
-source(file.path(dir_code,'AFR_io_prepare.R'))
+load(file.path(dir_data,'load_ftr_attridN.Rda'))
+source(file.path(dir_code,'AFR_io_prepareN.R'))
 #speed + util + Dense特征
 load(file.path(dir_data,'ioFeature.Rda'))
 #100%util持续时间
@@ -178,14 +178,6 @@ eval(parse(text = sprintf("ggplot(subset(AFR_muC,value.x > 1),aes(maxA1,AFRst,fi
 geom_bar(stat = 'identity',position = 'stack')",attrAdd)))
 
 
-
-
-
-
-
-
-
-
 # P1.结论画图
 AFR_maxU$item <- gsub('^\\[.*,|^\\(.*,|\\]','',AFR_maxU$item)
 AFR_maxU$item <- factor(as.character(as.numeric(AFR_maxU$item)/12))
@@ -211,8 +203,8 @@ ggsave(file=file.path(dir_data,'ioUtil',paste('Duration of Full Load and AFR','.
        plot=pp, width = 16, height = 12, dpi = 100)
 
 
-cairo_ps(file=file.path(dir_data,'ioUtil',paste('Duration of Full Load and AFR','.eps',sep=''))
-         , width=16, height=12)
-print(pp)
-dev.off()
+# cairo_ps(file=file.path(dir_data,'ioUtil',paste('Duration of Full Load and AFR','.eps',sep=''))
+#          , width=16, height=12)
+# print(pp)
+# dev.off()
 
