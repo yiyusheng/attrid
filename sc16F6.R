@@ -9,8 +9,8 @@ source(file.path(dir_code,'attr_function.R'))
 source(file.path(dir_code,'AFR_io_function.R'))
 
 #@@@ LOAD DATA @@@#
-load(file.path(dir_data,'load_ftr_attridN.Rda'))
-source(file.path(dir_code,'AFR_io_prepareN.R'))
+load(file.path(dir_data,'load_ftr_attridOld.Rda'))
+source(file.path(dir_code,'AFR_io_prepareOld.R'))
 #speed + util + Dense特征
 load(file.path(dir_data,'ioFeature.Rda'))
 #100%util持续时间
@@ -21,10 +21,10 @@ load(file.path(dir_data,'ioUtilMax.Rda'))
 # F1.plot
 AFR_plot <- function(cm,title,ylimL,ylimR){ 
   cm1 <- cm
-  p1 <- ggplot(cm1,aes(x = factor(itemN),y = AFR,fill = class)) + 
+  p1 <- ggplot(cm1,aes(x = factor(maxA1),y = AFR,fill = class)) + 
     geom_bar(stat = 'identity',position = 'dodge') +
-    xlab('Coefficient of Variable') + ylab('Annual Failure Rate (%)') + 
-    scale_y_continuous(limits = c(ylimL,ylimR),oob = rescale_none,breaks = seq(ylimL,ylimR,0.2)) +
+    xlab('Duration of full workload (minutes)') + ylab('Annual Failure Rate (%)') + 
+    scale_y_continuous(limits = c(ylimL,ylimR),oob = rescale_none,breaks = seq(ylimL,ylimR,5)) +
     # scale_x_continuous(breaks = floor(min(cm1$maxCVd)):ceiling(max(cm1$maxCVd))) +
     # scale_y_continuous(breaks = seq(0,8,1)) +
     guides(fill = guide_legend(title=NULL)) + 
@@ -77,18 +77,11 @@ ioF <- factorX(subset(ioFtr,svrid %in% tmp.cmdb$svr_asset_id,c('svrid',attr)))
 names(ioF) <- c('svrid','attr')
 
 maxU <- tapply(ioF$attr,ioF$svrid,max)
-# meanU <- tapply(ioF$attr,ioF$svrid,mean)
-# maxtopU <- tapply(ioF$attr,ioF$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
 
 divU <- seq(0,100,10)
-staU <- data.frame(svrid = names(meanU),
+staU <- data.frame(svrid = names(maxU),
                    maxoU = as.numeric(maxU),
-                   # meanoU = as.numeric(meanU),
-                   # maxtopoU = as.numeric(maxtopU),
-                   maxU = cut(as.numeric(maxU),divU,include.lowest = T)
-                   # meanU = cut(as.numeric(meanU),divU,include.lowest = T),
-                   # maxtopU = cut(as.numeric(maxtopU),divU,include.lowest = T)
-                   )
+                   maxU = cut(as.numeric(maxU),divU,include.lowest = T))
 
 tf <- merge(tmp.f,staU,by.x = 'svr_id',by.y = 'svrid')
 tcmdb <- merge(tmp.cmdb,staU,by.x = 'svr_asset_id',by.y = 'svrid')
@@ -97,10 +90,10 @@ tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dC
 
 # tab1
 busyBound <- 100
-busyPerc <- data.frame(lowerC = nrow(tfC[tfC$maxoU < busyBound,])/nrow(tcmdbC[tcmdbC$maxoU < busyBound,])*6*100,
-                       higherC = nrow(tfC[tfC$maxoU >= busyBound,])/nrow(tcmdbC[tcmdbC$maxoU >= busyBound,])*6*100,
-                       lowerTS = nrow(tfTS[tfTS$maxoU < busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU < busyBound,])/12*6*100,
-                       higherTS = nrow(tfTS[tfTS$maxoU >= busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU >= busyBound,])/12*6*100)
+busyPerc <- data.frame(lowerC = nrow(tfC[tfC$maxoU < busyBound,])/nrow(tcmdbC[tcmdbC$maxoU < busyBound,])*6*100/2.26*1.48,
+                       higherC = nrow(tfC[tfC$maxoU >= busyBound,])/nrow(tcmdbC[tcmdbC$maxoU >= busyBound,])*6*100/2.26*1.48,
+                       lowerTS = nrow(tfTS[tfTS$maxoU < busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU < busyBound,])/12*6*100/1.96*1.61,
+                       higherTS = nrow(tfTS[tfTS$maxoU >= busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU >= busyBound,])/12*6*100/1.96*1.61)
 
 #持续时间与故障率
 ioU <- factorX(subset(ioUtilMax,svrid %in% tmp.cmdb$svr_asset_id))
@@ -111,19 +104,9 @@ meanA1 <- tapply(ioU$A1,ioU$svrid,mean)
 maxA1 <- tapply(ioU$A1,ioU$svrid,max)
 maxtopA1 <- tapply(ioU$A1,ioU$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
 
-# meanA2 <- tapply(ioU$A2,ioU$svrid,mean)
-# maxA2 <- tapply(ioU$A2,ioU$svrid,max)
-# maxtopA2 <- tapply(ioU$A2,ioU$svrid,function(x){x <- sort(x,decreasing = T);mean(x[1:10])})
-# maxsumA2 <- tapply(ioU$A2,ioU$svrid,sum)
-
-maxsumA2[maxsumA2 == 0] <- 0.5
-maxsumA2 <- log2(maxsumA2)
-
 divU1 <- c(-1,0,1,2,3,6,12,60,120,288)
-divU2 <- c(seq(0,24,2),144,288)
-divU3 <- c(-1,seq(0,9,3),15)
 
-staU <- data.frame(svrid = names(meanU),
+staU1 <- data.frame(svrid = names(meanA1),
                    meanoA1 = as.numeric(meanA1),
                    maxoA1 = as.numeric(maxA1),
                    maxtopoA1 = as.numeric(maxtopA1),
@@ -131,22 +114,23 @@ staU <- data.frame(svrid = names(meanU),
                    meanA1 = cut(as.numeric(meanA1),divU1,include.lowest = T),
                    maxA1 = cut(as.numeric(maxA1),divU1,include.lowest = T),
                    maxtopA1 = cut(as.numeric(maxtopA1),divU1,include.lowest = T))
-                   
-                   # meanoA2 = as.numeric(meanA2),
-                   # maxoA2 = as.numeric(maxA2),
-                   # maxtopoA2 = as.numeric(maxtopA2),
-                   # maxsumoA2 = as.numeric(maxsumA2),
-                   # 
-                   # meanA2 = cut(as.numeric(meanA2),divU2,include.lowest = T),
-                   # maxA2 = cut(as.numeric(maxA2),divU2,include.lowest = T),
-                   # maxtopA2 = cut(as.numeric(maxtopA2),divU2,include.lowest = T),
-                   # maxsumA2 = cut(as.numeric(maxsumA2),divU3,include.lowest = T))
 
-tf <- merge(tmp.f,staU,by.x = 'svr_id',by.y = 'svrid')
-tcmdb <- merge(tmp.cmdb,staU,by.x = 'svr_asset_id',by.y = 'svrid')
+tf <- merge(tmp.f,staU1,by.x = 'svr_id',by.y = 'svrid')
+tcmdb <- merge(tmp.cmdb,staU1,by.x = 'svr_asset_id',by.y = 'svrid')
 
 tfC <- subset(tf,grepl('C',dClass));tfTS <- subset(tf,grepl('TS',dClass))
 tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dClass))
 
-a <- ioAFR(tcmdbC,tfC,'maxoA1')
-b <- ioAFR(tcmdbTS,tfTS,'maxoA1')
+attrNeed <- 'maxA1'
+a <- ioAFR(tcmdbC,tfC,attrNeed)
+a$class <- 'Nserv'
+b <- ioAFR(tcmdbTS,tfTS,attrNeed,diskCount = 12)
+b$class <- 'Sserv'
+a$AFR <- a$AFR/2.26*1.48
+b$AFR <- b$AFR/1.96*1.61
+Dura <- rbind(item_order(a,attrNeed),item_order(b,attrNeed))
+Dura$maxA1 <- as.numeric(gsub('\\]$|^.*,','',Dura$maxA1))*5
+
+AFR_plot(Dura,'fig6',0,30)
+ggplot(Dura,aes(x = maxA1,y = AFR,fill = class)) + geom_bar(stat = 'identity',position = 'dodge')
+
