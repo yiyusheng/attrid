@@ -23,8 +23,8 @@ AFR_plot <- function(cm,title){
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
     theme(panel.background = element_rect(color = 'black'),
-          panel.grid.minor = element_blank(),
-          panel.grid.major = element_line(colour = 'grey', linetype = 'dotted'),
+          panel.grid.minor = element_line(size = 0.4),
+          panel.grid.major = element_line(colour = 'grey', linetype = 'dotted', size = 1),
 #           panel.grid.major.x = element_blank(),
           
           plot.title = element_blank(),
@@ -35,7 +35,8 @@ AFR_plot <- function(cm,title){
           legend.key.width = unit(1.5,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
           legend.text = element_text(size = 26),
-          legend.position = 'top',
+          legend.position = c(0.05,0.95),
+          legend.justification = c(0,1),
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p1)

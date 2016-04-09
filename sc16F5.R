@@ -33,6 +33,7 @@ AFR_plot <- function(cm,title,ylimL,ylimR){
           plot.title = element_blank(),
           axis.line = element_line(color = 'black'),
           axis.text = element_text(size = 24),
+          axis.text.x = element_text(angle = 40, margin = margin(10)),
           axis.title = element_text(size = 26),
           
           legend.key.width = unit(1.5,units = 'line'),

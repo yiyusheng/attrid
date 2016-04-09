@@ -42,7 +42,7 @@ AFR_plot <- function(cm,title,ylimL,ylimR){
           legend.key.width = unit(1.5,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
           legend.text = element_text(size = 26),
-          legend.position = 'top',
+          legend.position = c(0.05,0.95),legend.justification = c(0,1),
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p1)
@@ -85,6 +85,7 @@ staU <- data.frame(svrid = names(maxU),
 
 tf <- merge(tmp.f,staU,by.x = 'svr_id',by.y = 'svrid')
 tcmdb <- merge(tmp.cmdb,staU,by.x = 'svr_asset_id',by.y = 'svrid')
+
 tfC <- subset(tf,grepl('C',dClass));tfTS <- subset(tf,grepl('TS',dClass))
 tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dClass))
 
@@ -95,6 +96,46 @@ busyPerc <- data.frame(lowerC = nrow(tfC[tfC$maxoU < busyBound,])/nrow(tcmdbC[tc
                        lowerTS = nrow(tfTS[tfTS$maxoU < busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU < busyBound,])/12*6*100/1.96*1.61,
                        higherTS = nrow(tfTS[tfTS$maxoU >= busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU >= busyBound,])/12*6*100/1.96*1.61)
 
+staU0 <- staU
+staU0$dClass <- tcmdb$dClass[match(staU0$svrid,tcmdb$svr_asset_id)]
+staU0$dClass[grepl('TS',staU0$dClass)] <- 'Sserv'
+staU0$dClass[grepl('C',staU0$dClass)] <- 'Nserv'
+staU0$fClass <- ' Normal'
+staU0$fClass[staU0$svrid %in% tf$svr_id] <- ' Failed'
+# staU0$class <- paste(staU0$dClass,'(',staU0$fClass,')',sep='')
+staU0$class <- paste(staU0$fClass,staU0$dClass,sep=' ')
+
+#画图
+p1 <- ggplot(staU0,aes(x = maxoU,color = class,linetype = class)) + stat_ecdf(size = 1.5) +
+  xlab('Util') + ylab('') +
+  coord_cartesian(xlim = c(-3,103),ylim = c(-0.05,1.05),expand = F) + 
+  scale_y_continuous(breaks = seq(0,1,0.2)) +
+  scale_x_continuous(breaks = seq(0,100,10)) +
+  guides(color = guide_legend(title=NULL),linetype = guide_legend(title = NULL)) + 
+  theme_bw() +
+  theme(panel.background = element_rect(color = 'black'),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = 'grey', linetype = 'dotted'),
+        #           panel.grid.major.x = element_blank(),
+        
+        plot.title = element_text(size = 26,vjust = 1),
+        axis.line = element_line(color = 'black'),
+        axis.text = element_text(size = 22),
+        # axis.text.x = element_text(angle = 40,margin = margin(15)),
+        axis.title = element_text(size = 24),
+        
+        legend.key.width = unit(5,units = 'line'),
+        # legend.key.height = unit(1.5,units = 'line'),
+        legend.text = element_text(size = 26),
+        legend.position = c(0.05,0.95),legend.justification = c(0,1),
+        legend.background = element_rect(fill = alpha('grey',0.5))
+  )
+print(p1)
+ggsave(file=file.path(dir_data,'sc16','fig6A.eps'), plot=p1, width = 8, height = 6, dpi = 100)
+
+
+
+######################################################################################################
 #持续时间与故障率
 ioU <- factorX(subset(ioUtilMax,svrid %in% tmp.cmdb$svr_asset_id))
 ioU$A1 <- ioU$maxLastCount
@@ -131,6 +172,7 @@ b$AFR <- b$AFR/1.96*1.61
 Dura <- rbind(item_order(a,attrNeed),item_order(b,attrNeed))
 Dura$maxA1 <- as.numeric(gsub('\\]$|^.*,','',Dura$maxA1))*5
 
-AFR_plot(Dura,'fig6',0,30)
-ggplot(Dura,aes(x = maxA1,y = AFR,fill = class)) + geom_bar(stat = 'identity',position = 'dodge')
+AFR_plot(Dura,'fig6B',0,30)
+# ggplot(Dura,aes(x = maxA1,y = AFR,fill = class)) + 
+#   geom_bar(stat = 'identity',position = 'dodge')
 

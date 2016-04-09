@@ -18,8 +18,9 @@ AFR_plot <- function(cm,title){
   cm1 <- subset(cm,warP == 'Under warranty')
   cm1$sep9023 <- factor((2^cm1$sep9023)/(2^30))
   p1 <- ggplot(cm1,aes(x = sep9023,y = AFR)) + 
-    geom_bar(stat = 'identity') + ggtitle('Under warranty') +
-    xlab('Amount of I/O workload (TB)') + ylab('Annual Failure Rate (%)') + 
+    geom_bar(stat = 'identity') + 
+    # ggtitle('Under warranty') +
+    xlab('Amount of I/O workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
     # scale_y_continuous(breaks = seq(0,1.75,0.25),limits = c(0,1.75)) +
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
@@ -45,8 +46,9 @@ AFR_plot <- function(cm,title){
   cm2 <- subset(cm,warP == 'Warranty expired')
   cm2$sep9023 <- factor((2^cm2$sep9023)/(2^30))
   p2 <- ggplot(cm2,aes(x = sep9023,y = AFR)) + 
-    geom_bar(stat = 'identity') + ggtitle('Warranty expired') +
-    xlab('Amount of I/O workload (TB)') + ylab('Annual Failure Rate (%)') + 
+    geom_bar(stat = 'identity') + 
+    # ggtitle('Warranty expired') +
+    xlab('Amount of I/O workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
     # ylim(c(0,8)) +
     # scale_y_continuous(breaks = seq(0,8,1),limits = c(0,8)) +
     guides(fill = guide_legend(title=NULL)) + 
@@ -84,32 +86,36 @@ classExchg <- function(df){
 }
 
 #F3. CDF plot
-CDF_plot <- function(data,title,breaks_x = NULL,breaks_y = NULL){
-  p <- ggplot(data,aes(acct_9023O,color = factor(shTime))) + stat_ecdf(size = 1) +
-  xlab('Amount of I/O workload') + ylab('') +
-  scale_y_continuous(breaks = seq(0,1,0.1)) +
-  scale_x_continuous(breaks = breaks_x) +
-  guides(color = guide_legend(title=NULL)) + 
-  theme_bw() +
-  theme(panel.background = element_rect(color = 'black'),
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_line(colour = 'grey', linetype = 'dotted'),
-        #           panel.grid.major.x = element_blank(),
-        
-        plot.title = element_text(size = 26,vjust = 1),
-        axis.line = element_line(color = 'black'),
-        axis.text = element_text(size = 22),
-        # axis.text.x = element_text(angle = 40,margin = margin(15)),
-        axis.title = element_text(size = 24),
-        
-        legend.key.width = unit(1.5,units = 'line'),
-        legend.key.height = unit(1.5,units = 'line'),
-        legend.text = element_text(size = 26),
-        legend.position = c(0,1),legend.justification = c(0,1),
-        legend.background = element_rect(fill = alpha('grey',0.5))
-  )
+CDF_plot <- function(data,tt,xl){
+  data$shTime <- paste(data$shTime + 1,'years',sep=' ')
+  data$shTime[data$shTime == '1 years'] <- '1 year'
+  
+  p <- ggplot(data,aes(acct_9023O,color = factor(shTime),linetype = factor(shTime))) + 
+    stat_ecdf(size = 1) + xlab('Amount of I/O workload (Terabytes)') + ylab('') + 
+    coord_cartesian(xlim = xl) +
+    scale_y_continuous(breaks = seq(0,1,0.1)) +
+    scale_x_continuous(breaks = seq(xl[1],xl[2],1),labels = round(2^(seq(xl[1],xl[2],1)-30),2)) +
+    guides(color = guide_legend(title = NULL), linetype = guide_legend((title = NULL))) +
+    theme_bw() +
+    theme(panel.background = element_rect(color = 'black'),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(colour = 'grey', linetype = 'dotted'),
+          #           panel.grid.major.x = element_blank(),
+          
+          plot.title = element_text(size = 26,vjust = 1),
+          axis.line = element_line(color = 'black'),
+          axis.text = element_text(size = 22),
+          axis.text.x = element_text(angle = 40,margin = margin(10)),
+          axis.title = element_text(size = 24),
+          
+          legend.key.width = unit(1.5,units = 'line'),
+          legend.key.height = unit(1.5,units = 'line'),
+          legend.text = element_text(size = 26),
+          legend.position = c(0,1),legend.justification = c(0,1),
+          legend.background = element_rect(fill = alpha('grey',0.5))
+    )
   print(p)
-  ggsave(file=file.path(dir_data,'sc16',paste(title,'.eps',sep='')), plot=p, width = 8, height = 6, dpi = 100)
+  ggsave(file=file.path(dir_data,'sc16',paste(tt,'.eps',sep='')), plot=p, width = 8, height = 6, dpi = 300)
 } 
 #####################################################################################################
 # Fig1
@@ -150,8 +156,8 @@ AFR9023C <- ioAFR(ioC,fC,c('sep9023','warP'))
 pC <- AFR_plot(subset(AFR9023C),'fig2A')
 pTS <- AFR_plot(subset(AFR9023TS),'fig2B')
 
-CDF_plot(ioC,'fig2A3',breaks_x = seq(25,40,1))
-CDF_plot(ioTS,'fig2B3',breaks_x = seq(25,40,1))
+CDF_plot(ioC,'fig2A3',c(28,38))
+CDF_plot(ioTS,'fig2B3',c(25,38))
 
 mean(ioTS$acct_9023[ioTS$shTime <= 1])
 mean(ioTS$acct_9023[ioTS$shTime > 1 & ioTS$shTime <= 3])
