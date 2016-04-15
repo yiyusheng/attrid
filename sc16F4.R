@@ -9,8 +9,8 @@ source(file.path(dir_code,'attr_function.R'))
 source(file.path(dir_code,'AFR_io_function.R'))
 
 #@@@ LOAD DATA @@@#
-load(file.path(dir_data,'load_ftr_attrid.Rda'))
-source(file.path(dir_code,'AFR_io_prepare.R'))
+load(file.path(dir_data,'load_ftr_attridOld.Rda'))
+source(file.path(dir_code,'AFR_io_prepareOld.R'))
 load(file.path(dir_data,'ioFluc9023Simp.Rda'))
 
 #####################################################################################################
@@ -23,7 +23,7 @@ AFR_plot <- function(cm,title){
     geom_bar(stat = 'identity',position = 'dodge') +
     xlab('Coefficient of Variable') + ylab('Annual Failure Rate (%)') + 
     # scale_x_continuous(breaks = floor(min(cm1$maxCVd)):ceiling(max(cm1$maxCVd))) +
-    scale_y_continuous(breaks = seq(0,8,1)) +
+    scale_y_continuous(breaks = seq(0,6,1)) +
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
     theme(panel.background = element_rect(color = 'black'),
@@ -39,7 +39,8 @@ AFR_plot <- function(cm,title){
           legend.key.width = unit(1.5,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
           legend.text = element_text(size = 26),
-          legend.position = 'top',
+          legend.position = c(0.05,0.95),
+          legend.justification = c(0,1),
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p1)
@@ -56,7 +57,7 @@ ioAFR <- function(io,f,attr,diskCount = 1){
   }
   tMerge <- merge(t1,t2,by = attr,all = T)
   names(tMerge) <- c(attr,'count','fCount')
-  tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*100
+  tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*600
   tMerge <- subset(tMerge,!is.na(AFR))
 }
 #####################################################################################################

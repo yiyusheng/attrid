@@ -100,8 +100,8 @@ staU0 <- staU
 staU0$dClass <- tcmdb$dClass[match(staU0$svrid,tcmdb$svr_asset_id)]
 staU0$dClass[grepl('TS',staU0$dClass)] <- 'Sserv'
 staU0$dClass[grepl('C',staU0$dClass)] <- 'Nserv'
-staU0$fClass <- ' Normal'
-staU0$fClass[staU0$svrid %in% tf$svr_id] <- ' Failed'
+staU0$fClass <- 'Normal'
+staU0$fClass[staU0$svrid %in% tf$svr_id] <- 'Failed'
 # staU0$class <- paste(staU0$dClass,'(',staU0$fClass,')',sep='')
 staU0$class <- paste(staU0$fClass,staU0$dClass,sep=' ')
 
@@ -124,10 +124,10 @@ p1 <- ggplot(staU0,aes(x = maxoU,color = class,linetype = class)) + stat_ecdf(si
         # axis.text.x = element_text(angle = 40,margin = margin(15)),
         axis.title = element_text(size = 24),
         
-        legend.key.width = unit(5,units = 'line'),
-        # legend.key.height = unit(1.5,units = 'line'),
+        legend.key.width = unit(4,units = 'line'),
+        legend.key.height = unit(2,units = 'line'),
         legend.text = element_text(size = 26),
-        legend.position = c(0.05,0.95),legend.justification = c(0,1),
+        legend.position = c(0,1),legend.justification = c(0,1),
         legend.background = element_rect(fill = alpha('grey',0.5))
   )
 print(p1)

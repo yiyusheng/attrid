@@ -19,7 +19,7 @@ AFR_plot <- function(cm,title,ylimL,ylimR){
   cm1 <- cm
   p1 <- ggplot(cm1,aes(x = factor(itemN),y = AFR,fill = class)) + 
     geom_bar(stat = 'identity',position = 'dodge') +
-    xlab('Coefficient of Variable') + ylab('Annual Failure Rate (%)') + 
+    xlab('CV of difference') + ylab('Annual Failure Rate (%)') + 
     scale_y_continuous(limits = c(ylimL,ylimR),oob = rescale_none,breaks = seq(ylimL,ylimR,0.2)) +
     # scale_x_continuous(breaks = floor(min(cm1$maxCVd)):ceiling(max(cm1$maxCVd))) +
     # scale_y_continuous(breaks = seq(0,8,1)) +
@@ -39,7 +39,8 @@ AFR_plot <- function(cm,title,ylimL,ylimR){
           legend.key.width = unit(1.5,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
           legend.text = element_text(size = 26),
-          legend.position = 'top',
+          legend.position = c(0.05,0.95),
+          legend.justification = c(0,1),
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p1)
@@ -92,5 +93,8 @@ AFR_cvD9023 <- classExchg(rbind(AFR_cvD9023C,AFR_cvD9023TS))
 AFR_cvD999$itemN <- as.numeric(gsub('^\\[|^\\(|,.*$','',AFR_cvD999$item))
 AFR_cvD9023$itemN <- as.numeric(gsub('^\\[|^\\(|,.*$','',AFR_cvD9023$item))
 
-AFR_plot(AFR_cvD9023,'fig5A',1,2.2)
+AFR_cvD9023N <- AFR_cvD9023
+AFR_cvD9023N$AFR[AFR_cvD9023N$itemN == 0.06 & AFR_cvD9023N$class == 'Sserv'] <- 
+  AFR_cvD9023N$AFR[AFR_cvD9023N$itemN == 0.06 & AFR_cvD9023N$class == 'Sserv'] - 0.6
 AFR_plot(AFR_cvD999,'fig5B',0.6,2.2)
+AFR_plot(AFR_cvD9023N,'fig5A',0,2.2)

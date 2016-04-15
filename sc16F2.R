@@ -20,7 +20,7 @@ AFR_plot <- function(cm,title){
   p1 <- ggplot(cm1,aes(x = sep9023,y = AFR)) + 
     geom_bar(stat = 'identity') + 
     # ggtitle('Under warranty') +
-    xlab('Amount of I/O workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
+    xlab('Amount of I/O Workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
     # scale_y_continuous(breaks = seq(0,1.75,0.25),limits = c(0,1.75)) +
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
@@ -48,7 +48,7 @@ AFR_plot <- function(cm,title){
   p2 <- ggplot(cm2,aes(x = sep9023,y = AFR)) + 
     geom_bar(stat = 'identity') + 
     # ggtitle('Warranty expired') +
-    xlab('Amount of I/O workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
+    xlab('Amount of I/O Workload (TeraBytes)') + ylab('Annual Failure Rate (%)') + 
     # ylim(c(0,8)) +
     # scale_y_continuous(breaks = seq(0,8,1),limits = c(0,8)) +
     guides(fill = guide_legend(title=NULL)) + 
@@ -91,7 +91,7 @@ CDF_plot <- function(data,tt,xl){
   data$shTime[data$shTime == '1 years'] <- '1 year'
   
   p <- ggplot(data,aes(acct_9023O,color = factor(shTime),linetype = factor(shTime))) + 
-    stat_ecdf(size = 1) + xlab('Amount of I/O workload (Terabytes)') + ylab('') + 
+    stat_ecdf(size = 1) + xlab('Amount of I/O Workload (Terabytes)') + ylab('') + 
     coord_cartesian(xlim = xl) +
     scale_y_continuous(breaks = seq(0,1,0.1)) +
     scale_x_continuous(breaks = seq(xl[1],xl[2],1),labels = round(2^(seq(xl[1],xl[2],1)-30),2)) +
@@ -108,10 +108,10 @@ CDF_plot <- function(data,tt,xl){
           axis.text.x = element_text(angle = 40,margin = margin(10)),
           axis.title = element_text(size = 24),
           
-          legend.key.width = unit(1.5,units = 'line'),
+          legend.key.width = unit(4,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
           legend.text = element_text(size = 26),
-          legend.position = c(0,1),legend.justification = c(0,1),
+          legend.position = c(1,0),legend.justification = c(1,0),
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p)
@@ -156,8 +156,9 @@ AFR9023C <- ioAFR(ioC,fC,c('sep9023','warP'))
 pC <- AFR_plot(subset(AFR9023C),'fig2A')
 pTS <- AFR_plot(subset(AFR9023TS),'fig2B')
 
-CDF_plot(ioC,'fig2A3',c(28,38))
-CDF_plot(ioTS,'fig2B3',c(25,38))
+ioTSN <- subset(ioTS,shTime < 6)
+CDF_plot(ioC,'fig2A3',c(25,38))
+CDF_plot(ioTSN,'fig2B3',c(25,38))
 
 mean(ioTS$acct_9023[ioTS$shTime <= 1])
 mean(ioTS$acct_9023[ioTS$shTime > 1 & ioTS$shTime <= 3])
