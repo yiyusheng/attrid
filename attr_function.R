@@ -1,6 +1,6 @@
 #Function set
 
-# F1. 单字段分区域故障率
+# F1. AFR of single attr
 sinAttrFR <- function(data,dataF,singlePartCount,title,units,disks){
   div <- as.numeric(quantile(data,seq(0,1,1/singlePartCount)))
   cut <- tableX(cut(data,div))
@@ -32,15 +32,15 @@ sinAttrFR <- function(data,dataF,singlePartCount,title,units,disks){
   return(cutM)
 }
 
-# F2. 双字段分区域故障率
+# F2. two attr AFR
 dblAttrFR <- function(mean_io,doublePartCount,title,xl,yl){
   
-  #F2.1 数据声明
+  #F2.1 data announcement
   partA <- data.frame(matrix(0,doublePartCount,doublePartCount))
   partF <- data.frame(matrix(0,doublePartCount,doublePartCount))
   partR <- data.frame(matrix(0,doublePartCount,doublePartCount))
   
-  #F2.2 划分
+  #F2.2 split
   cn <- names(mean_io)
   names(mean_io) <- c('svrid','colA','colB','class')
   divA <- as.numeric(quantile(mean_io$colA,seq(0,1,1/doublePartCount)))
@@ -48,7 +48,7 @@ dblAttrFR <- function(mean_io,doublePartCount,title,xl,yl){
   divB <- as.numeric(quantile(mean_io$colB,seq(0,1,1/doublePartCount)))
   divB <- divB + mean(divB)*1e-20*seq(0,(length(divB)-1),1)
   
-  #F2.3 求数量，比例
+  #F2.3 calculate the number and ratio
   for (i in 1:(length(divA)-1)){
     for (j in 1:(length(divB)-1)){
       tmp <- mean_io[mean_io$colA > divA[i] & mean_io$colA <= divA[i+1] &
@@ -59,8 +59,8 @@ dblAttrFR <- function(mean_io,doublePartCount,title,xl,yl){
   }
   partR <- partF/partA
   
-  #F2.4 预处理及融化
-  #过滤数据不足的区间
+  #F2.4 preprocess and melt
+  #filter region not containing enough data
   partR[is.na(partR) | partA <= nrow(mean_io_C)/doublePartCount/doublePartCount/4] <- -1
   partR <- round(partR*1e5)/1e5
   names(partR) <- divB[1:doublePartCount]
@@ -92,7 +92,7 @@ dblAttrFR <- function(mean_io,doublePartCount,title,xl,yl){
   return(list(partA,partF,partR))
 }
 
-# F3. 单字段累积故障率
+# F3. single attr cumulate AFR
 sinAttrCumFR <- function(data,attr,title){
   tmp_io <- data
   tmp_io <- tmp_io[order(tmp_io[[attr]]),]
@@ -103,7 +103,7 @@ sinAttrCumFR <- function(data,attr,title){
   write.csv(tmp_io,file = file.path(dir_data,title))
 }
 
-# F4. MCF计算，未完成，放弃。
+# F4. MCF computing, unfinished and abort
 mcf <- function(data,attr){
   data <- data[order(data[[attr]]),]
   mcf <- data.frame(x = sort(unique(data[[attr]])))
@@ -113,9 +113,8 @@ mcf <- function(data,attr){
   #   mcf$cumu
 }
 
-# F5. 单字段人工分区域故障率
-# 相比于F1,这里不再是按机器数来分区间，而是采用人工划分
-# 例如对时间采取[0,5,1],[5,20,5],[20,100,40]来进行划分
+# F5. single attr AFR with mannual partition
+# for example, time are partitioned to [0,5,1],[5,20,5],[20,100,40]
 sinAttrManualFR <- function(data,dataF,div,title,units,disks){
   cut <- tableX(cut(data,div))
   cutF <- tableX(cut(dataF,div))
@@ -146,7 +145,7 @@ sinAttrManualFR <- function(data,dataF,div,title,units,disks){
   return(cutM)
 }
 
-# F6. 为多行内容进行table
+# F6. table for multiple columns
 colTableX <- function(data,col,decreasing = T,rm.na = F){
   colMerge <- data[[col[1]]]
   for (i in seq(2,length(col))){
@@ -155,7 +154,7 @@ colTableX <- function(data,col,decreasing = T,rm.na = F){
   return(tableX(colMerge,decreasing = decreasing))
 }
 
-# F7. 拆分合并之后的col，并输出data.frame
+# F7. merge splited column and export a data.frame
 splitToDF <- function(data,split = '_',header = ''){
   r <- data.frame(matrix(unlist(strsplit(as.character(data),split)),byrow = T,nrow = length(data)))
   if (header[1] != ''){
@@ -164,7 +163,7 @@ splitToDF <- function(data,split = '_',header = ''){
   return(r)
 }
 
-# F8. 增长率计算
+# F8. comupute rate of increment
 incCalc <- function(data){
   len <- length(data)
   inc <- (data[2:len] - data[1:(len-1)])/data[1:(len-1)]
@@ -172,7 +171,7 @@ incCalc <- function(data){
   return(inc)
 }
 
-# F9. 多图函数
+# F9. multiplot
 multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
   require(grid)
   
@@ -201,7 +200,7 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
   }
 }
 
-# F10.返回多个值时用list[]分别接收
+# F10.return multiple value and recive by list
 # from https://raw.githubusercontent.com/ggrothendieck/gsubfn/master/R/list.R
 list <- structure(NA,class="result")
 "[<-.result" <- function(x,...,value) {
@@ -215,8 +214,7 @@ list <- structure(NA,class="result")
   x
 }
 
-## F11.为了进行log2处理，把小于1大于0的值设为1,大于-1小于0的值设为-1
-# 后一个函数将(-Inf,Inf)的值用log2映射到(-Inf,Inf),其中[-1,1]映射为0.
+## F11.for log2 computation, set [0,1] to 1 and [-1,0] to -1
 mdf4log2 <- function(x){
   x[x < 1 & x >= 0] <- 1
   x[x > -1 & x < 0] <- -1
@@ -229,7 +227,7 @@ log4neg <- function(x){
   x
 }
 
-# F12.将df的item以括号后第一个数字的顺序排序,用于方便的画图
+# F12.order for column of df in order to plot conveniently
 item_order <- function(df,attr = 'item'){
   od <- as.numeric(gsub('^\\[|^\\(|,.*$','',df[[attr]]))
   df[attr] <- factor(df[[attr]],levels = df[[attr]][order(od)])

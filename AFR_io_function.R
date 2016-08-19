@@ -65,16 +65,17 @@ AFR_plot <- function(cutMerge,title,yl){
   }
   print(p1)
   ggsave(file=file.path(dir_data,'ship_time',paste(title,'.png',sep='')), plot=p1, width = 16, height = 12, dpi = 100)
+  p1
 }
 
 AFR_value <- function(p3.f,p3.cmdb,p3.io,attr,levelCount,lastYears,diskCount){
-  # 求区间
+  # compute div
   div902 <- quantile(p3.io$mean_902/diskCount,seq(0,1,1/levelCount))
   div903 <- quantile(p3.io$mean_903/diskCount,seq(0,1,1/levelCount))
   div999 <- quantile(p3.io$mean_999,seq(0,1,1/levelCount))
   divAll <- c(0,(seq(1,(lastYears-1)) - 1/12),lastYears)
   divF <- seq(0,lastYears)
-  # 给每台机器添加区间
+  # add div for each server
   p3.io$lv902 <- cut(p3.io$mean_902/diskCount,div902)
   p3.io$lv903 <- cut(p3.io$mean_903/diskCount,div903)
   p3.io$lv999 <- cut(p3.io$mean_999,div999)
@@ -114,9 +115,9 @@ AFR_value <- function(p3.f,p3.cmdb,p3.io,attr,levelCount,lastYears,diskCount){
 
 
 
-#对任何一个字段，不同时间段的故障率
+# compute AFR for each attr and different time period
 AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
-  # 求区间
+  # compute div 
   f <- factorX(f)
   cmdb <- factorX(cmdb)
   if (dev != ''){
@@ -154,7 +155,7 @@ AFR_attr <- function(f,cmdb,attr,lastYears,diskCount,dev = '',defValue = ' 0'){
   return(cutMerge)
 }
 
-#分字段处理，不处理时间
+# AFR for attr without time
 AFR_attr_notime <- function(f,io,attr1,attr2,diskCount,dev = ""){
   if(dev != ""){
     f <- subset(f,grepl(dev,dClass))
