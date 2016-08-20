@@ -1,4 +1,4 @@
-# ²âÊÔÓÃ
+# æµ‹è¯•ç”¨
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -12,7 +12,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # load(file.path(dir_data,'load_ftr_attrid.Rda'))
 
 #@@@ FUNCTION @@@#
-# F1.¶ÔÃ¿Ì¨»úÆ÷µÄÄ³¸öÊôĞÔ»­Í¼£¬Ò»ÖÜÒ»¸öÍ¼
+# F1.å¯¹æ¯å°æœºå™¨çš„æŸä¸ªå±æ€§ç”»å›¾ï¼Œä¸€å‘¨ä¸€ä¸ªå›¾
 mtwplot <- function(sid,attr){
   sidp <- gsub('.*_','',sid)
   print(sid)
@@ -67,7 +67,7 @@ mtwplot <- function(sid,attr){
   p
 }
 
-# F2.¶ÔÊıÖµºÍfft×÷Í¼
+# F2.å¯¹æ•°å€¼å’Œfftä½œå›¾
 mtplot <- function(sid){
   sidp <- gsub('.*_','',sid)
   print(sid)
@@ -99,7 +99,7 @@ mtplot <- function(sid){
   return(list(dataVo,dataFS,dataF))
 }
 ############################################################################################
-# # T1. data1ÖĞÈı×Ö¶Î·ÖÎ»µã
+# # T1. data1ä¸­ä¸‰å­—æ®µåˆ†ä½ç‚¹
 # load(file.path(dir_data,'data1Quan.Rda'))
 # q902 <- data.frame(quan = seq(0,100,0.1),value = q902,cl = 'Read')
 # q903 <- data.frame(quan = seq(0,100,0.1),value = q903,cl = 'write')
@@ -108,7 +108,7 @@ mtplot <- function(sid){
 # row.names(q) <- NULL
 # ggplot(q,aes(x = quan,y = log2(value),group = cl,color = cl)) + geom_line()
 
-# T2. ÆµÆ×Í¼
+# T2. é¢‘è°±å›¾
 # load(file.path(dir_data,'failIOSample.Rda'))
 # svrid_cpl <- tapply(failIO$svrid,factor(failIO$svrid),length)
 # svrid_full <- names(svrid_cpl)[as.numeric(svrid_cpl) == 17280]
@@ -116,19 +116,19 @@ mtplot <- function(sid){
 # save(failIOSample,file = file.path(dir_data,'failIOSample.Rda'))
 # failIO <- failIOSample
 # 
-# data <- failIO$a902[failIO$svrid == levels(failIO$svrid)[4]]   #Êı¾İÑ¡Ôñ
+# data <- failIO$a902[failIO$svrid == levels(failIO$svrid)[4]]   #æ•°æ®é€‰æ‹©
 # data <- subset(failIO,svrid %in% levels(failIO$svrid)[4])
 # 
-# #FTÖ®ºóÈı¸ö×Ö¶Î×î¸ßµÄÈıÖÖÆµÂÊ
+# #FTä¹‹åä¸‰ä¸ªå­—æ®µæœ€é«˜çš„ä¸‰ç§é¢‘ç‡
 # maxFreq <- function(sid){
 #   L <- 3
 # #   sprintf(print(sid))
 #   data <- subset(failIO,svrid == sid)
-#   #¼ÆËã
+#   #è®¡ç®—
 #   fftR <- abs(fft(data$a902))[2:(N/2)]
 #   fftW <- abs(fft(data$a903))[2:(N/2)]
 #   fftU <- abs(fft(data$a999))[2:(N/2)]
-#   #Êı¾İÕûÀí
+#   #æ•°æ®æ•´ç†
 #   df <- data.frame(f = f[2:(N/2)],fftR,fftW,fftU);
 #   Freq <- c(df$f[order(df$fftR,decreasing = T)][1:L],
 #             df$f[order(df$fftW,decreasing = T)][1:L],
@@ -138,7 +138,7 @@ mtplot <- function(sid){
 #             df$fftU[order(df$fftU,decreasing = T)][1:L])
 # }
 # 
-# #²ÎÊıÉèÖÃÓë¼ÆËã
+# #å‚æ•°è®¾ç½®ä¸è®¡ç®—
 # fs <- 1/300;N <- 17280;
 # n <- 0:(N-1);t <- n/fs;
 # f <- n*fs/N
@@ -150,7 +150,7 @@ mtplot <- function(sid){
 # load(file.path(dir_data,'fourierTransMThH.Rda'))
 # R1 <- subset(frT,svrid %in% R$svrid)
 # 
-# # T3.svm³¢ÊÔ
+# # T3.svmå°è¯•
 # simData=function(radius,width,distance,sample_size)
 # {
 #   aa1=runif(sample_size/2)
@@ -185,7 +185,7 @@ mtplot <- function(sid){
 # pred1<-fitted(m1)
 # table(pred1,dataSim[,3])
 # 
-# # T4. ¸µÀïÒ¶±ä»»Ñ§Ï°
+# # T4. å‚…é‡Œå¶å˜æ¢å­¦ä¹ 
 # xs <- seq(-2*pi,2*pi,pi/100)
 # wave.1 <- sin(3*xs)
 # wave.2 <- sin(10*xs)
@@ -205,7 +205,7 @@ mtplot <- function(sid){
 # plot(xs,wave.3,type="l"); title("Repeating pattern")
 # points(repeat.xs,wave.3.repeat,type="l",col="red"); abline(h=0,v=c(-2*pi,0),lty=3)
 # 
-# # T5.ÎÄ¼şÖØÃüÃûÒÔ·ÅÈëÍ¬Ò»¸öÎÄ¼ş¼ĞÖĞ²é¿´
+# # T5.æ–‡ä»¶é‡å‘½åä»¥æ”¾å…¥åŒä¸€ä¸ªæ–‡ä»¶å¤¹ä¸­æŸ¥çœ‹
 # dir_rename1 <- 'D:/Data/attrid/FailIOCoarse/test200-read/Week'
 # dir_rename2 <- 'D:/Data/attrid/FailIOCoarse/test200-write/Week'
 # dir_rename3 <- 'D:/Data/attrid/FailIOCoarse/test200-util/Week'
@@ -227,7 +227,7 @@ mtplot <- function(sid){
 # file.rename(file.path(dir_rename3,names3),
 #             file.path(dir_rename3,newnames3))
 
-# T4.Ê±ÓòÓëÆµÓòÊı¾İ¹Û²ì
+# T4.æ—¶åŸŸä¸é¢‘åŸŸæ•°æ®è§‚å¯Ÿ
 # load(file.path(dir_data,'failIO.Rda'))
 # svrCount <- tapply(failIO$svrid,factor(failIO$svrid),length)
 # svr902 <- tapply(failIO$a902,factor(failIO$svrid),)
@@ -242,7 +242,7 @@ mtplot <- function(sid){
 # N <- 17280
 # 
 # 
-# #¶ÔÃ¿ÖÜµÄÊıÖµ×÷Í¼£¬¹²8ÖÜÓÖ5Ìì
+# #å¯¹æ¯å‘¨çš„æ•°å€¼ä½œå›¾ï¼Œå…±8å‘¨åˆ5å¤©
 # cut <- c(as.POSIXct('2014-06-01'),as.POSIXct('2014-06-08'),as.POSIXct('2014-06-15'),
 #          as.POSIXct('2014-06-22'),as.POSIXct('2014-06-29'),as.POSIXct('2014-07-06'),as.POSIXct('2014-07-13'),
 #          as.POSIXct('2014-07-20'),as.POSIXct('2014-07-27'),as.POSIXct('2014-08-01'))
@@ -262,9 +262,9 @@ mtplot <- function(sid){
 # list[rV,rFS,rF] <- mtplot(sidset[8]);
 # print(rFS[1:5,c('fft','round','fftRate','absR')])
 
-# T5.·ÖÎö902Óë903µÄ²¨¶¯
+# T5.åˆ†æ902ä¸903çš„æ³¢åŠ¨
 
-# # T5.1 ¼ÆËãÃ¿Ìì×î´ó²¨¶¯
+# # T5.1 è®¡ç®—æ¯å¤©æœ€å¤§æ³¢åŠ¨
 # data$a902l <- data$a902
 # data$a903l <- data$a903
 # data$fluc902 <- 0
@@ -297,11 +297,11 @@ mtplot <- function(sid){
 # names(fluc.data) <- c('idx902','maxV902','maxF902',
 #                       'idx903','maxV903','maxF903')
 # fluc <- cbind(fluc,fluc.data)
-# ¶ÔÓÚÒòÎªÏÂ½µµ¼ÖÂµÄ×î´ó²îÒì£¬ÕÒÏÂ½µµ½µÄÄÇ¸öÖµ
+# å¯¹äºå› ä¸ºä¸‹é™å¯¼è‡´çš„æœ€å¤§å·®å¼‚ï¼Œæ‰¾ä¸‹é™åˆ°çš„é‚£ä¸ªå€¼
 # fluc$maxV902[fluc$maxF902 < 0] <- fluc$maxV902[fluc$maxF902 < 0] + fluc$maxF902[fluc$maxF902 < 0]
 # fluc$maxV903[fluc$maxF903 < 0] <- fluc$maxV903[fluc$maxF903 < 0] + fluc$maxF903[fluc$maxF903 < 0]
 
-# T5.2 Ô­Êı¾İ²ÉÑùÖ®ºó½øĞĞ²¨¶¯·ÖÎö£¨ÎŞºÏÊÊ½á¹û£©
+# T5.2 åŸæ•°æ®é‡‡æ ·ä¹‹åè¿›è¡Œæ³¢åŠ¨åˆ†æï¼ˆæ— åˆé€‚ç»“æœï¼‰
 # flucLg <- fluc
 # flucLg[,c(4,5,7,8)] <- apply(flucLg[,c(4,5,7,8)],2,function(x){
 #   x[x <= 1 & x >= -1] <- 1
@@ -320,7 +320,7 @@ mtplot <- function(sid){
 # flucSmp$m902 <- abs(flucSmp$d902)/abs(flucSmp$a902)
 # flucSmp$m903 <- abs(flucSmp$d903)/abs(flucSmp$a903)
 # a <- flucSmp[1:10000,]
-# #·Ö»úĞÍ
+# #åˆ†æœºå‹
 # flucSmpC <- subset(flucSmp,class == 'C')
 # flucSmpTS <- subset(flucSmp,class == 'TS')
 # 
@@ -333,8 +333,8 @@ mtplot <- function(sid){
 # p3 <- ggplot(flucSmpC[sample(nrow(flucSmpTS),100000) & flucSmpC > 1,],aes(x = m902,y=m902))+geom_point(alpha = 0.3)
 # print(p3)
 
-# T6.¼ÆËãÃ¿ÌìÃ¿Ì¨»úÆ÷Ó²ÅÌÀûÓÃÂÊÁ¬Ğø³¬¹ı100µÄÊı¾İµãÊı.
-# ÒòÎªÑù±¾Êı¾İÖĞ³¬¹ı100µÄÊıÁ¿Ì«ÉÙ£¬È¡³¬¹ı5µÄ999×÷ÎªÀı×Ó
+# T6.è®¡ç®—æ¯å¤©æ¯å°æœºå™¨ç¡¬ç›˜åˆ©ç”¨ç‡è¿ç»­è¶…è¿‡100çš„æ•°æ®ç‚¹æ•°.
+# å› ä¸ºæ ·æœ¬æ•°æ®ä¸­è¶…è¿‡100çš„æ•°é‡å¤ªå°‘ï¼Œå–è¶…è¿‡5çš„999ä½œä¸ºä¾‹å­
 # r <- by(data[,c('svrid','time','a999')],data$svrid),function(x){
 #   rr <- by(x[,c('svrid','a999')],x$svrid,function(xx){
 #     idx <- which(xx$a999 > 5)
@@ -348,13 +348,13 @@ mtplot <- function(sid){
 #   })
 # }
 
-# T7.Í³¼Æ902£¬903£¬9023Óë999µÄ¹ØÏµ
+# T7.ç»Ÿè®¡902ï¼Œ903ï¼Œ9023ä¸999çš„å…³ç³»
 # load(file.path(dir_data,'spdUtilSta.Rda'))
 # list[su9023C,su9023TS,su902C,su902TS,su903C,su903TS] <- split(spdUtilSta,spdUtilSta$class)
 # su9023C <- su9023C[order(su9023C$cutA),]
 # ggplot(su9023C,aes(cutA,cut999,size = log2(value))) + geom_point()
 
-# T8.¿ÉÊÓ»¯902£¬903£¬9023³ıÒÔ999Ö®ºóµÄÖµÓëÔ­ÖµµÄ¶Ô±È¡£
+# T8.å¯è§†åŒ–902ï¼Œ903ï¼Œ9023é™¤ä»¥999ä¹‹åçš„å€¼ä¸åŸå€¼çš„å¯¹æ¯”ã€‚
 # load(file.path(dir_data,'failIO.Rda'))
 # svrCount <- tapply(failIO$svrid,factor(failIO$svrid),length)
 # svr902 <- tapply(failIO$a902,factor(failIO$svrid),)
@@ -365,7 +365,7 @@ mtplot <- function(sid){
 # save(data,file = file.path(dir_data,'freqFieldWatch700.Rda'))
 load(file.path(dir_data,'freqFieldWatch700.Rda'))
 
-#¶ÔÃ¿ÖÜµÄÊıÖµ×÷Í¼£¬¹²8ÖÜÓÖ5Ìì
+#å¯¹æ¯å‘¨çš„æ•°å€¼ä½œå›¾ï¼Œå…±8å‘¨åˆ5å¤©
 cut <- c(as.POSIXct('2014-06-01'),as.POSIXct('2014-06-08'),as.POSIXct('2014-06-15'),
          as.POSIXct('2014-06-22'),as.POSIXct('2014-06-29'),as.POSIXct('2014-07-06'),as.POSIXct('2014-07-13'),
          as.POSIXct('2014-07-20'),as.POSIXct('2014-07-27'),as.POSIXct('2014-08-01'))
@@ -373,7 +373,7 @@ cut <- c(as.POSIXct('2014-06-01'),as.POSIXct('2014-06-08'),as.POSIXct('2014-06-1
 
 sidset <- paste(1:length(levels(data$svrid)),levels(data$svrid),sep='_')
 
-#ÕûÀí999Óë9023
+#æ•´ç†999ä¸9023
 data$a902[data$a902 < 0] <- 0
 data$a903[data$a903 < 0] <- 0
 data$a999[data$a999 < 0] <- 0
@@ -381,8 +381,8 @@ data$a999[data$a999 > 100] <- 100
 data$a9023 <- data$a902 + data$a903
 data <- subset(data,!is.na(a902) & !is.na(a903) & !is.na(a999) & !is.na(a9023))
 
-#Éú³ÉĞÂµÄ999£¬°Ñ999Îª0µÄÖµ±äÎª0.1µ½0.5Ö®¼äµÄËæ»úÖµ
-#ÕâÑùÈç¹ûspdÊÇ0£¬ÄÇ³ıÁËÖ®ºóÒ²ÊÇ0£¬spdÈç¹ûĞ¡£¬ÄÇ³ıÁËÖ®ºó¾Í´ó¡£
+#ç”Ÿæˆæ–°çš„999ï¼ŒæŠŠ999ä¸º0çš„å€¼å˜ä¸º0.1åˆ°0.5ä¹‹é—´çš„éšæœºå€¼
+#è¿™æ ·å¦‚æœspdæ˜¯0ï¼Œé‚£é™¤äº†ä¹‹åä¹Ÿæ˜¯0ï¼Œspdå¦‚æœå°ï¼Œé‚£é™¤äº†ä¹‹åå°±å¤§ã€‚
 data$a999n <- data$a999
 len_zero <- sum(data$a999n == 0)
 data$a999n[data$a999n == 0] <- runif(len_zero,0.1,0.5)
@@ -392,7 +392,7 @@ data$a923 <- data$a9023/data$a999/100
 # b <- lapply(sidset,mtwplot,c('a903'))
 c <- lapply(sidset,mtwplot,c('a923','a9023'))
 
-# T9.È·ÈÏÃ¿Ì¨»úÆ÷µÄ·şÎñÂÊÎª0µÄÊ±¼äÕ¼×ÜÊ±¼äµÄ°Ù·Ö±È
+# T9.ç¡®è®¤æ¯å°æœºå™¨çš„æœåŠ¡ç‡ä¸º0çš„æ—¶é—´å æ€»æ—¶é—´çš„ç™¾åˆ†æ¯”
 load(file.path(dir_data,'ioFeature.Rda'))
 
 # TEST

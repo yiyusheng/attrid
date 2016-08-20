@@ -11,9 +11,9 @@ source(file.path(dir_code,'AFR_io_function.R'))
 #@@@ LOAD DATA @@@#
 load(file.path(dir_data,'load_ftr_attridOld.Rda'))
 source(file.path(dir_code,'AFR_io_prepareOld.R'))
-#speed + util + Dense特征
+#speed + util + Dense鐗瑰緛
 load(file.path(dir_data,'ioFeature.Rda'))
-#100%util持续时间
+#100%util鎸佺画鏃堕棿
 load(file.path(dir_data,'ioUtilMax.Rda'))
 
 #####################################################################################################
@@ -105,7 +105,7 @@ staU0$fClass[staU0$svrid %in% tf$svr_id] <- 'Failed'
 # staU0$class <- paste(staU0$dClass,'(',staU0$fClass,')',sep='')
 staU0$class <- paste(staU0$fClass,staU0$dClass,sep=' ')
 
-#画图
+#鐢诲浘
 p1 <- ggplot(staU0,aes(x = maxoU,color = class,linetype = class)) + stat_ecdf(size = 1.5) +
   xlab('Util') + ylab('') +
   coord_cartesian(xlim = c(-3,103),ylim = c(-0.05,1.05),expand = F) + 
@@ -136,7 +136,7 @@ ggsave(file=file.path(dir_data,'sc16','fig6A.eps'), plot=p1, width = 8, height =
 
 
 ######################################################################################################
-#持续时间与故障率
+#鎸佺画鏃堕棿涓庢晠闅滅巼
 ioU <- factorX(subset(ioUtilMax,svrid %in% tmp.cmdb$svr_asset_id))
 ioU$A1 <- ioU$maxLastCount
 ioU$A2 <- ioU$maxCount

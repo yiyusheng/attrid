@@ -9,7 +9,7 @@ source(file.path(dir_code,'attr_function.R'))
 
 #@@@ LOAD DATA @@@#
 # L1. For ftr_attrid.R
-# L1.1 cmdbÊı¾İ
+# L1.1 cmdbæ•°æ®
 load(file.path(dir_dataA,'disk_number_label.Rda'))
 load(file.path(dir_dataA,'mcf_all_age_rsv2014.Rda'))
 dev_need <- c('TS4','TS5','TS6','C1')
@@ -18,7 +18,7 @@ data.config <- subset(data.config,use_time > as.POSIXct('2010-01-01'))
 # data.config <- subset(data.config,dev_class_id %in% dev_need)
 data.config$dev_class_id <- factor(data.config$dev_class_id)
 
-# L1.2 ¶ÁÈ¡k131-9**,È¡ÌáÈ¡¹ÊÕÏÊı¾İ
+# L1.2 è¯»å–k131-9**,å–æå–æ•…éšœæ•°æ®
 data.flist$dev_class_id <- cmdb$dev_class_id[match(data.flist$svr_id,cmdb$svr_asset_id)]
 data.f <- subset(data.flist,f_time > as.POSIXct('2014/06/01') & 
                    f_time < as.POSIXct('2014/08/01') &
@@ -31,7 +31,7 @@ load(file = file.path(dir_data,'attr.Rda'))
 k131 <- subset(cmdb,svr_asset_id %in% k131_902$svrid)
 
 
-# L1.3 Ó²ÅÌÓÃÁ¿ÓëÇ¿¶È: ÇóÃ¿Ì¨»úÆ÷902.mean,903.mean,999.meanµÄ¾ùÖµ,¾ùÖµ/Ê¹ÓÃÊ±¼ä°Ù·Ö±ÈµÃÇ¿¶È.
+# L1.3 ç¡¬ç›˜ç”¨é‡ä¸å¼ºåº¦: æ±‚æ¯å°æœºå™¨902.mean,903.mean,999.meançš„å‡å€¼,å‡å€¼/ä½¿ç”¨æ—¶é—´ç™¾åˆ†æ¯”å¾—å¼ºåº¦.
 # tmp.902 <- k131_902
 # tmp.903 <- k131_903
 # tmp.999 <- k131_999
@@ -54,7 +54,7 @@ k131 <- subset(cmdb,svr_asset_id %in% k131_902$svrid)
 # save(mean_io,file = file.path(dir_data,'mean_io.Rda'))
 load(file = file.path(dir_data,'mean_io.Rda'))
 
-# L1.4 ´¦Àídisk_ip,Éú³Ésata2/sata3ÊıÁ¿¼°ÓĞmodelÊıĞ¡ÓÚ3Ê±µÄmodel¼°ÊıÁ¿£¬modelÒÑÅÅĞò¡£
+# L1.4 å¤„ç†disk_ip,ç”Ÿæˆsata2/sata3æ•°é‡åŠæœ‰modelæ•°å°äº3æ—¶çš„modelåŠæ•°é‡ï¼Œmodelå·²æ’åºã€‚
 # disk_ip$SATA2 <- 0
 # disk_ip$SATA3 <- 0
 # disk_ip$modelA <- ''

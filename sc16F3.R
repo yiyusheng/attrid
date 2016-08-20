@@ -82,7 +82,7 @@ ioTS <- subset(io,grepl('TS',dClass))
 fC <- subset(f,dClass == 'C')
 fTS <- subset(f,grepl('TS',dClass))
 #####################################################################################################
-# »­Í¼fig3A
+# ç”»å›¾fig3A
 io$dClassA <- io$dClass;io$dClassA[grepl('TS',io$dClass)] <- 'Sserv'
 io$dClassA[grepl('C',io$dClass)] <- 'Nserv'
 p1 <- ggplot(subset(io,!is.na(rwRate)),aes(rwRate,color = dClassA,linetype = dClassA)) + 

@@ -1,5 +1,5 @@
-# IOÀûÓÃÂÊ·ÖÎö£¬¶ÔÃ¿Ì¨»úÆ÷µÄ999µÄÖµÓë¹ÊÕÏÖ®¼äµÄ¹ØÏµ½øĞĞ·ÖÎö
-# ²¢¶Ô9023/999µÄÖµ½øĞĞ·ÖÎö
+# IOåˆ©ç”¨ç‡åˆ†æï¼Œå¯¹æ¯å°æœºå™¨çš„999çš„å€¼ä¸æ•…éšœä¹‹é—´çš„å…³ç³»è¿›è¡Œåˆ†æ
+# å¹¶å¯¹9023/999çš„å€¼è¿›è¡Œåˆ†æ
 
 rm(list = ls())
 #@@@ CONFIGURE @@@#
@@ -13,14 +13,14 @@ source(file.path(dir_code,'AFR_io_function.R'))
 #@@@ LOAD DATA @@@#
 load(file.path(dir_data,'load_ftr_attridN.Rda'))
 source(file.path(dir_code,'AFR_io_prepareN.R'))
-#speed + util + DenseÌØÕ÷
+#speed + util + Denseç‰¹å¾
 load(file.path(dir_data,'ioFeature.Rda'))
-#100%util³ÖĞøÊ±¼ä
+#100%utilæŒç»­æ—¶é—´
 load(file.path(dir_data,'ioUtilMax.Rda'))
 
 #@@@ FUNCTION @@@#
 
-# F1.½«dfµÄitemÒÔÀ¨ºÅºóµÚÒ»¸öÊı×ÖµÄË³ĞòÅÅĞò,ÓÃÓÚ·½±ãµÄ»­Í¼[ÒÑ¼ÓÈëattr_function]
+# F1.å°†dfçš„itemä»¥æ‹¬å·åç¬¬ä¸€ä¸ªæ•°å­—çš„é¡ºåºæ’åº,ç”¨äºæ–¹ä¾¿çš„ç”»å›¾[å·²åŠ å…¥attr_function]
 item_order <- function(df,attr = 'item'){
   od <- as.numeric(gsub('^\\[|^\\(|,.*$','',df[[attr]]))
   df[attr] <- factor(df[[attr]],levels = df[[attr]][order(od)])
@@ -30,7 +30,7 @@ item_order <- function(df,attr = 'item'){
 }
 
 #########################################################################################################
-# A1.999ÖµÃ¿ÈÕ¾ùÖµ£¬Ã¿ÈÕ×îÖµ£¬top10×îÖµÓë¹ÊÕÏÂÊµÄ¹ØÏµ
+# A1.999å€¼æ¯æ—¥å‡å€¼ï¼Œæ¯æ—¥æœ€å€¼ï¼Œtop10æœ€å€¼ä¸æ•…éšœç‡çš„å…³ç³»
 ioFtr$cvUtil <- ioFtr$sdUtil/ioFtr$meanUtil
 # ioFtr <- ioUtilMax
 x <- 'max';attr <- paste(x,'Util',sep='')
@@ -86,15 +86,15 @@ ggsave(file=file.path(dir_data,'ioUtil',paste(attr,'Maxtop','.png',sep='')),
        plot=p3, width = 16, height = 12, dpi = 100)
 #   return(list(AFR_meanU,AFR_maxU,AFR_maxtopU))
 
-#¼ÆËã³ÖĞø·±Ã¦Ê±¼äÃ»ÓĞ³¬¹ı5·ÖÖÓµÄ»úÆ÷µÄ¹ÊÕÏÂÊ
+#è®¡ç®—æŒç»­ç¹å¿™æ—¶é—´æ²¡æœ‰è¶…è¿‡5åˆ†é’Ÿçš„æœºå™¨çš„æ•…éšœç‡
 busyBound <- 98
 busyPerc <- data.frame(lowerC = nrow(tfC[tfC$maxoU < busyBound,])/nrow(tcmdbC[tcmdbC$maxoU < busyBound,])*6*100,
                        higherC = nrow(tfC[tfC$maxoU >= busyBound,])/nrow(tcmdbC[tcmdbC$maxoU >= busyBound,])*6*100,
                        lowerTS = nrow(tfTS[tfTS$maxoU < busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU < busyBound,])/12*6*100,
                        higherTS = nrow(tfTS[tfTS$maxoU >= busyBound,])/nrow(tcmdbTS[tcmdbTS$maxoU >= busyBound,])/12*6*100)
 
-# A2.½áºÏ×î³¤³ÖĞøÊ±¼äºÍmax´ÎÊı½øĞĞ·ÖÎö
-# [½á¹û²¢Ã»ÓĞÊ²Ã´ÓÃ£¬±¾À´Ï£Íû´æ´¢»ú×î´óÂúÔØÊ±¼äÉÙÊ±¹ÊÕÏÂÊ¸ßµÄÔ­ÒòÊÇÂúÔØ´ÎÊı¶à£¬½á¹û²¢²»ÊÇ]
+# A2.ç»“åˆæœ€é•¿æŒç»­æ—¶é—´å’Œmaxæ¬¡æ•°è¿›è¡Œåˆ†æ
+# [ç»“æœå¹¶æ²¡æœ‰ä»€ä¹ˆç”¨ï¼Œæœ¬æ¥å¸Œæœ›å­˜å‚¨æœºæœ€å¤§æ»¡è½½æ—¶é—´å°‘æ—¶æ•…éšœç‡é«˜çš„åŸå› æ˜¯æ»¡è½½æ¬¡æ•°å¤šï¼Œç»“æœå¹¶ä¸æ˜¯]
 ioU <- factorX(subset(ioUtilMax,svrid %in% tmp.cmdb$svr_asset_id))
 ioU$A1 <- ioU$maxLastCount
 ioU$A2 <- ioU$maxCount
@@ -139,9 +139,9 @@ tcmdbC <- subset(tcmdb,grepl('C',dClass)); tcmdbTS <- subset(tcmdb,grepl('TS',dC
 ggplot(tfTS,aes(meanA2)) + geom_histogram()
 ggplot(tfC,aes(meanA2)) + geom_histogram()
 
-# ½«²»Í¬³ÖĞøÂúÔØÊ±³¤µÄ¹ÊÕÏÂÊ¸ù¾İÂúÔØ´ÎÊı·Ö³É¼¸·İÔÙ»­Í¼
+# å°†ä¸åŒæŒç»­æ»¡è½½æ—¶é•¿çš„æ•…éšœç‡æ ¹æ®æ»¡è½½æ¬¡æ•°åˆ†æˆå‡ ä»½å†ç”»å›¾
 attrAdd <- 'shTime'
-# TSÀà
+# TSç±»
 tbl.cmdbTS <- melt(table(tcmdbTS[,c('maxA1',attrAdd)]));tbl.fTS <- melt(table(tfTS[,c('maxA1',attrAdd)]))
 AFR_muTS <- merge(tbl.cmdbTS,tbl.fTS,by = c('maxA1',attrAdd))
 AFR_muTS$AFR <- AFR_muTS$value.y/AFR_muTS$value.x
@@ -159,7 +159,7 @@ for (x in levels(AFR_muTS$maxA1)){
 eval(parse(text = sprintf("ggplot(subset(AFR_muTS,value.x > 1),aes(maxA1,AFRst,fill = factor(%s))) + 
                           geom_bar(stat = 'identity',position = 'stack')",attrAdd)))
 
-# CÀà
+# Cç±»
 tbl.cmdbC <- melt(table(tcmdbC[,c('maxA1',attrAdd)]));tbl.fC <- melt(table(tfC[,c('maxA1',attrAdd)]))
 AFR_muC <- merge(tbl.cmdbC,tbl.fC,by = c('maxA1',attrAdd))
 AFR_muC$AFR <- AFR_muC$value.y/AFR_muC$value.x
@@ -178,7 +178,7 @@ eval(parse(text = sprintf("ggplot(subset(AFR_muC,value.x > 1),aes(maxA1,AFRst,fi
 geom_bar(stat = 'identity',position = 'stack')",attrAdd)))
 
 
-# P1.½áÂÛ»­Í¼
+# P1.ç»“è®ºç”»å›¾
 AFR_maxU$item <- gsub('^\\[.*,|^\\(.*,|\\]','',AFR_maxU$item)
 AFR_maxU$item <- factor(as.character(as.numeric(AFR_maxU$item)/12))
 od <- order(as.numeric(levels(AFR_maxU$item)))

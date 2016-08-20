@@ -1,5 +1,5 @@
-# IOÀûÓÃÂÊ·ÖÎö£¬¶ÔÃ¿Ì¨»úÆ÷µÄ999µÄÖµÓë¹ÊÕÏÖ®¼äµÄ¹ØÏµ½øÐÐ·ÖÎö
-# ²¢¶Ô9023/999µÄÖµ½øÐÐ·ÖÎö
+# IOåˆ©ç”¨çŽ‡åˆ†æžï¼Œå¯¹æ¯å°æœºå™¨çš„999çš„å€¼ä¸Žæ•…éšœä¹‹é—´çš„å…³ç³»è¿›è¡Œåˆ†æž
+# å¹¶å¯¹9023/999çš„å€¼è¿›è¡Œåˆ†æž
 
 rm(list = ls())
 #@@@ CONFIGURE @@@#
@@ -26,7 +26,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 #@@@ FUNCTION @@@#
 
 #########################################################################################################
-# A1.Í³¼ÆdiffÒÔÅÐ¶ÏÄÄÑùµÄdiff¿ÉÒÔ×÷ÎªÖÜÆÚÐÔµÄÅÐ¶Ï±ê×¼.¼ÆËãÍêÖ®ºó´æ´¢
+# A1.ç»Ÿè®¡diffä»¥åˆ¤æ–­å“ªæ ·çš„diffå¯ä»¥ä½œä¸ºå‘¨æœŸæ€§çš„åˆ¤æ–­æ ‡å‡†.è®¡ç®—å®Œä¹‹åŽå­˜å‚¨
 # ioDura <- factorX(subset(ioDura,count == 288 & 
 #                            !is.na(diff902A) & !is.na(diff903A) & !is.na(diff9023A) & !is.na(diff999A) & 
 #                            svrid %in% cmdbio$svr_asset_id))
@@ -45,7 +45,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # ioDura$diff9023Cl <- log4neg(ioDura$diff9023C)
 # ioDura$diff999Cl <- log4neg(ioDura$diff999C)
 # 
-# #¼ÆËãdiff902µÄÌØÕ÷
+# #è®¡ç®—diff902çš„ç‰¹å¾
 # meanD902A <- tapply(ioDura$diff902Al,ioDura$svrid,mean)
 # maxD902A <- tapply(ioDura$diff902Al,ioDura$svrid,max)
 # sdD902A <- tapply(ioDura$diff902Al,ioDura$svrid,sd)
@@ -77,7 +77,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # dura902$cv <- (abs(dura902$cvDA) + abs(dura902$cvDB) + abs(dura902$cvDC))/3
 # dura902smp <- subset(dura902,!is.na(cvDC),c('svrid','cv','cvDA','cvDB','cvDC'))
 # 
-# #¼ÆËãdiff903µÄÌØÕ÷
+# #è®¡ç®—diff903çš„ç‰¹å¾
 # meanD903A <- tapply(ioDura$diff903Al,ioDura$svrid,mean)
 # maxD903A <- tapply(ioDura$diff903Al,ioDura$svrid,max)
 # sdD903A <- tapply(ioDura$diff903Al,ioDura$svrid,sd)
@@ -109,7 +109,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # dura903$cv <- (abs(dura903$cvDA) + abs(dura903$cvDB) + abs(dura903$cvDC))/3
 # dura903smp <- subset(dura903,!is.na(cvDC),c('svrid','cv','cvDA','cvDB','cvDC'))
 # 
-# #¼ÆËãdiff999µÄÌØÕ÷
+# #è®¡ç®—diff999çš„ç‰¹å¾
 # meanD999A <- tapply(ioDura$diff999Al,ioDura$svrid,mean)
 # maxD999A <- tapply(ioDura$diff999Al,ioDura$svrid,max)
 # sdD999A <- tapply(ioDura$diff999Al,ioDura$svrid,sd)
@@ -141,7 +141,7 @@ load(file.path(dir_data,'freqFieldWatch200.Rda'))
 # dura999$cv <- (abs(dura999$cvDA) + abs(dura999$cvDB) + abs(dura999$cvDC))/3
 # dura999smp <- subset(dura999,!is.na(cvDC),c('svrid','cv','cvDA','cvDB','cvDC'))
 # 
-# #¼ÆËãdiff9023µÄÌØÕ÷
+# #è®¡ç®—diff9023çš„ç‰¹å¾
 # meanD9023A <- tapply(ioDura$diff9023Al,ioDura$svrid,mean)
 # maxD9023A <- tapply(ioDura$diff9023Al,ioDura$svrid,max)
 # sdD9023A <- tapply(ioDura$diff9023Al,ioDura$svrid,sd)
@@ -301,7 +301,7 @@ ggsave(file=file.path(dir_data,'ioDura',paste('Coefficient of Variation of Mean 
 
 
 
-# #ÒýÈëÎÄ¼þÃû,½øÐÐ¼ìÑé
+# #å¼•å…¥æ–‡ä»¶å,è¿›è¡Œæ£€éªŒ
 # ioDuraTest <- factorX(subset(dura902,svrid %in% levels(data$svrid)))
 # p <- "D:\\Data\\attrid\\FailIOCoarse\\test200-read\\Week"
 # fname <- list.files(path = p)
