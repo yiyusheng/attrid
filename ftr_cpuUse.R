@@ -1,4 +1,4 @@
-# ÇóIO¿ÕÏĞÊ±¼äÌØÕ÷Óë¹ÊÕÏµÄ¹ØÏµ
+# æ±‚IOç©ºé—²æ—¶é—´ç‰¹å¾ä¸æ•…éšœçš„å…³ç³»
 rm(list = ls())
 dir_code <- 'D:/Git/attrid'
 dir_data <- 'D:/Data/attrid'
@@ -26,7 +26,7 @@ plotDevStime <- function(k131,suffix){
           legend.background = element_rect(fill = alpha('grey',0.8)),
           axis.text.x = element_text(angle = 30, hjust = 1))
   print(p)
-  ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ÉÏ¼ÜÊ±¼äÓë»úĞÍ_',suffix,'.png',sep='')),
+  ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ä¸Šæ¶æ—¶é—´ä¸æœºå‹_',suffix,'.png',sep='')),
          width = 12, height = 9, dpi = 100)
 }
 
@@ -42,7 +42,7 @@ frate_3 <- function(data){
   return(tmp)
 }
 
-# 1. LOAD cmdbÊı¾İ
+# 1. LOAD cmdbæ•°æ®
 load(file.path(dir_dataA,'disk_number_label.Rda'))
 load(file.path(dir_dataA,'mcf_all_age_rsv2014.Rda'))
 cmdb_simple <- cmdb[,c('svr_asset_id','ip','dev_class_id','bs1','use_time')]
@@ -56,7 +56,7 @@ data.f <- subset(data.flist,f_time > as.POSIXct('2014/06/01') &
                    f_time < as.POSIXct('2014/08/01') &
                    dev_class_id %in% dev_need)
 
-# 2. ¶ÁÈ¡k131-9**,È¡ÌáÈ¡¹ÊÕÏÊı¾İ,´æ´¢
+# 2. è¯»å–k131-9**,å–æå–æ•…éšœæ•°æ®,å­˜å‚¨
 # k131_902 <- read.csv(file.path(dir_data,'attr_902'))
 # k131_903 <- read.csv(file.path(dir_data,'attr_903'))
 # k131_999 <- read.csv(file.path(dir_data,'attr_999'))
@@ -83,14 +83,14 @@ data.f <- subset(data.flist,f_time > as.POSIXct('2014/06/01') &
 # sta_999$class[k131$svr_asset_id %in% data.f$svr_id] <- 'Failure'
 # save(k131_902,k131_903,k131_999,k131_svrid,sta_999,file = file.path(dir_data,'attr.Rda'))
 
-# 2.1 ¶ÁÈ¡²¢¹ıÂËÊı¾İ
+# 2.1 è¯»å–å¹¶è¿‡æ»¤æ•°æ®
 load(file = file.path(dir_data,'attr.Rda'))
 k131_999 <- subset(k131_999,svrid %in% sta_999$svrid[sta_999$count == 60])
 k131 <- subset(cmdb,dev_class_id %in% dev_need & 
                  svr_asset_id %in% k131_svrid & 
                  svr_asset_id %in% k131_999$svrid)
 
-# 2.2 »úĞÍ,¹ÊÕÏ,ÉÏ¼ÜÊ±¼äµÄ¹ØÏµÍ¼Í³¼Æ
+# 2.2 æœºå‹,æ•…éšœ,ä¸Šæ¶æ—¶é—´çš„å…³ç³»å›¾ç»Ÿè®¡
 k131$class <- 'Normal'
 k131$class[k131$svr_asset_id %in% data.f$svr_id] <- 'Failure'
 se <- seq(as.Date('2009-01-01'),as.Date('2015-01-01'),'1 year')
@@ -102,7 +102,7 @@ k131 <- subset(k131,!is.na(ut_part))
 k131 <- factorX(k131)
 plotDevStime(k131,'All')
 
-# 3. IOÊ¹ÓÃÌØÕ÷: ÇóÃ¿Ì¨»úÆ÷Ã¿Ìì999·ÖÎ»µãÎª0µÄ°Ù·Ö±È.²¢ÇóÆ½¾ù
+# 3. IOä½¿ç”¨ç‰¹å¾: æ±‚æ¯å°æœºå™¨æ¯å¤©999åˆ†ä½ç‚¹ä¸º0çš„ç™¾åˆ†æ¯”.å¹¶æ±‚å¹³å‡
 # tmp <- k131_999
 # cn <- paste('p',seq(10,100,10),sep='')
 # tmp$use_perc <- apply(tmp[,cn],1,function(x)sum(x == 0))
@@ -134,10 +134,10 @@ p <- ggplot(subset(use_999,use_perc != -1)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¿ÕÏĞÊ±¼äÍ³¼Æ.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç©ºé—²æ—¶é—´ç»Ÿè®¡.png'),
        width = 12, height = 9, dpi = 100)
 
-# 3.1 ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ
+# 3.1 ç©ºé—²æ—¶é—´ä¸æ•…éšœç‡
 count_split <- 10
 tmp2 <- floor(use_999$use_perc/count_split)*count_split
 use_999$use_perc_std <- factor(tmp2,levels = sort(unique(tmp2)))
@@ -158,10 +158,10 @@ p <- ggplot(subset(tmp3),aes(x = factor(perc),y = rate*100)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ.png',sep = '')),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸æ•…éšœç‡.png',sep = '')),
        width = 12, height = 9, dpi = 100)
 
-# # 3.2 ¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,TSÀà
+# # 3.2 ç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,TSç±»
 # count_split <- 10
 # tmp2 <- floor(use_999$use_perc/count_split)*count_split
 # use_999$use_perc_std <- factor(tmp2,levels = sort(unique(tmp2)))
@@ -184,10 +184,10 @@ ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ.p
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ-',d,'.png',sep = '')),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸æ•…éšœç‡-',d,'.png',sep = '')),
 #        width = 12, height = 9, dpi = 100)
 # 
-# # 3.3 ¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,CÀà
+# # 3.3 ç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,Cç±»
 # count_split <- 10
 # tmp2 <- floor(use_999$use_perc/count_split)*count_split
 # use_999$use_perc_std <- factor(tmp2,levels = sort(unique(tmp2)))
@@ -209,10 +209,10 @@ ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ.p
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ-',d,'.png',sep = '')),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸æ•…éšœç‡-',d,'.png',sep = '')),
 #        width = 12, height = 9, dpi = 100)
 
-# 3.4 ·Ö¶Î¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,CÀà,¼ÓÈëÉÏ¼ÜÊ±¼ä
+# 3.4 åˆ†æ®µç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,Cç±»,åŠ å…¥ä¸Šæ¶æ—¶é—´
 se <- c(0,30,80,100.1)
 tmp34 <- subset(use_999,dev_class_id == 'C1')
 tmp34$use_perc_3 <- cut(tmp34$use_perc,se,right = F)
@@ -241,10 +241,10 @@ p <- ggplot(subset(tmp34A),aes(x = factor(perc),y = rate*100)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä-',d,'.png',sep = '')),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸ä¸Šæ¶æ—¶é—´-',d,'.png',sep = '')),
        width = 12, height = 9, dpi = 100)
 
-# 3.5 ·Ö¶Î¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,TSÀà,¼ÓÈëÉÏ¼ÜÊ±¼ä
+# 3.5 åˆ†æ®µç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,TSç±»,åŠ å…¥ä¸Šæ¶æ—¶é—´
 se <- c(0,50,70,100.1)
 tmp35 <- subset(use_999,dev_class_id != 'C1')
 tmp35$use_perc_3 <- cut(tmp35$use_perc,se,right = F)
@@ -280,10 +280,10 @@ p <- ggplot(subset(tmp35A),aes(x = factor(perc),y = rate*100,label = label)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä-',d,'.png',sep = '')),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸ä¸Šæ¶æ—¶é—´-',d,'.png',sep = '')),
        width = 12, height = 9, dpi = 100)
 
-# 3.6 ·Ö¶Î¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,CÀà
+# 3.6 åˆ†æ®µç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,Cç±»
 se <- c(0,30,80,100.1)
 tmp36 <- subset(use_999,dev_class_id == 'C1')
 tmp36$use_perc_3 <- cut(tmp36$use_perc,se,right = F)
@@ -305,10 +305,10 @@ p <- ggplot(subset(tmp36A),aes(x = factor(perc),y = rate*100)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä(3¶Î)-',d,'.png',sep = '')),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸ä¸Šæ¶æ—¶é—´(3æ®µ)-',d,'.png',sep = '')),
        width = 12, height = 9, dpi = 100)
 
-# 3.7 ÔÚ¿ÕÏĞÊ±¼äÕ¼±ÈÎª0-100µÄ»úÆ÷ÖĞÌô100¸ö³öÀ´¿´ËûÃÇµÄ999µÄÖµ.(ÒòÎª30µµÖ»ÓĞ1443Ì¨»úÆ÷£¬ËùÒÔÈ«²¿È¡Íê£¬Ã¿µµÈ¡1400Ì¨)
+# 3.7 åœ¨ç©ºé—²æ—¶é—´å æ¯”ä¸º0-100çš„æœºå™¨ä¸­æŒ‘100ä¸ªå‡ºæ¥çœ‹ä»–ä»¬çš„999çš„å€¼.(å› ä¸º30æ¡£åªæœ‰1443å°æœºå™¨ï¼Œæ‰€ä»¥å…¨éƒ¨å–å®Œï¼Œæ¯æ¡£å–1400å°)
 # tmp <- tapply(use_999$svrid,use_999$use_perc_std,function(x)as.character(sample(x,1400)))
 # svrid_perc <- data.frame()
 # for (i in names(tmp)){
@@ -320,7 +320,7 @@ ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä
 # svrid_perc$use_perc <- as.numeric(levels(svrid_perc$use_perc)[svrid_perc$use_perc])
 # save(svrid_perc,file = file.path(dir_data,'svrid_perc.Rda'))
 
-#Ã¿µµÈ¡100¸ö
+#æ¯æ¡£å–100ä¸ª
 load(file.path(dir_data,'svrid_perc.Rda'))
 svrid_perc_mysql <- data.frame()
 k <- 1
@@ -329,11 +329,11 @@ for (i in seq(0,90,10)){
   tmp1 <- subset(svrid_perc,use_perc == i)
   svrid_perc_mysql <- rbind(svrid_perc_mysql,tmp1[seq(((k-1)*c+1),k*c,1),])
 }
-tmp2 <- sort(svrid_perc_mysql[['svrid']]) #ÕâÀïĞ´´í£¬µ¼ÖÂ³öÁË14000¸öµÄÊı¾İ¡£²î²»¶à10GµÄÊı¾İ¡£¶Á²»ÁËµÄ¡£
+tmp2 <- sort(svrid_perc_mysql[['svrid']]) #è¿™é‡Œå†™é”™ï¼Œå¯¼è‡´å‡ºäº†14000ä¸ªçš„æ•°æ®ã€‚å·®ä¸å¤š10Gçš„æ•°æ®ã€‚è¯»ä¸äº†çš„ã€‚
 write.table(tmp2,file = file.path(dir_data,'svrid_percA'),quote = F,row.names = F,col.names = F)
 
 #####################################################################################################################
-#¶ÁÈ¡Êı¾İ
+#è¯»å–æ•°æ®
 # d1014_902 <- read.csv(file = file.path(dir_data,'attr_902_d1019A'),colClasses = c('factor','POSIXct','int','int'))
 # save(d1014_999,file=file.path(dir_data,'attr_999_dataA'))
 
@@ -380,7 +380,7 @@ for (s in svrid_perc$svrid){
          width = 12, height = 9, dpi = 100)
 }
 
-# 3.9 ¹Û²ì902£¬903£¬999µÄÊıÖµ¹ØÏµ
+# 3.9 è§‚å¯Ÿ902ï¼Œ903ï¼Œ999çš„æ•°å€¼å…³ç³»
 load(file.path(dir_data,'merge_io.Rda'))
 merge_io <- subset(merge_io,a902 >= 0 & a903 >= 0 & a999 >= 0)
 avg_io <- data.frame(svrid = levels(merge_io$svrid),
@@ -394,7 +394,7 @@ zero999_quan903 <- data.frame(quan = seq(0,1,0.01),value = quantile(zero999_io$a
 zero999_quan <- rbind(zero999_quan902,zero999_quan903)
 p <- ggplot(zero999_quan,aes(x = quan,y = value,group = attr,color = attr)) + 
   geom_line(size = 1) +  geom_point(size = 3) + ylim(c(0,1000)) +
-  ggtitle('999Îª0ÖµÊ±µÄ902/903·Ö²¼') + xlab('·ÖÎ»µã') + ylab('Öµ') +
+  ggtitle('999ä¸º0å€¼æ—¶çš„902/903åˆ†å¸ƒ') + xlab('åˆ†ä½ç‚¹') + ylab('å€¼') +
   theme(axis.text = element_text(size = 18),
         axis.title = element_text(size = 20),
         legend.text = element_text(size = 18),
@@ -404,7 +404,7 @@ p <- ggplot(zero999_quan,aes(x = quan,y = value,group = attr,color = attr)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','999Îª0ÖµÊ±µÄ902903·Ö²¼.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','999ä¸º0å€¼æ—¶çš„902903åˆ†å¸ƒ.png'),
        width = 12, height = 9, dpi = 100)
 
 full999_io <- subset(merge_io,a999 !=0)
@@ -416,7 +416,7 @@ full999_quan <- rbind(full999_quan902,full999_quan903)
 
 p <- ggplot(full999_quan,aes(x = quan,y = value,group = attr,color = attr)) + 
   geom_line(size = 1) +  geom_point(size = 3) + ylim(c(0,50000)) +
-  ggtitle('999Îª100Ê±µÄ902/903·Ö²¼') + xlab('·ÖÎ»µã') + ylab('Öµ') +
+  ggtitle('999ä¸º100æ—¶çš„902/903åˆ†å¸ƒ') + xlab('åˆ†ä½ç‚¹') + ylab('å€¼') +
   theme(axis.text = element_text(size = 18),
         axis.title = element_text(size = 20),
         legend.text = element_text(size = 18),
@@ -426,10 +426,10 @@ p <- ggplot(full999_quan,aes(x = quan,y = value,group = attr,color = attr)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','999Îª100Ê±µÄ902903·Ö²¼.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','999ä¸º100æ—¶çš„902903åˆ†å¸ƒ.png'),
        width = 12, height = 9, dpi = 100)
 
-# 3.10 µ¼³ö¹ÊÕÏ»úIO²¢·ÖÎö
+# 3.10 å¯¼å‡ºæ•…éšœæœºIOå¹¶åˆ†æ
 fail_svrid <- data.frame(svrid = intersect(data.f$svr_id,k131$svr_asset_id))
 fail_svridA <- data.frame(svrid = setdiff(data.f$svr_id,k131$svr_asset_id))
 fail_svridAll <- data.frame(svrid = unique(data.f$svr_id))
@@ -437,7 +437,7 @@ write.table(fail_svrid,file = file.path(dir_data,'fail_svrid'),row.names = F,quo
 write.table(fail_svridA,file = file.path(dir_data,'fail_svridA'),row.names = F,quote = F,col.names = F)
 write.table(fail_svridAll,file = file.path(dir_data,'fail_svridAll'),row.names = F,quote = F,col.names = F)
 
-# 3.11 ²é¿´»úÆ÷µÄÄÚºË°æ±¾
+# 3.11 æŸ¥çœ‹æœºå™¨çš„å†…æ ¸ç‰ˆæœ¬
 cmdb_io <- subset(cmdb,svr_asset_id %in% k131_902$svrid)
 cmdb_io$kernelFlag <- '0'
 cmdb_io$kernelFlag[grepl('2.6.16.60',cmdb_io$os_kernal)] <- '16'
@@ -447,7 +447,7 @@ statKernelA <- tableX(cmdb_io$os_kernal)
 statKernelB <- tableX(cmdb_io$os_version)
 statKernelA$num <- substr(statKernelA$item,1,9)
 statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
-# # 3.3 ¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì,¼ÓÈëÉÏ¼ÜÊ±¼ä
+# # 3.3 ç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“,åŠ å…¥ä¸Šæ¶æ—¶é—´
 # frate <- function(data){
 #   tmp <- data.frame(perc = as.numeric(levels(data$use_perc_std)),
 #                     rate = tapply(data$class,data$use_perc_std,function(x)sum(x == 'Failure')/length(x)))
@@ -475,10 +475,10 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('Ó²ÅÌ¿ÕÏĞÊ±¼äÓë¹ÊÕÏÂÊ-',d,'.png',sep = '')),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io',paste('ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸æ•…éšœç‡-',d,'.png',sep = '')),
 #        width = 12, height = 9, dpi = 100)
 # 
-# # 3.3 »úĞÍ/ÉÏ¼ÜÊ±¼äÓë¿ÕÏĞÊ±¼ä¶Ô¹ÊÕÏµÄÓ°Ïì
+# # 3.3 æœºå‹/ä¸Šæ¶æ—¶é—´ä¸ç©ºé—²æ—¶é—´å¯¹æ•…éšœçš„å½±å“
 # frate_3 <- function(data){
 #   tmp <- data.frame(perc = levels(data$use_perc_3),
 #                     rate = tapply(data$class,data$use_perc_3,function(x)sum(x == 'Failure')/length(x)))
@@ -488,7 +488,7 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 # tmp7 <- use_999
 # tmp7$use_perc_3 <- cut(tmp7$use_perc,se,right = F)
 # 
-# # ÉÏ¼ÜÊ±¼ä·ÖÀà
+# # ä¸Šæ¶æ—¶é—´åˆ†ç±»
 # uni <- unique(tmp7$ut_part)
 # tmp3 <- data.frame()
 # for (i in 1:length(uni)){
@@ -510,10 +510,10 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸ä¸Šæ¶æ—¶é—´.png'),
 #        width = 12, height = 9, dpi = 100)
 # 
-# # »úĞÍ·ÖÀà
+# # æœºå‹åˆ†ç±»
 # uni <- unique(tmp7$dev_class_id)
 # tmp3 <- data.frame()
 # for (i in 1:length(uni)){
@@ -535,10 +535,10 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¿ÕÏĞÊ±¼äÓë»úĞÍ.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸æœºå‹.png'),
 #        width = 12, height = 9, dpi = 100)
 # 
-# # 3.4 ÉÏ¼ÜÊ±¼äÓëÓ²ÅÌ¿ÕÏĞÊ±¼ä
+# # 3.4 ä¸Šæ¶æ—¶é—´ä¸ç¡¬ç›˜ç©ºé—²æ—¶é—´
 # use_999 <- subset(use_999,!is.na(ut_part))
 # use_999$uu <- factor(paste(use_999$use_perc_std,use_999$ut_part,sep='_'))
 # tmp4 <- data.frame(uu = levels(use_999$uu),
@@ -561,17 +561,17 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¿ÕÏĞÊ±¼äÓëÉÏ¼ÜÊ±¼ä.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç©ºé—²æ—¶é—´ä¸ä¸Šæ¶æ—¶é—´.png'),
 #        width = 12, height = 9, dpi = 100)
 
-# 3.4 Ê¹ÓÃÌØÕ÷³¬¹ı95%µÄ»úÆ÷µÄ»úĞÍ,ÉÏ¼ÜÊ±¼ä,Óë¹ÊÕÏ×÷Í¼
-# Ê¹ÓÃÌØÕ÷Ã»ÓĞ³¬¹ı95%µÄ»úÆ÷µÄ»úĞÍÉÏ¼ÜÊ±¼äÓë¹ÊÕÏ×÷Í¼
+# 3.4 ä½¿ç”¨ç‰¹å¾è¶…è¿‡95%çš„æœºå™¨çš„æœºå‹,ä¸Šæ¶æ—¶é—´,ä¸æ•…éšœä½œå›¾
+# ä½¿ç”¨ç‰¹å¾æ²¡æœ‰è¶…è¿‡95%çš„æœºå™¨çš„æœºå‹ä¸Šæ¶æ—¶é—´ä¸æ•…éšœä½œå›¾
 # use_999A <- subset(use_999,use_perc <= 0.05)
 # use_999B <- subset(use_999,use_perc >0.05)
 # plotDevStime(use_999A,'idle(A)')
 # plotDevStime(use_999B,'idle(B)')
 
-# # 4. Í³¼Æ999ÖĞÓĞp100³¬¹ı100µÄĞĞ.
+# # 4. ç»Ÿè®¡999ä¸­æœ‰p100è¶…è¿‡100çš„è¡Œ.
 # tmp <- subset(k131_999,p100 > 100)
 # tmp <- factorX(tmp)
 # tmp.svrid <- data.frame(svrid = levels(tmp$svrid),
@@ -582,12 +582,12 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 # tmp.svrid$cutCount <- cut(tmp.svrid$count,se)
 # ggplot(tmp.svrid,aes(x = dev_class_id,fill = cutCount)) + geom_histogram()
 
-# # 2.2 È¡Ã»ÓĞIOµÄ¹ÊÕÏ»úÊı¾İ,ÕâĞ©Êı¾İ¿ÉÄÜÒòÎª²»È«Ã»ÓĞÈ¡ÌØÕ÷
+# # 2.2 å–æ²¡æœ‰IOçš„æ•…éšœæœºæ•°æ®,è¿™äº›æ•°æ®å¯èƒ½å› ä¸ºä¸å…¨æ²¡æœ‰å–ç‰¹å¾
 # svrid_more <- subset(data.f,!(svr_id %in% k131$svr_asset_id))
 # svrid_more <- factor(svrid_more$svr_id)
 # write.table(svrid_more,file = file.path(dir_data,'more_svrid'),row.names = F,col.names = F,quote = F)
 
-# # 3.1 ½«µãÏŞÖÆÔÚ0%-10%ÄÚ
+# # 3.1 å°†ç‚¹é™åˆ¶åœ¨0%-10%å†…
 # p <- ggplot(subset(use_999,use_perc != -1)) + 
 #   geom_histogram(aes(x = use_perc,fill = class),binwidth = 0.5) + 
 #   xlim(c(0,10)) + 
@@ -602,11 +602,11 @@ statKernelNum <- data.frame(tapply(statKernelA$count,statKernelA$num,sum))
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¿ÕÏĞÊ±¼äÍ³¼Æ-10perc.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç©ºé—²æ—¶é—´ç»Ÿè®¡-10perc.png'),
 #        width = 12, height = 9, dpi = 100)
 # tableX(cut(use_999$use_perc,seq(0,1,0.01),right = F))
 
-# 2.31 Á½¸öÔÂÄÚ¹ÊÕÏ»úÆ÷»úĞÍ
+# 2.31 ä¸¤ä¸ªæœˆå†…æ•…éšœæœºå™¨æœºå‹
 # svrid <- read.csv(file = file.path(dir_data,'all_svrid','all_svrid'),header = F)
 # names(svrid) <- c('svrid','ip')
 # tmp <- subset(data.f,svr_id %in% k131_svrid)

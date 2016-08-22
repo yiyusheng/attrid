@@ -1,4 +1,4 @@
-# Ê¹ÓÃSVMÑ§Ï°ÒÑ±ê¼ÇÊı¾İµÄÖÜÆÚĞÔ£¬²¢¼ÆËãÔ¤²â¾«¶È
+# ä½¿ç”¨SVMå­¦ä¹ å·²æ ‡è®°æ•°æ®çš„å‘¨æœŸæ€§ï¼Œå¹¶è®¡ç®—é¢„æµ‹ç²¾åº¦
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -21,7 +21,7 @@ readline <- function(str){
   })
 }
 
-# P1.ÕûÀíÊı¾İ
+# P1.æ•´ç†æ•°æ®
 PL <- data.frame(svrid = gsub('.png','',nm$name[nm$smp != 0]),
                  lab902 = unlist(sapply(1:34,function(x){
                   readline(perioLabel[x,])
@@ -34,7 +34,7 @@ PL <- merge(PL,frT[,ftrNeed],by = 'svrid',all.x = T)
 delrow <- apply(is.na(PL[,4:ncol(PL)]),1,any)
 PL <- PL[!delrow,]
 
-# P2.½¨Ä£ºÍÔ¤²â
+# P2.å»ºæ¨¡å’Œé¢„æµ‹
 require('e1071')
 m1 <- tune.svm(lab902 ~ F902fst + A902fst + A902Sum , data = PL, 
 #                cross = 10,type = 'C-classification',kernel = "radial",

@@ -1,6 +1,6 @@
-# IO²¨¶¯·ÖÎö£¬¶Ô·şÎñÆ÷ÉÏÅÜ³öÀ´µÄIO²¨¶¯ĞÅÏ¢Óë¹ÊÕÏÂÊÖ®¼äµÄÁªÏµ½øĞĞ·ÖÎö¡£
-# ²¨¶¯ĞÅÏ¢°üº¬Ã¿Ì¨·şÎñÆ÷Ã¿ÌìµÄĞÅÏ¢
-# °üº¬¼ÇÂ¼ÊıÁ¿£¬coefficient variable,Ã¿Ìì×î´ó±ä»¯µÄË÷Òı£¬×î´ó±ä»¯µÄÖµ£¬×î´ó±ä»¯Ê±µÄµÍÖµ
+# IOæ³¢åŠ¨åˆ†æï¼Œå¯¹æœåŠ¡å™¨ä¸Šè·‘å‡ºæ¥çš„IOæ³¢åŠ¨ä¿¡æ¯ä¸æ•…éšœç‡ä¹‹é—´çš„è”ç³»è¿›è¡Œåˆ†æã€‚
+# æ³¢åŠ¨ä¿¡æ¯åŒ…å«æ¯å°æœåŠ¡å™¨æ¯å¤©çš„ä¿¡æ¯
+# åŒ…å«è®°å½•æ•°é‡ï¼Œcoefficient variable,æ¯å¤©æœ€å¤§å˜åŒ–çš„ç´¢å¼•ï¼Œæœ€å¤§å˜åŒ–çš„å€¼ï¼Œæœ€å¤§å˜åŒ–æ—¶çš„ä½å€¼
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -16,7 +16,7 @@ source(file.path(dir_code,'AFR_io_prepare.R'))
 load(file.path(dir_data,'ioFluc9023Simp.Rda'))
 
 #@@@ FUNCTION @@@#
-# F1.½«Ğ¡ÓÚ1µÄÖµÉèÎª1ÒÔ½øĞĞlog2µÄ´¦Àí
+# F1.å°†å°äº1çš„å€¼è®¾ä¸º1ä»¥è¿›è¡Œlog2çš„å¤„ç†
 logStand <- function(v){
   v[v < 1] <- 1
   v
@@ -31,7 +31,7 @@ logStand <- function(v){
 # ioFluc <-factorX(ioFluc)
 
 #########################################################################################################
-# A1.cvÓë¹ÊÕÏµÄ¹ØÏµ
+# A1.cvä¸æ•…éšœçš„å…³ç³»
 # colNeed <- c('svrid','time','cv902','maxF902','cv903','maxF903')
 # ioFlucF <- factorX(subset(ioFluc,svrid %in% tmp.f$svr_id,colNeed))
 # ioFlucN <- factorX(subset(ioFluc,!(svrid %in% tmp.f$svr_id),colNeed))
@@ -47,7 +47,7 @@ logStand <- function(v){
 # b <- factorX(subset(data,svrid %in% a$svrid))
 # c <- factorX(subset(a,svrid %in% b$svrid))
 
-#A2.Ã¿ÈÕ×î´óÌø±äµÄ¾ùÖµ
+#A2.æ¯æ—¥æœ€å¤§è·³å˜çš„å‡å€¼
 # me902 <- tapply(ioFluc$maxF902,ioFluc$svrid,function(x){mean(abs(x))})
 # me903 <- tapply(ioFluc$maxF903,ioFluc$svrid,function(x){mean(abs(x))})
 # max902 <- tapply(ioFluc$maxF902,ioFluc$svrid,function(x){max(abs(x))})
@@ -67,15 +67,15 @@ logStand <- function(v){
 # names(avgMaxF)[8:13] <- paste(names(avgMaxF[,2:7]),'l',sep='')
 # tmp.f <- merge(tmp.f,avgMaxF,by.x = 'svr_id',by.y = 'svrid')
 # tmp.cmdb <- merge(tmp.cmdb,avgMaxF,by.x = 'svr_asset_id',by.y = 'svrid')
-# #¼ÆËã¹ÊÕÏÂÊ
-# # CÀà
+# #è®¡ç®—æ•…éšœç‡
+# # Cç±»
 # AFR_mean902C <- AFR_attr_notime(tmp.f,tmp.cmdb,'mean902l','mean902l',1,dev = 'C')
 # AFR_mean903C <- AFR_attr_notime(tmp.f,tmp.cmdb,'mean903l','mean903l',1,dev = 'C')
 # AFR_max902C <- AFR_attr_notime(tmp.f,tmp.cmdb,'max902l','max902l',1,dev = 'C')
 # AFR_max903C <- AFR_attr_notime(tmp.f,tmp.cmdb,'max903l','max903l',1,dev = 'C')
 # AFR_meantop902C <- AFR_attr_notime(tmp.f,tmp.cmdb,'meantop902l','meantop902l',1,dev = 'C')
 # AFR_meantop903C <- AFR_attr_notime(tmp.f,tmp.cmdb,'meantop903l','meantop903l',1,dev = 'C')
-# # TSÀà
+# # TSç±»
 # AFR_mean902TS <- AFR_attr_notime(tmp.f,tmp.cmdb,'mean902l','mean902l',12,dev = 'TS')
 # AFR_mean903TS <- AFR_attr_notime(tmp.f,tmp.cmdb,'mean903l','mean903l',12,dev = 'TS')
 # AFR_max902TS <- AFR_attr_notime(tmp.f,tmp.cmdb,'max902l','max902l',12,dev = 'TS')
@@ -83,7 +83,7 @@ logStand <- function(v){
 # AFR_meantop902TS <- AFR_attr_notime(tmp.f,tmp.cmdb,'meantop902l','meantop902l',12,dev = 'TS')
 # AFR_meantop903TS <- AFR_attr_notime(tmp.f,tmp.cmdb,'meantop903l','meantop903l',12,dev = 'TS')
 # 
-# #»­Í¼
+# #ç”»å›¾
 # # ggplot(subset(AFR_mean902C,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 # # ggplot(subset(AFR_mean903C,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 # ggplot(subset(AFR_max902C,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
@@ -98,7 +98,7 @@ logStand <- function(v){
 # ggplot(subset(AFR_meantop902TS,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 # ggplot(subset(AFR_meantop903TS,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 
-# A3.¼ÆËã¶ÁĞ´ºÍµÄÊı¾İ
+# A3.è®¡ç®—è¯»å†™å’Œçš„æ•°æ®
 ioFluc <- ioFluc9023
 ioFluc$cv9023 <- abs(ioFluc$cv902)
 ioFluc <- subset(ioFluc,svrid %in% cmdbio$svr_asset_id)
@@ -122,19 +122,19 @@ l <- ncol(avgMaxF)
 avgMaxF[,2:l] <- apply(avgMaxF[,2:l],2,logStand)
 avgMaxF[,(l+1):(2*l-1)] <- apply(avgMaxF[,2:l],2,function(x)round(log2(x)))
 names(avgMaxF)[(l+1):(2*l-1)] <- paste(names(avgMaxF[,2:l]),'l',sep='')
-#´¦ÀímaxCV
+#å¤„ç†maxCV
 avgMaxF$maxCV <- round(avgMaxF$maxCV)
 divCV <- c(0,1,2,4,8,12,max(avgMaxF$maxCV,na.rm = T))
 avgMaxF$maxCVd <- cut(avgMaxF$maxCV,divCV,include.lowest = T)
 avgMaxF$maxCVd <- gsub('^\\[|^\\(|,.*$','',avgMaxF$maxCVd)
-#´¦ÀímaxCVl
+#å¤„ç†maxCVl
 avgMaxF$maxCVl[avgMaxF$maxCVl > 4] <- Inf 
 
 tf <- merge(tmp.f,avgMaxF,by.x = 'svr_id',by.y = 'svrid')
 tcmdb <- merge(tmp.cmdb,avgMaxF,by.x = 'svr_asset_id',by.y = 'svrid')
 
 
-# #»­Í¼
+# #ç”»å›¾
 # AFR_mean9023C <- AFR_attr_notime(tf,tcmdb,'mean9023l','mean9023l',1,dev = 'C')
 # AFR_max9023C <- AFR_attr_notime(tf,tcmdb,'max9023l','max9023l',1,dev = 'C')
 # AFR_meanSDC <- AFR_attr_notime(tf,tcmdb,'meanSDl','meanSDl',1,dev = 'C')
@@ -164,7 +164,7 @@ tcmdb <- merge(tmp.cmdb,avgMaxF,by.x = 'svr_asset_id',by.y = 'svrid')
 # ggplot(subset(AFR_meanCVTS,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 # ggplot(subset(AFR_maxCVTS,count_io > 100),aes(item,AFR)) + geom_bar(stat = 'identity')
 
-#½áÂÛ»­Í¼
+#ç»“è®ºç”»å›¾
 AFR_maxCVC <- AFR_attr_notime(tf,tcmdb,'maxCVl','maxCVl',1,dev = 'C')
 AFR_maxCVTS <- AFR_attr_notime(tf,tcmdb,'maxCVl','maxCVl',12,dev = 'TS')
 AFR_maxCVCp <- AFR_maxCVC[1:5,]

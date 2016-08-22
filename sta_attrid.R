@@ -1,4 +1,4 @@
-# Í³¼ÆIOÊı¾İ
+# ç»Ÿè®¡IOæ•°æ®
 rm(list = ls())
 dir_code <- 'D:/Git/attrid'
 dir_data <- 'D:/Data/attrid/sta_csv'
@@ -6,13 +6,13 @@ dir_data1 <- 'D:/Data/Disk Number'
 require('ggplot2')
 source('D:/Git/R_Function/Rfun.R')
 
-# 1. ¶ÁÈ¡¹ÊÕÏµ¥
+# 1. è¯»å–æ•…éšœå•
 load(file.path(dir_data1,'data_mcf_rsv2014.Rda'))
 load(file.path(dir_data1,'disk_number_label.Rda'))
 data.mcf$dup <- !duplicated(data.mcf$ip)
 flist <- subset(data.mcf, f_time < as.POSIXct('2014-08-01') & f_time >= as.POSIXct('2014-06-01'))
 
-# 2. ¶ÁÈ¡attrid²¢Í³¼Æ
+# 2. è¯»å–attridå¹¶ç»Ÿè®¡
 # attr_name <- c(26,40,41,50,51,9,902,9020,903,905,907,927,928,929,930,999)
 attr_name <- 9020
 attr_name <- paste('attr',attr_name,sep='')
@@ -30,12 +30,12 @@ for (x in attr_name) {
   sta_attr[[x]] <- attr
 }
 
-# 2.5 ¶ÔËùÓĞ902Êı¾İ½øĞĞ·Ö¿é
+# 2.5 å¯¹æ‰€æœ‰902æ•°æ®è¿›è¡Œåˆ†å—
 attr <- attr[order(attr$svrid),]
 part_svrid <- attr$svrid[seq(1,nrow(attr),5000)]
 write.table(part_svrid,file = file.path(dir_data,'part_svrid'),quote = F,row.names = F,col.names = F)
 
-# 3. Çó¹ÊÕÏµ¥ÓëattridµÄ½»
+# 3. æ±‚æ•…éšœå•ä¸attridçš„äº¤
 its <- matrix(0,2,length(attr_name))
 names(its) <- attr_name
 for (i in 1:length(attr_name)) {
@@ -61,7 +61,7 @@ sta_dev$all_disk <- sta_dev$all
 sta_dev$diff_disk[sta_dev$dev_class_id != 'C1'] <- sta_dev$diff[sta_dev$dev_class_id != 'C1']*12
 sta_dev$all_disk[sta_dev$dev_class_id != 'C1'] <- sta_dev$all[sta_dev$dev_class_id != 'C1']*12
 
-# 4. Ö¸¶¨»úĞÍÖĞÃ¿¸ö»úĞÍÑ¡È¡3000Ì¨ÎŞ¹ÊÕÏ»ú
+# 4. æŒ‡å®šæœºå‹ä¸­æ¯ä¸ªæœºå‹é€‰å–3000å°æ— æ•…éšœæœº
 num_need <- 1000
 good_list <- list()
 for (d in dev_need){
@@ -72,7 +72,7 @@ for (d in dev_need){
 good_svr <- as.character(unlist(good_list))
 write.csv(good_svr,file = file.path(dir_data,'good_svrid.csv'),row.names = F)
 
-# 5. ËùÓĞÊı¾İÖĞÃ¿¸ö»úĞÍÑ¡Ôñ10Ì¨¹ÊÕÏ»ú,10Ì¨ÎŞ¹ÊÕÏ»ú¿´Êı¾İ
+# 5. æ‰€æœ‰æ•°æ®ä¸­æ¯ä¸ªæœºå‹é€‰æ‹©10å°æ•…éšœæœº,10å°æ— æ•…éšœæœºçœ‹æ•°æ®
 bad_svrid <- tapply(cmdb_its$svr_asset_id,factor(cmdb_its$dev_class_id),function(x)x[round(runif(10,1,length(x)))])
 bad_svrid <- data.frame(svrid = as.character(unlist(bad_svrid)))
 bad_svrid$dev_class_id <- cmdb$dev_class_id[match(bad_svrid$svrid,cmdb$svr_asset_id)]
@@ -88,11 +88,11 @@ row.names(attr_svrid) <- NULL
 attr_svrid <- attr_svrid[!duplicated(attr_svrid$svrid),]
 write.csv(attr_svrid,file = file.path(dir_data,'attr_svrid.csv'),row.names = F)
 
-# 6. ÌáÈ¡ËùÓĞ¹ÊÕÏ»úsvrid
+# 6. æå–æ‰€æœ‰æ•…éšœæœºsvrid
 tmp <- as.character(cmdb_its$svr_asset_id)
 write.csv(tmp,file = file.path(dir_data,'bad_svrid.csv'),row.names = F)
 
-# 7. ¶ÔÈ¡³öµÄÎŞ¹ÊÕÏ»ú½øĞĞ´¦Àí
+# 7. å¯¹å–å‡ºçš„æ— æ•…éšœæœºè¿›è¡Œå¤„ç†
 tmp <- read.csv(file.path(dir_data,'attr_902_bad'))
 names(tmp) <- c('date','svrid','attrid','timepoint','value')
 tmp1 <- table(tmp$svrid)

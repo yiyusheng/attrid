@@ -1,4 +1,4 @@
-#CONFIGURE ÖÐÎÄ
+#CONFIGURE ä¸­æ–‡
 dir_code <- 'D:/Git/attrid'
 dir_data <- 'D:/Data/attrid'
 dir_dataA <- 'D:/Data/Disk Number'

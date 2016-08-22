@@ -1,10 +1,10 @@
-# ÒÔ6-7Á½ÔÂÎª¹Û²ì´°¿Ú£¬ÇóÕâÁ½¸öÔÂµÄ»úÆ÷¹ÊÕÏ¶ÔÓ¦ÉÏ¼ÜÊ±¼äµÄÄê¹ÊÕÏÂÊ
-# ÉÏ¼ÜÊ±¼äÇø·Ö·Ö0-3¸öÔÂ£¬3-6¸öÔÂ£¬6-12¸öÔÂ£¬1-2Äê£¬2-3Äê£¬3-4Äê
-# ¼ÆËãÃ¿¸öÇø¼äÄÚµÄ¹ÊÕÏ»úÊıÁ¿ºÍ»úÆ÷×ÜÁ¿¡£
-# ÀıÈç3-6¸öÔÂµÄ¹ÊÕÏÂÊ¼ÆËã£º
-#   ½«Ê±¼ä´°¿ÚÄÚµÄ¹ÊÕÏ»úÆ÷£¬¹ÊÕÏÊ±µÄÒÑ·şÒÛÊ±¼äÎª3-6¸öÔÂµÄ»úÆ÷×÷Îª·Ö×Ó£¬È¥ÖØ
-#   ½«ÉÏ¼ÜÊ±¼ä¾à6ÔÂ·İ-1¸öÔÂÖÁ-6¸öÔÂÖĞ£¨¼´È¥Äê12ÔÂÖÁ5ÔÂ£©ÉÏ¼ÜµÄ»úÆ÷×÷Îª·ÖÄ¸¡£
-#   ÒòÎªÕâĞ©»úÆ÷ÔÚ¹Û²ì´°¿ÚÖĞ·¢Éú¹ÊÕÏÊÇ»á±»¼ÆÈë·Ö×ÓµÄ
+# ä»¥6-7ä¸¤æœˆä¸ºè§‚å¯Ÿçª—å£ï¼Œæ±‚è¿™ä¸¤ä¸ªæœˆçš„æœºå™¨æ•…éšœå¯¹åº”ä¸Šæ¶æ—¶é—´çš„å¹´æ•…éšœç‡
+# ä¸Šæ¶æ—¶é—´åŒºåˆ†åˆ†0-3ä¸ªæœˆï¼Œ3-6ä¸ªæœˆï¼Œ6-12ä¸ªæœˆï¼Œ1-2å¹´ï¼Œ2-3å¹´ï¼Œ3-4å¹´
+# è®¡ç®—æ¯ä¸ªåŒºé—´å†…çš„æ•…éšœæœºæ•°é‡å’Œæœºå™¨æ€»é‡ã€‚
+# ä¾‹å¦‚3-6ä¸ªæœˆçš„æ•…éšœç‡è®¡ç®—ï¼š
+#   å°†æ—¶é—´çª—å£å†…çš„æ•…éšœæœºå™¨ï¼Œæ•…éšœæ—¶çš„å·²æœå½¹æ—¶é—´ä¸º3-6ä¸ªæœˆçš„æœºå™¨ä½œä¸ºåˆ†å­ï¼Œå»é‡
+#   å°†ä¸Šæ¶æ—¶é—´è·6æœˆä»½-1ä¸ªæœˆè‡³-6ä¸ªæœˆä¸­ï¼ˆå³å»å¹´12æœˆè‡³5æœˆï¼‰ä¸Šæ¶çš„æœºå™¨ä½œä¸ºåˆ†æ¯ã€‚
+#   å› ä¸ºè¿™äº›æœºå™¨åœ¨è§‚å¯Ÿçª—å£ä¸­å‘ç”Ÿæ•…éšœæ˜¯ä¼šè¢«è®¡å…¥åˆ†å­çš„
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -20,7 +20,7 @@ source(file.path(dir_code,'AFR_io_prepare.R'))
 
 
 #########################################################################################################
-# # P2.¼ÆËãÄê¹ÊÕÏÂÊ
+# # P2.è®¡ç®—å¹´æ•…éšœç‡
 cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',1,dev = 'C')
 cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',12,dev = 'TS')
 cm3 <- AFR_attr_notime(tmp.f,tmp.cmdb,'fsTime','shTime',12,dev = 'TS1T')
@@ -32,8 +32,8 @@ plotCol <- c('item','class','AFR')
 naFill <- cbind(expand.grid(item = levels(cm$item),class = levels(factor(cm$class))),AFR = NA)
 AFR_plot(rbind(subset(cm,,plotCol),naFill),'Ship Time and Annual Failure Rate',-2)
 # # 
-# P3.·ÖIO¼ÆËãÄê¹ÊÕÏÂÊ,½«3¸öIO×Ö¶Î¸÷×Ô¸ù¾İ·ÖÎ»µã·Ö³ÉNµµ£¬°Ñµµ´Î±ê³ö
-#CÀà
+# P3.åˆ†IOè®¡ç®—å¹´æ•…éšœç‡,å°†3ä¸ªIOå­—æ®µå„è‡ªæ ¹æ®åˆ†ä½ç‚¹åˆ†æˆNæ¡£ï¼ŒæŠŠæ¡£æ¬¡æ ‡å‡º
+#Cç±»
 tmp.fC <- subset(tmp.f,dev_class_id == 'C1')
 tmp.cmdbC <- subset(tmp.cmdb,dev_class_id == 'C1')
 tmp.ioC <- subset(tmp.io,dev_class_id == 'C1')
@@ -43,7 +43,7 @@ cmv999C <- AFR_value(tmp.fC,tmp.cmdbC,tmp.ioC,'999',3,lastYears,1)
 AFR_value_plot(cmv902C,'Ship Time and IO read (non-storage servers)',25)
 AFR_value_plot(cmv903C,'Ship Time and IO Write (non-storage servers)',20)
 AFR_value_plot(cmv999C,'Ship Time and IO Time (non-storage servers)',30)
-# TSÀà
+# TSç±»
 tmp.fTS <- subset(tmp.f,dev_class_id != 'C1')
 tmp.cmdbTS <- subset(tmp.cmdb,dev_class_id != 'C1')
 tmp.ioTS <- subset(tmp.io,dev_class_id != 'C1')
@@ -54,7 +54,7 @@ AFR_value_plot(cmv902T,'Ship Time and IO read (storage servers)',25)
 AFR_value_plot(cmv903T,'Ship Time and IO Write (storage servers)',20)
 AFR_value_plot(cmv999T,'Ship Time and IO Time (storage servers)',30)
 
-# Êı¾İÕûºÏÓë×¼±¸
+# æ•°æ®æ•´åˆä¸å‡†å¤‡
 tmpP3.io <- subset(tmp.io,mean_902 > 0 & mean_903 > 0)
 tmpP3.cmdb <- tmp.cmdb
 tmpP3.f <- tmp.f
@@ -64,7 +64,7 @@ tmpP3.io$total9023 <- log2(tmpP3.io$mean_902*86400*365 + tmpP3.io$mean_903*86400
 tmpP3.cmdb$total902 <- tmpP3.io$total902[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
 tmpP3.cmdb$total903 <- tmpP3.io$total903[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
 tmpP3.cmdb$total9023 <- tmpP3.io$total9023[match(tmpP3.cmdb$svr_asset_id,tmpP3.io$svrid)]
-# CÀà
+# Cç±»
 tmpP3.fC <- subset(tmpP3.f,dClass == 'C',c('ip','svr_id','dClass','dev_class_id','failShiptime'))
 tmpP3.cmdbC <- subset(tmpP3.cmdb,dClass == 'C',c('svr_asset_id','dev_class_id','ip',
                                                'shiptimeToLeft','dClass','total902','total903','total9023'))
@@ -84,7 +84,7 @@ tmpP3.fC <- subset(tmpP3.fC,!is.na(sep902) & !is.na(sep903) & !is.na(sep9023))
 AFR.totalC <- AFR_attr(tmpP3.fC,tmpP3.cmdbC,'sep9023',6,1)
 AFR_value_plot(AFR.totalC,'Ship Time and Read Total (Non-Storage Server)',-1,subdir = '0114io')
 
-# TSÀà
+# TSç±»
 tmpP3.fTS <- subset(tmpP3.f,dClass == 'TS',c('ip','svr_id','dClass','dev_class_id','failShiptime'))
 tmpP3.cmdbTS <- subset(tmpP3.cmdb,dClass == 'TS',c('svr_asset_id','dev_class_id','ip',
                                                  'shiptimeToLeft','dClass','total902','total903'))
@@ -103,12 +103,12 @@ AFR.totalTS <- AFR_attr(tmpP3.fTS,tmpP3.cmdbTS,'sep902',6,12)
 AFR_value_plot(AFR.totalTS,'Ship Time and Read Total (Storage Server)',-1,subdir = '0114io')
 
 # 
-# # P4.¶Ô´æ´¢ÏµÍ³ÅäÖÃ½øĞĞ·ÖÎö£¨½Ó¿Ú£¬ÈİÁ¿£¬modelÊı£¬Type,³ÇÊĞ£¬raid)
-# # P4.1A ´¦Àí½Ó¿ÚA
+# # P4.å¯¹å­˜å‚¨ç³»ç»Ÿé…ç½®è¿›è¡Œåˆ†æï¼ˆæ¥å£ï¼Œå®¹é‡ï¼Œmodelæ•°ï¼ŒType,åŸå¸‚ï¼Œraid)
+# # P4.1A å¤„ç†æ¥å£A
 # disk_ip$SATA <- 'MIX'
 # disk_ip$SATA[disk_ip$SATA2 == 0] <- 'SATA3'
 # disk_ip$SATA[disk_ip$SATA3 == 0] <- 'SATA2'
-# # P4.2 ´¦ÀíÈİÁ¿
+# # P4.2 å¤„ç†å®¹é‡
 # modelC <- c('ST3500514NS','ST500NM0011','ST1000NM0011','ST31000524NS','ST3250310NS')
 # modelTS <- c('ST31000524NS','ST1000NM0011','ST2000NM0011','ST32000645NS')
 # disk_ip$modelF <- ''
@@ -124,33 +124,33 @@ AFR_value_plot(AFR.totalTS,'Ship Time and Read Total (Storage Server)',-1,subdir
 # disk_ip$modelF[disk_ip$modelA %in% modelTS[3:4] &  disk_ip$dClass == 'TS' &
 #                  (disk_ip$modelB == '' | disk_ip$modelB %in% modelTS[3:4]) & 
 #                  disk_ip$disk_model_c1 <= 2] <- '2000G(TS)'
-# # P4.3 TS»úĞÍµÄ³ÇÊĞ
+# # P4.3 TSæœºå‹çš„åŸå¸‚
 # cmdb$city <- factor(substr(cmdb$idc_name,1,2))
-# city <- list(c('ÉîÛÚ','¹ãÖİ','¶«İ¸','Ïã¸Û','ÉÇÍ·'),
-#           c('ÉÏº£','º¼Öİ','ÄÏ¾©'),
-#           c('Ìì½ò','¼ÃÄÏ','±±¾©'),
-#           c('Î÷°²','³É¶¼'))
+# city <- list(c('æ·±åœ³','å¹¿å·','ä¸œè','é¦™æ¸¯','æ±•å¤´'),
+#           c('ä¸Šæµ·','æ­å·','å—äº¬'),
+#           c('å¤©æ´¥','æµå—','åŒ—äº¬'),
+#           c('è¥¿å®‰','æˆéƒ½'))
 # cmdb$cityF <- ''
 # cmdb$cityF[cmdb$city %in% city[[1]]] <- 'South of CN'
 # cmdb$cityF[cmdb$city %in% city[[2]]] <- 'East of CN'
 # cmdb$cityF[cmdb$city %in% city[[3]]] <- 'North of CN'
 # cmdb$cityF[cmdb$city %in% city[[4]]] <- 'West of CN'
-# # P4.4 OSÌáÈ¡
+# # P4.4 OSæå–
 # cmdb$OS <- gsub('-.*$','',cmdb$os_kernal)
 # OS <- c('2.6.16.60','2.6.32.43')
 # cmdb$OSF <- ''
 # cmdb$OSF[cmdb$OS %in% OS] <- cmdb$OS[cmdb$OS %in% OS]
-# # Merge²¢Ñ¡Ôñcol
+# # Mergeå¹¶é€‰æ‹©col
 # col.cmdb <- c('svr_asset_id','ip','dev_class_id','type_name','raid','dClass','cityF','OSF','shiptimeToLeft')
 # col.diskIP <- c('ip','SATA','modelF','disk_model_c1')
 # strConf <- merge(cmdb[,col.cmdb],disk_ip[,col.diskIP],by = 'ip',all = T)
-# # ´¦Àí½Ó¿ÚB
+# # å¤„ç†æ¥å£B
 # strConf$SATA[strConf$dev_class_id %in% class_B] <- 'SAS'
 # strConf <- factorColX(strConf,c('dClass','cityF','OSF','SATA','modelF'))
-# # Îª¹ÊÕÏµ¥Ìí¼Ó×Ö¶Î
+# # ä¸ºæ•…éšœå•æ·»åŠ å­—æ®µ
 # data.fM <- merge(strConf[,c(1,4:ncol(strConf))],data.f,by = 'ip',all.y = T)
 # 
-# # P4.5 ·Ö±ğ´¦Àí
+# # P4.5 åˆ†åˆ«å¤„ç†
 # # # AFR for dev
 # # data.dev <- subset(strConf,dClass != '' & dClass != 'B' & 
 # #                      !(SATA == 'MAX' & shiptimeToLeft >= 4) & ip %in% cmdbio$ip)
@@ -204,7 +204,7 @@ AFR_value_plot(AFR.totalTS,'Ship Time and Read Total (Storage Server)',-1,subdir
 # # AFR_value_plot(AFR.mdC,'Ship Time and capacity (Connectting server)',-1,subdir = 'Storage Configuration')
 # # AFR_value_plot(AFR.mdTS,'Ship Time and capacity (Storage server)',-1,subdir = 'Storage Configuration',cylim = 10)
 
-# # p5. ÏµÍ³Ó²ÅÌÆôÍ£´ÎÊıÌØÕ÷(999)
+# # p5. ç³»ç»Ÿç¡¬ç›˜å¯åœæ¬¡æ•°ç‰¹å¾(999)
 # load(file.path(dir_data,'diskLaunchFreq.Rda'))
 # names(diskLaunchFreq) <- c('lCount','count','svrid')
 # diskLaunchFreq <- subset(diskLaunchFreq,count > 10000)
@@ -224,7 +224,7 @@ AFR_value_plot(AFR.totalTS,'Ship Time and Read Total (Storage Server)',-1,subdir
 # AFR_value_plot(AFR.LRC,'Ship Time and Launch Frequency (Non-Storage Server)',-1)
 # AFR_value_plot(AFR.LRTS,'Ship Time and Launch Frequency (Storage Server)',-1)
 
-# P6.999·åÖµÌØÕ÷
+# P6.999å³°å€¼ç‰¹å¾
 load(file.path(dir_data,'peak999.Rda'))
 peak999 <- subset(peak999,!is.na(rMax) & !is.na(rCsig902) & !is.na(rCsigE100))
 div.rMax <- quantile(peak999$rMax,seq(0,1,1/3))
@@ -249,7 +249,7 @@ attr <- c('rCsigE100')
 for (i in seq(1,length(attr))){
   eval(parse(text = sprintf('peak999$div%s <- as.character(cut(peak999$%s,div.%s))',attr[i],attr[i],attr[i])))
   if(attr[i] == 'rCsigE100'){
-    eval(parse(text = sprintf("peak999$div%s[peak999$%s == -1] <- 'Î´ÖªÒì³£'",attr[i],attr[i])))
+    eval(parse(text = sprintf("peak999$div%s[peak999$%s == -1] <- 'æœªçŸ¥å¼‚å¸¸'",attr[i],attr[i])))
   }
   eval(parse(text = sprintf("peak999$div%s[peak999$%s == 0] <- '-1'",attr[i],attr[i])))
   eval(parse(text = sprintf("peak999$div%s <- factor(peak999$div%s)",attr[i],attr[i])))
@@ -265,17 +265,17 @@ for (i in seq(1,length(attr))){
     AFR.rMaxC <- factorX(subset(AFR.rMaxC,value != ' 0'))
     AFR.rMaxTS <- factorX(subset(AFR.rMaxTS,value != ' 0'))
   }else if(attr[i] == 'rCsigE100'){
-    AFR.rCsigE100C <- factorX(subset(AFR.rCsigE100C, value != 'Î´ÖªÒì³£'))
-    AFR.rCsigE100TS <- factorX(subset(AFR.rCsigE100TS, value != 'Î´ÖªÒì³£'))
+    AFR.rCsigE100C <- factorX(subset(AFR.rCsigE100C, value != 'æœªçŸ¥å¼‚å¸¸'))
+    AFR.rCsigE100TS <- factorX(subset(AFR.rCsigE100TS, value != 'æœªçŸ¥å¼‚å¸¸'))
   }
   eval(parse(text = sprintf("AFR_value_plot(AFR.%sC,'Ship Time and %s (Non-Storage Server)',yl = -1,
-                            subdir = 'peak999',valueFilter = c(' 0','Î´ÖªÒì³£'),cylim = 60)",attr[i],attr[i])))
+                            subdir = 'peak999',valueFilter = c(' 0','æœªçŸ¥å¼‚å¸¸'),cylim = 60)",attr[i],attr[i])))
   eval(parse(text = sprintf("AFR_value_plot(AFR.%sTS,'Ship Time and %s (Storage Server)',-1,
-                            subdir = 'peak999',cylim = 60,valueFilter = c(' 0','Î´ÖªÒì³£'))",attr[i],attr[i])))
+                            subdir = 'peak999',cylim = 60,valueFilter = c(' 0','æœªçŸ¥å¼‚å¸¸'))",attr[i],attr[i])))
 }
 
-# P7.²é¿´¹ÊÕÏÀàĞÍÓëioÌØÕ÷µÄ¹ØÏµ
-tmp.fA <- subset(tmp.f,grepl('Ó²ÅÌ¹ÊÕÏ',fType))
+# P7.æŸ¥çœ‹æ•…éšœç±»å‹ä¸ioç‰¹å¾çš„å…³ç³»
+tmp.fA <- subset(tmp.f,grepl('ç¡¬ç›˜æ•…éšœ',fType))
 tmp.fA$fType <- factorX(gsub('_uwork','',tmp.fA$fType))
 tmp.fA$failShiptime <- round(tmp.fA$failShiptime)
 attr.fA <- names(tmp.fA)[8:ncol(tmp.fA)]
@@ -284,9 +284,9 @@ for(i in seq(1,length(attr.fA))){
   ggsave(file=file.path(dir_data,'fType_io',paste(attr.fA[i],'.png',sep='')), plot=p, width = 16, height = 12, dpi = 100)
 }
 
-# P8.ÁË½âÊÇ·ñÓĞĞéÄâ»ú¶ÔÓ¦Ä¸»úµÄIOÊı¾İ£¬¿´ÊÇ·ñÓĞ¿ÉÄÜ¶ÔĞéÄâÆ½Ì¨µÄ»úÆ÷µÄ¹ÊÕÏÂÊ½øĞĞ´¦Àí¡£
-Server <- read.csv(file = 'C:/MyCloud/ÂÛÎÄ_ÏµÍ³¼¶Ó²ÅÌ¹ÊÕÏ·ÖÎö/Êı¾İ/¿ÉÄÜÓÃµÃÉÏµÄÊı¾İ/Server_fromM1_IEGfile.csv')
-VServer <- read.csv(file = 'C:/MyCloud/ÂÛÎÄ_ÏµÍ³¼¶Ó²ÅÌ¹ÊÕÏ·ÖÎö/Êı¾İ/¿ÉÄÜÓÃµÃÉÏµÄÊı¾İ/virtual_Server_fromM1_IEGfile.csv')
+# P8.äº†è§£æ˜¯å¦æœ‰è™šæ‹Ÿæœºå¯¹åº”æ¯æœºçš„IOæ•°æ®ï¼Œçœ‹æ˜¯å¦æœ‰å¯èƒ½å¯¹è™šæ‹Ÿå¹³å°çš„æœºå™¨çš„æ•…éšœç‡è¿›è¡Œå¤„ç†ã€‚
+Server <- read.csv(file = 'C:/MyCloud/è®ºæ–‡_ç³»ç»Ÿçº§ç¡¬ç›˜æ•…éšœåˆ†æ/æ•°æ®/å¯èƒ½ç”¨å¾—ä¸Šçš„æ•°æ®/Server_fromM1_IEGfile.csv')
+VServer <- read.csv(file = 'C:/MyCloud/è®ºæ–‡_ç³»ç»Ÿçº§ç¡¬ç›˜æ•…éšœåˆ†æ/æ•°æ®/å¯èƒ½ç”¨å¾—ä¸Šçš„æ•°æ®/virtual_Server_fromM1_IEGfile.csv')
 VServer$svrid <- factor(gsub('-VM.*','',VServer$svr_asset_id))
 VServer$monDev <- Server$dev_class_name[match(VServer$svrid,Server$svr_asset_id)]
 MonServer <- data.frame(svrid = levels(VServer$svrid),
@@ -299,13 +299,13 @@ load(file = file.path(dir_data,'attr.Rda'))
 MonInModel <- subset(MonServer,ip %in% disk_ip$ip)
 MonInIO <- subset(MonServer, svrid %in% peak999$svrid)
 
-# P9.SMART SNÓë³ö³§Ê±¼äÑĞ¾¿
+# P9.SMART SNä¸å‡ºå‚æ—¶é—´ç ”ç©¶
 load(file = file.path(dir_data,'smart_1208.Rda'))
 reg_ip <- "((\\d+\\.){3}\\d+)(.*)"
 smart <- factorX(subset(smart_1208,grepl(reg_ip,ip) & modelNum != ''))
 a <- unique(smart$modelNum)
 
-# P10.¶Ô¶ÁĞ´¸ºÔØµÄÕ¼±È¶Ô¹ÊÕÏÂÊµÄÓ°ÏìÑĞ¾¿
+# P10.å¯¹è¯»å†™è´Ÿè½½çš„å æ¯”å¯¹æ•…éšœç‡çš„å½±å“ç ”ç©¶
 tmp.io$total <- tmp.io$mean_902 + tmp.io$mean_903
 tmp.io$Rperc <- tmp.io$mean_902/tmp.io$total*100
 div_rate <- c(0,30,70,100)
@@ -319,7 +319,7 @@ AFR_rateC <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',1,dev = 'C')
 AFR_rateTS <- AFR_attr_notime(tmp.f,tmp.io,'lb_rate',12,dev = 'TS')
 AFR_rate <- rbind(AFR_rateC,AFR_rateTS)
 
-#»­Í¼
+#ç”»å›¾
 p <- ggplot(AFR_rate,aes(x = item,y = AFR,fill = class)) + geom_bar(stat = 'identity',position = 'dodge') +
   xlab('I/O Workload Distribution') + ylab('Annual Failure Rate (%)') + ggtitle('I/O Workload Distribution and AFR') +
   guides(fill = guide_legend(title=NULL)) + 

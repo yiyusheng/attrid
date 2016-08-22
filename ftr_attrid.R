@@ -1,5 +1,5 @@
-# ÇóIOÓÃÁ¿ÌØÕ÷.
-# s*±íÊ¾Í³¼Æ£¬P*±íÊ¾»­Í¼
+# æ±‚IOç”¨é‡ç‰¹å¾.
+# s*è¡¨ç¤ºç»Ÿè®¡ï¼ŒP*è¡¨ç¤ºç”»å›¾
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -12,8 +12,8 @@ source(file.path(dir_code,'attr_function.R'))
 load(file.path(dir_data,'load_ftr_attrid.Rda'))
 
 #########################################################################################################
-# S1. Á½Á½ÁªºÏ»®·ÖÇø¼ä£¬²¢¸ø³ö¸÷Çø¼äµÄ¹ÊÕÏÂÊ
-# S1.1 Çø¼ä²âÊÔ£¬µÃ³öÓÃ10^seq(-5,5)À´»®·ÖÇø¼ä±È½ÏºÃ
+# S1. ä¸¤ä¸¤è”åˆåˆ’åˆ†åŒºé—´ï¼Œå¹¶ç»™å‡ºå„åŒºé—´çš„æ•…éšœç‡
+# S1.1 åŒºé—´æµ‹è¯•ï¼Œå¾—å‡ºç”¨10^seq(-5,5)æ¥åˆ’åˆ†åŒºé—´æ¯”è¾ƒå¥½
 quanSeq <- seq(0,1,0.01)
 quan_attr <- data.frame(quan = quanSeq,
                         q902 = as.numeric(quantile(mean_io$mean_902,quanSeq)),
@@ -23,10 +23,10 @@ quan_melted = melt(quan_attr,id.vars = 'quan')
 ggplot(quan_melted,aes(x = quan,y = value,group = variable,color = variable)) +
   geom_line() + scale_y_log10()
 serverZeroAttr <- subset(mean_io,mean_902 <= 0 | mean_903 <= 0 | mean_999 <= 0)
-# S1.2 Çø¼äÊıÁ¿ºÍÇø¼ä¹ÊÕÏÊı(ÒòÎªlog10²»ÄÜÓĞ0ºÍ¸ºÊı£¬ËùÓĞÒªÈ¥µô
-# ÕâÑù¾ÍÈ¥µôÁËÒ»Ö±Ã»ÓĞ¶Á»òĞ´»òCPUÀûÓÃµÄ»úÆ÷,7637Ì¨£¬ÆäÖĞ°üº¬¹ÊÕÏ»ú47Ì¨)
-# ±ê¼Ç£º¶Ár,Ğ´w,cpuUse c
-# ±ê¼Ç£ºÇø¼äÖĞ»úÆ÷ÊıA,Çø¼äÖĞ¹ÊÕÏÊıF,Çø¼ä¹ÊÕÏÂÊR
+# S1.2 åŒºé—´æ•°é‡å’ŒåŒºé—´æ•…éšœæ•°(å› ä¸ºlog10ä¸èƒ½æœ‰0å’Œè´Ÿæ•°ï¼Œæ‰€æœ‰è¦å»æ‰
+# è¿™æ ·å°±å»æ‰äº†ä¸€ç›´æ²¡æœ‰è¯»æˆ–å†™æˆ–CPUåˆ©ç”¨çš„æœºå™¨,7637å°ï¼Œå…¶ä¸­åŒ…å«æ•…éšœæœº47å°)
+# æ ‡è®°ï¼šè¯»r,å†™w,cpuUse c
+# æ ‡è®°ï¼šåŒºé—´ä¸­æœºå™¨æ•°A,åŒºé—´ä¸­æ•…éšœæ•°F,åŒºé—´æ•…éšœç‡R
 mean_io <- subset(mean_io,mean_902 >= 0 & mean_903 >= 0 & mean_999 >= 0)
 mean_io$dev_class_id <- cmdb$dev_class_id[match(mean_io$svrid,cmdb$svr_asset_id)]
 mean_ioF <- subset(mean_io,class == 'Failure')
@@ -34,7 +34,7 @@ mean_io$mean_9023 <- mean_io$mean_902 + mean_io$mean_903
 mean_io$ioFreq <- mean_io$mean_9023/mean_io$mean_999
 singlePartCount <- 10
 
-# S1.3.1 µ¥×Ö¶Î·ÇÆ½¾ùÇø¼ä·ÖÎö
+# S1.3.1 å•å­—æ®µéå¹³å‡åŒºé—´åˆ†æ
 mean_io_TS <- subset(mean_io,dev_class_id != 'C1')
 mean_ioF_TS <- subset(mean_io_TS,class == 'Failure')
 mean_io_C <- subset(mean_io,dev_class_id == 'C1')
@@ -63,17 +63,17 @@ mean_ioF_C <- subset(mean_io_C,class == 'Failure')
 # sinAttrFR(mean_io_C$ioFreq,mean_ioF_C$ioFreq,singlePartCount,
 #           'non-Storage Server - Value Partition and Failure Rate (IO Frequency)','%',1)
 
-# S1.3.2 µ¥×Ö¶ÎÀÛ»ı¹ÊÕÏÂÊ·ÖÎö(ºáÖáÎª¸ù¾İ×Ö¶ÎÅÅĞòºóµÄ»úÆ÷±àºÅ)
-# # TSÀà»úÆ÷
+# S1.3.2 å•å­—æ®µç´¯ç§¯æ•…éšœç‡åˆ†æ(æ¨ªè½´ä¸ºæ ¹æ®å­—æ®µæ’åºåçš„æœºå™¨ç¼–å·)
+# # TSç±»æœºå™¨
 # sinAttrCumFR(mean_io_TS,'mean_902','singleCumulationTSR.csv')
 # sinAttrCumFR(mean_io_TS,'mean_903','singleCumulationTSW.csv')
 # sinAttrCumFR(mean_io_TS,'mean_999','singleCumulationTST.csv')
-# # CÀà»úÆ÷
+# # Cç±»æœºå™¨
 # sinAttrCumFR(mean_io_C,'mean_902','singleCumulationCR.csv')
 # sinAttrCumFR(mean_io_C,'mean_903','singleCumulationCW.csv')
 # sinAttrCumFR(mean_io_C,'mean_999','singleCumulationCT.csv')
 
-# S1.3.4 µ¥×Ö¶ÎÈË¹¤·ÖÇø¼ä»®·ÖÇó¹ÊÕÏÂÊ
+# S1.3.4 å•å­—æ®µäººå·¥åˆ†åŒºé—´åˆ’åˆ†æ±‚æ•…éšœç‡
 tmp1 <- sinAttrManualFR(mean_io_TS$mean_999,mean_ioF_TS$mean_999,
 #                 c(seq(0,20,5),seq(30,70,10)),
                 c(seq(0,5,1),seq(10,40,5),seq(50,100,20)),
@@ -89,8 +89,8 @@ tmp4 <- sinAttrManualFR(mean_io_C$mean_999,mean_ioF_C$mean_999,
                         seq(0,100,1),
                         'non-Storage Server Manual- Value Partition and Failure Rate (Time)','%',1)
 
-# S1.3.x ×ÜÌåÊıÖµµÄ·Ö²¼¼ìÑé
-#ÕıÌ¬·Ö²¼
+# S1.3.x æ€»ä½“æ•°å€¼çš„åˆ†å¸ƒæ£€éªŒ
+#æ­£æ€åˆ†å¸ƒ
 require(MASS)
 norm_902 <- shapiro.test(mean_io_C$mean_902)
 norm_902 <- wilcox.test(mean_io_C$mean_902)
@@ -101,7 +101,7 @@ tmp <- mean_io_C[mean_io_C[[attr]] > quantile(mean_io_C[[attr]],0.50) &
 ggplot(tmp,aes(x = mean_902)) + geom_bar(binwidth = 1)
   stat_ecdf(geom = 'smooth')
 
-# S1.4 Á½×Ö¶Î·ÖÎö(°´µ¥×Ö¶Î½øĞĞ·Ö¸î)
+# S1.4 ä¸¤å­—æ®µåˆ†æ(æŒ‰å•å­—æ®µè¿›è¡Œåˆ†å‰²)
 # doublePartCount <- 10
 # tmp <- dblAttrFR(subset(mean_io_C,,c('svrid','mean_902','mean_903','class')),
 #                  10,'Non-Storage Server - Read and Write','Read (KB/s)','Write (KB/s)')
@@ -123,8 +123,8 @@ ggplot(tmp,aes(x = mean_902)) + geom_bar(binwidth = 1)
 #                  10,'Storage Server - Write and Time','Write (KB/s)','Time (KB/s)')
 # part_wcA <- tmp[[1]];part_wcF <- tmp[[2]]; part_wcR <- tmp[[3]]
 
-# S1.5 Á½×Ö¶Î·ÖÎö(¶ÁĞ´£¬°´¶ÁĞ´¸÷½øĞĞÒ»´Î·Ö¸î£¬°´¶ÁµÄÖµ½øĞĞ¶ş´Î·Ö¸î)
-# ½á¹û²¢²»ºÃ£¬·ÅÆú
+# S1.5 ä¸¤å­—æ®µåˆ†æ(è¯»å†™ï¼ŒæŒ‰è¯»å†™å„è¿›è¡Œä¸€æ¬¡åˆ†å‰²ï¼ŒæŒ‰è¯»çš„å€¼è¿›è¡ŒäºŒæ¬¡åˆ†å‰²)
+# ç»“æœå¹¶ä¸å¥½ï¼Œæ”¾å¼ƒ
 doublePartCountA <- 10
 mean_io_dp <- mean_io_TS
 mean_io_dp$rw <- mean_io_dp$mean_902 + mean_io_dp$mean_903
@@ -161,8 +161,8 @@ part$sumLeft <- factor(as.character(part$sumLeft),levels = sort(unique(part$sumL
 part$bLeft <- factor(as.character(part$bLeft),levels = sort(unique(part$bLeft)))
 ggplot(subset(part,rate <= 0.0065),aes(x = bLeft, y = sumLeft, size = rate)) + geom_point()
 
-# S2. Á½Á½¾ÛÀà²¢Çó¹ÊÕÏÂÊ
-# ÎŞ·¨¾ù·Ö£¬·ÅÆú
+# S2. ä¸¤ä¸¤èšç±»å¹¶æ±‚æ•…éšœç‡
+# æ— æ³•å‡åˆ†ï¼Œæ”¾å¼ƒ
 colIO <- list(c('mean_902','mean_903'),
           c('mean_902','mean_999'),
           c('mean_903','mean_999'))
@@ -186,12 +186,12 @@ partCenter$rate <- partR
 ggplot(partCenter,aes(x = mean_902, y = mean_903, size = rate, colour = size)) + 
   geom_point()
 
-# S3.Èı×Ö¶ÎÀÛ»ı·Ö²¼¼ÆËã
+# S3.ä¸‰å­—æ®µç´¯ç§¯åˆ†å¸ƒè®¡ç®—
 tmp_io <- mean_io_C
 cdf <- data.frame(io = c(tmp_io$mean_902,tmp_io$mean_903,tmp_io$mean_999),
                   class = rep(c('902','903','999'),each = nrow(tmp_io)))
 ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
-# #»­Í¼³¢ÊÔ
+# #ç”»å›¾å°è¯•
 # melt_rcR <- melt(as.matrix(part_rcR))
 # melt_rcA <- melt(as.matrix(part_rcA))
 # melt_rcF <- melt(as.matrix(part_rcF))
@@ -199,7 +199,7 @@ ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
 # names(melt_rc) <- c('Var1','Var2','Rate','numAll','numFailure')
 # ggplot(subset(melt_rc,Rate != -1),aes(x = as.character(Var1),y = as.character(Var2),size = value)) + geom_point()
 #########################################################################################################
-# # P1. 999¾ùÖµÓë·Ç¿ÕÏĞÊ±¼ä
+# # P1. 999å‡å€¼ä¸éç©ºé—²æ—¶é—´
 # p <- ggplot(mean_io,aes(x = use_perc,y = mean_999)) + 
 #   geom_point(aes(shape = class,color = class,alpha = size),size = 5) +
 #   ggtitle('Disk Util') + xlab('Percentage of Time with Idel Disk(%)') + ylab('Mean Disk Util(%)') +
@@ -213,10 +213,10 @@ ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(CPU)Óë·Ç¿ÕÏĞÊ±¼ä.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(CPU)ä¸éç©ºé—²æ—¶é—´.png'),
 #        width = 12, height = 9, dpi = 100)
 
-# # P2. 999¾ùÖµÓë¹ÊÕÏÊıÁ¿
+# # P2. 999å‡å€¼ä¸æ•…éšœæ•°é‡
 # p <- ggplot(mean_io,aes(x = mean_999)) + 
 #   geom_bar(aes(fill = class),binwidth = 0.5) +
 #   ggtitle('Disk Usage(Util)') + xlab('Mean Util(%)') + ylab('Number of Servers') +
@@ -231,10 +231,10 @@ ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(CPU)-30.png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(CPU)-30.png'),
 #        width = 12, height = 9, dpi = 100)
 
-# # P3. ×÷Í¼: 902.meanÓë·±Ã¦Ê±¼ä
+# # P3. ä½œå›¾: 902.meanä¸ç¹å¿™æ—¶é—´
 # p <- ggplot(mean_io) + 
 #   geom_point(aes(x = mean_902,y = use_perc,color = class,size = size)) +
 #   ggtitle('Disk Usage (Read)') + xlab('Mean Read Usage(kB/s)') + ylab('Percentage of Time with Idel Disk(%)') +
@@ -248,10 +248,10 @@ ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(¶Á).png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(è¯»).png'),
 #        width = 12, height = 9, dpi = 100)
 
-# # P4. ×÷Í¼: 903.meanÓë·±Ã¦Ê±¼ä
+# # P4. ä½œå›¾: 903.meanä¸ç¹å¿™æ—¶é—´
 # p <- ggplot(mean_io) + 
 #   geom_point(aes(x = mean_903,y = use_perc,color = class,size = size)) +
 #   ggtitle('Disk Usage (Write)') + xlab('Mean Write Usage(kB/s)') + ylab('Percentage of Time with Idel Disk(%)') +
@@ -265,10 +265,10 @@ ggplot(subset(cdf,io>0),aes(log10(io),colour = class)) + stat_ecdf()
 #         legend.justification = c(0,0),
 #         legend.background = element_rect(fill = alpha('grey',0.5)))
 # print(p)
-# ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(Ğ´).png'),
+# ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(å†™).png'),
 #        width = 12, height = 9, dpi = 100)
 
-# P5. ×÷Í¼: 902.meanÓë903.mean
+# P5. ä½œå›¾: 902.meanä¸903.mean
 p <- ggplot(mean_io,aes(x = mean_902,y = mean_903)) + 
   geom_point(aes(shape = class,color = class,alpha = size),size = 5) +
   ggtitle('Disk Usage and Failure') + xlab('Mean Read Usage(kB/s)') + ylab('Mean Write Usage(kB/s)') +
@@ -283,10 +283,10 @@ p <- ggplot(mean_io,aes(x = mean_902,y = mean_903)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¶ÁĞ´Óë¹ÊÕÏ-É¢µãÍ¼.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜è¯»å†™ä¸æ•…éšœ-æ•£ç‚¹å›¾.png'),
        width = 12, height = 9, dpi = 100)
 
-# P6. ×÷Í¼: 902.meanÓë903.mean(ÏŞÖÆ5000)
+# P6. ä½œå›¾: 902.meanä¸903.mean(é™åˆ¶5000)
 p <- ggplot(mean_io,aes(x = mean_902,y = mean_903)) + 
   geom_point(aes(shape = class,color = class,alpha = size),size = 5) +
   ggtitle('Disk Usage and Failure') + xlab('Mean Read Usage(kB/s)') + ylab('Mean Write Usage(kB/s)') +
@@ -301,10 +301,10 @@ p <- ggplot(mean_io,aes(x = mean_902,y = mean_903)) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌ¶ÁĞ´Óë¹ÊÕÏ-É¢µãÍ¼-5000.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜è¯»å†™ä¸æ•…éšœ-æ•£ç‚¹å›¾-5000.png'),
        width = 12, height = 9, dpi = 100)
 
-# P7. ×÷Í¼: 902.meanÓë¹ÊÕÏ
+# P7. ä½œå›¾: 902.meanä¸æ•…éšœ
 p <- ggplot(mean_io) + 
   geom_bar(aes(x = mean_902,fill = class)) +
   ggtitle('Disk usage(Read) and Failure') + xlab('Mean Read Usage(kB/s)') + ylab('Number of Servers') + 
@@ -317,10 +317,10 @@ p <- ggplot(mean_io) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(¶Á)-Ö±·½Í¼.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(è¯»)-ç›´æ–¹å›¾.png'),
        width = 12, height = 9, dpi = 100)
 
-# P8. ×÷Í¼: 903.meanÓë¹ÊÕÏ
+# P8. ä½œå›¾: 903.meanä¸æ•…éšœ
 p <- ggplot(mean_io) + 
   geom_bar(aes(x = mean_903,fill = class)) +
   ggtitle('Disk usage(Write) and Failure') + xlab('Mean Write Usage(kB/s)') + ylab('Number of Servers') + 
@@ -333,5 +333,5 @@ p <- ggplot(mean_io) +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 print(p)
-ggsave(plot = p,file = file.path(dir_data,'ftr_io','Ó²ÅÌÓÃÁ¿(Ğ´)-Ö±·½Í¼.png'),
+ggsave(plot = p,file = file.path(dir_data,'ftr_io','ç¡¬ç›˜ç”¨é‡(å†™)-ç›´æ–¹å›¾.png'),
        width = 12, height = 9, dpi = 100)

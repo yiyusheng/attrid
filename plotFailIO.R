@@ -1,4 +1,4 @@
-# ½«¹ÊÕÏ»úµÄIOÊı¾İ×÷Í¼
+# å°†æ•…éšœæœºçš„IOæ•°æ®ä½œå›¾
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -14,7 +14,7 @@ load(file.path(dir_data,'load_ftr_attrid.Rda'))
 load(file.path(dir_data,'failIO.Rda'))
 
 #@@@ LOCAL FUNCTION @@@#
-# F1.¸øIO»­Í¼
+# F1.ç»™IOç”»å›¾
 plotIO <- function(data){
   svrid <- as.character(data$svrid[1])
   data$fPoint <- 'Before Failure'
@@ -65,7 +65,7 @@ plotIO <- function(data){
          plot=p999, width = 16, height = 12, dpi = 100)
 }
 
-# P1.Êı¾İÔ¤´¦Àí
+# P1.æ•°æ®é¢„å¤„ç†
 failIO$time <- NULL
 failIO$timepoint <- NULL
 failIO <- factorX(failIO)

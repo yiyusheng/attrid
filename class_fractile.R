@@ -1,4 +1,4 @@
-# IOÌØÕ÷: ·ÖÎ»µã + ¸ßÖĞµÍ·ÖÀà
+# IOç‰¹å¾: åˆ†ä½ç‚¹ + é«˜ä¸­ä½åˆ†ç±»
 rm(list = ls())
 dir_code <- 'D:/Git/attrid'
 dir_data <- 'D:/Data/attrid'
@@ -24,7 +24,7 @@ ftr_quan <- function(data){
 }
 
 #@@@ LOAD DATA
-# 1. cmdbÊı¾İ
+# 1. cmdbæ•°æ®
 load(file.path(dir_dataA,'disk_number_label.Rda'))
 load(file.path(dir_dataA,'mcf_all_age_rsv2014.Rda'))
 dev_need <- c('TS4','TS5','TS6','C1')
@@ -33,7 +33,7 @@ data.config <- subset(data.config,use_time > as.POSIXct('2010-01-01'))
 # data.config <- subset(data.config,dev_class_id %in% dev_need)
 data.config$dev_class_id <- factor(data.config$dev_class_id)
 
-# 2. ¶ÁÈ¡k131-9**
+# 2. è¯»å–k131-9**
 k131_902 <- read.csv(file.path(dir_data,'k131_902'))
 k131_903 <- read.csv(file.path(dir_data,'k131_903'))
 k131_999 <- read.csv(file.path(dir_data,'k131_999'))
@@ -41,7 +41,7 @@ k131_902$dev_class_id <- cmdb$dev_class_id[match(k131_902$svrid,cmdb$svr_asset_i
 k131_903$dev_class_id <- cmdb$dev_class_id[match(k131_903$svrid,cmdb$svr_asset_id)]
 k131_999$dev_class_id <- cmdb$dev_class_id[match(k131_999$svrid,cmdb$svr_asset_id)]
 
-# 3. ÇóËùÓĞÊı¾İµãµÄmeanÖµµÄ·ÖÎ»µã
+# 3. æ±‚æ‰€æœ‰æ•°æ®ç‚¹çš„meanå€¼çš„åˆ†ä½ç‚¹
 dev_need <- c('C1','TS1','TS3','TS4','TS5','TS6')
 ftr.902 <- ftr_quan(subset(k131_902,dev_class_id %in% dev_need))
 ftr.903 <- ftr_quan(subset(k131_903,dev_class_id %in% dev_need))
@@ -61,7 +61,7 @@ ftr.all$dev_class_id <- cmdb$dev_class_id[match(ftr.all$svrid,cmdb$svr_asset_id)
 ftr.all$bs1 <- cmdb$bs1[match(ftr.all$svrid,cmdb$svr_asset_id)]
 ftr.all$db <- paste(ftr.all$dev_class_id,ftr.all$bs1,sep='_')
 
-# 4. ¾ÛÀà
+# 4. èšç±»
 ftr.data <- ftr.all
 se <- seq(3,20,1)
 rs <- rep(0,length(se))
@@ -73,7 +73,7 @@ for (i in 1:length(se)){
   cl <- cbind(cl,km[[i]]$cluster)
 }
 
-# 5. Çó¸÷¾ÛÀàÖ®¼äµÄÌõ¼şìØ
+# 5. æ±‚å„èšç±»ä¹‹é—´çš„æ¡ä»¶ç†µ
 cl <- cl[,2:ncol(cl)]
 ce <- list()
 for (i in 1:(ncol(cl)-1)){
@@ -81,7 +81,7 @@ for (i in 1:(ncol(cl)-1)){
   ce[i] <- list(tmp[2])
 }
 
-# 6.×Ü½á
+# 6.æ€»ç»“
 re <- list()
 s <- list()
 s1 <- list()

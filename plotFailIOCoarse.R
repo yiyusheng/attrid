@@ -1,4 +1,4 @@
-# ½«¹ÊÕÏ»úµÄIOÊı¾İ×÷Í¼¡£²¢ÓÃSVMÀ´Ñ§Ï°ÈË¹¤±ê¼ÇµÄÖÜÆÚ½á¹û¡£
+# å°†æ•…éšœæœºçš„IOæ•°æ®ä½œå›¾ã€‚å¹¶ç”¨SVMæ¥å­¦ä¹ äººå·¥æ ‡è®°çš„å‘¨æœŸç»“æœã€‚
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -15,7 +15,7 @@ failIO <- subset(failIO,svrid %in% gsub('.png','',nm$name[nm$smp != 0]))
 failIO <- failIO[order(failIO$svrid,failIO$time,failIO$timepoint),]
 failIO <- factorX(failIO)
 #@@@ LOCAL FUNCTION @@@#
-# F1.¸øIO»­Í¼
+# F1.ç»™IOç”»å›¾
 
 plotOneAttr <- function(data,uv,dv,week = F){
   if (week == T){
@@ -38,7 +38,7 @@ plotOneAttr <- function(data,uv,dv,week = F){
   p
 }
 
-# P1.Êı¾İÔ¤´¦Àí(ÓÃÈ«Á¿£¬È¥Í·Î²1%£¬3%£¬5%µÄ½á¹û£¬¼°Ö»ÓÃÒ»ÖÜµÄÊı¾İµÄ½á¹û)
+# P1.æ•°æ®é¢„å¤„ç†(ç”¨å…¨é‡ï¼Œå»å¤´å°¾1%ï¼Œ3%ï¼Œ5%çš„ç»“æœï¼ŒåŠåªç”¨ä¸€å‘¨çš„æ•°æ®çš„ç»“æœ)
 p902all <- tapply(failIO$a902,failIO$svrid,function(x){plotOneAttr(x,100,0)})
 p9021 <- tapply(failIO$a902,failIO$svrid,function(x){plotOneAttr(x,99,1)})
 p9023 <- tapply(failIO$a902,failIO$svrid,function(x){plotOneAttr(x,97,3)})
@@ -117,7 +117,7 @@ lapply(sort(names(p902all)),function(x){
 #   dev.off()
 # })
 
-# P2.ÎÄ¼şÖØÃüÃû
+# P2.æ–‡ä»¶é‡å‘½å
 # nm <- data.frame(name = paste(sort(names(plot902List)),'.png',sep = ''))
 # nm$newName <- paste(1:nrow(nm),nm$name,sep='_')
 # file.rename(file.path(dir_data,'FailIOCoarse','FailIOa902',nm$name),
@@ -127,7 +127,7 @@ lapply(sort(names(p902all)),function(x){
 # file.rename(file.path(dir_data,'FailIOCoarse','FailIOa999',nm$name),
 #             file.path(dir_data,'FailIOCoarse','FailIOa999',nm$newName))
 
-# P3.Ëæ»úÈ¡500¸ö»úÆ÷£¬¾«È·µÄ±ê¼ÇÖÜÆÚĞÔ
+# P3.éšæœºå–500ä¸ªæœºå™¨ï¼Œç²¾ç¡®çš„æ ‡è®°å‘¨æœŸæ€§
 # idx<- sort(sample(1:nrow(nm),500))
 # nm$smp <- 0
 # nm$smp[idx] <- 1:500

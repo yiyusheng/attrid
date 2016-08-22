@@ -1,4 +1,4 @@
-# ¶ÁÓëĞ´µÄ²»Í¬ÌØĞÔ¶Ô¹ÊÕÏµÄÓ°Ïì
+# è¯»ä¸å†™çš„ä¸åŒç‰¹æ€§å¯¹æ•…éšœçš„å½±å“
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -14,14 +14,14 @@ source(file.path(dir_code,'AFR_io_prepare.R'))
 #@@@ LOCAL FUNCTION @@@#
 
 ############################################################################################
-# C1.ÎªËùÓĞ»úÆ÷Éú³É¶ÁĞ´×ÜÁ¿Óë¶ÁĞ´±ÈÀı
+# C1.ä¸ºæ‰€æœ‰æœºå™¨ç”Ÿæˆè¯»å†™æ€»é‡ä¸è¯»å†™æ¯”ä¾‹
 ioC1 <- subset(tmp.io,mean_902 != 0 & mean_903 != 0)
 ioC1$mean_902 <- log2(ioC1$mean_902*86400*365)
 ioC1$mean_903 <- log2(ioC1$mean_903*86400*365)
 ioC1$mean_9023 <- log2(2^ioC1$mean_902 + 2^ioC1$mean_903)
 ioC1$rwRate <- (2^ioC1$mean_903)/(2^ioC1$mean_9023)*100
 
-# C1.1 ·Ö×Ö¶Î´¦Àí + Éú³É¹ÊÕÏµ¥×Ö¶Î
+# C1.1 åˆ†å­—æ®µå¤„ç† + ç”Ÿæˆæ•…éšœå•å­—æ®µ
 div902 <- seq(10,44,1)
 ioC1$cut902 <- cut(ioC1$mean_902,div902)
 ioC1$sep902 <- as.numeric(gsub('^\\(|,.*$','',ioC1$cut902))
@@ -35,7 +35,7 @@ divRate <- c(seq(0,100,5))
 ioC1$cutRate <- cut(ioC1$rwRate,divRate)
 ioC1$sepRate <- as.numeric(gsub('^\\(|,.*$','',ioC1$cutRate))
 
-#½«·Ö¶ÎÊı¾İ½»¸ø¹ÊÕÏ»ú
+#å°†åˆ†æ®µæ•°æ®äº¤ç»™æ•…éšœæœº
 fC1 <- subset(tmp.f, svr_id %in% ioC1$svrid)
 fC1$sep902 <- ioC1$sep902[match(fC1$svr_id,ioC1$svrid)]
 fC1$sep903 <- ioC1$sep903[match(fC1$svr_id,ioC1$svrid)]
@@ -43,7 +43,7 @@ fC1$sep9023 <- ioC1$sep9023[match(fC1$svr_id,ioC1$svrid)]
 fC1$sepRate <- ioC1$sepRate[match(fC1$svr_id,ioC1$svrid)]
 # ggplot(subset(ioC1,dClass == 'TS2T'),aes(x = mean_9023,fill = factor(shTime))) + geom_bar(binwidth = 1,position = 'fill')
 
-# C1.2 µ¥×Ö¶Î·Ö»úĞÍ´¦Àí
+# C1.2 å•å­—æ®µåˆ†æœºå‹å¤„ç†
 ioC1C <- subset(ioC1,dClass == 'C')
 ioC1TS1 <- subset(ioC1,dClass == 'TS1T')
 ioC1TS2 <- subset(ioC1,dClass == 'TS2T')
@@ -62,7 +62,7 @@ ioAFR <- function(div,ioC,fC,attr,diskCount = 1){
   AFR
 }
 
-#·Ö»úĞÍ
+#åˆ†æœºå‹
 AFR9023C <- ioAFR(div9023,ioC1C,fC1C,'sep9023')
 AFR9023TS1 <- ioAFR(div9023,ioC1TS1,fC1TS1,'sep9023',12)
 AFR9023TS2 <- ioAFR(div9023,ioC1TS2,fC1TS2,'sep9023',12)
@@ -80,15 +80,15 @@ AFR9023Both <- rbind(subset(AFR9023C,sep>=29 & sep<37),
                      subset(AFR9023TS1,sep > 30 & sep < 41),
                      subset(AFR9023TS2,sep > 30 & sep < 41))
 
-#Ğ´Õ¼±ÈµÍÓÚ10%
+#å†™å æ¯”ä½äº10%
 AFRRateTS_10 <- ioAFR(div9023,subset(ioC1TS,sepRate <= 10),subset(fC1TS,sepRate <= 10),'sep9023',12)
 ggplot(AFRRateTS_10,aes(x = sep,y = AFR)) + geom_bar(stat = 'identity')
-#Ğ´Õ¼±ÈÎª[40,60]
+#å†™å æ¯”ä¸º[40,60]
 AFRRateTS_40_60 <- ioAFR(div9023,subset(ioC1TS,sepRate >= 40 & sepRate <= 60),
                          subset(fC1TS,sepRate >= 40 & sepRate <= 60),'sep9023',12)
 ggplot(AFRRateTS_40_60,aes(x = sep,y = AFR)) + geom_bar(stat = 'identity')
 
-# ¶ÁĞ´±ÈÀı»­Í¼
+# è¯»å†™æ¯”ä¾‹ç”»å›¾
 Ra1 <- ggplot(subset(AFRRateC,sep>= 35),aes(x=sep,y=AFR)) + geom_bar(stat='identity') + 
   xlab('Percentage of Write Workload in I/O Workload (%)') + ylab('Annual Failure Rate (%)') + 
   ggtitle('I/O Workload Distribution and AFR (Non-Storage Servers)') +
@@ -138,7 +138,7 @@ Ra4 <- ggplot(subset(AFRRateTS),aes(x=sep,y=AFR)) + geom_bar(stat='identity') +
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
 
-# ¶ÁĞ´×ÜÁ¿£¨log2£©»­Í¼
+# è¯»å†™æ€»é‡ï¼ˆlog2ï¼‰ç”»å›¾
 A1 <- ggplot(subset(AFR9023C,sep >= 29 & sep < 37),aes(x=sep,y=AFR)) + geom_bar(stat='identity') + 
   xlab('Annual I/O Workload (2^x KB)') + ylab('Annual Failure Rate (%)') + 
   ggtitle('Annual I/O Workload and AFR (Non-Storage Servers)') +
@@ -199,7 +199,7 @@ ABoth <- ggplot(subset(AFR9023Both),aes(x=sep,y=AFR,fill=class)) + geom_bar(stat
         legend.position = c(.6,.8),
         legend.justification = c(0,0),
         legend.background = element_rect(fill = alpha('grey',0.5)))
-#´æ´¢
+#å­˜å‚¨
 ggsave(file = file.path(dir_data,'ReadWrite','C_Rate.png'), plot=Ra1, width = 16, height = 12, dpi = 100)
 ggsave(file = file.path(dir_data,'ReadWrite','TS1_Rate.png'), plot=Ra2, width = 16, height = 12, dpi = 100)
 ggsave(file = file.path(dir_data,'ReadWrite','TS2_Rate.png'), plot=Ra3, width = 16, height = 12, dpi = 100)
@@ -209,7 +209,7 @@ ggsave(file = file.path(dir_data,'ReadWrite','TS1_All.png'), plot=A2, width = 16
 ggsave(file = file.path(dir_data,'ReadWrite','TS2_All.png'), plot=A3, width = 16, height = 12, dpi = 100)
 ggsave(file = file.path(dir_data,'ReadWrite','TS_All.png'), plot=A4, width = 16, height = 12, dpi = 100)
 
-# C1.3 ¶ÁĞ´Á½×Ö¶Î´¦Àí
+# C1.3 è¯»å†™ä¸¤å­—æ®µå¤„ç†
 # rwTable <- colTableX(ioC1TS1,c('sep902','sep903'))
 # rwTable <- cbind(rwTable,splitToDF(rwTable$item))
 # rwTable$rate <- NULL
@@ -238,7 +238,7 @@ ggsave(file = file.path(dir_data,'ReadWrite','TS_All.png'), plot=A4, width = 16,
 # ggplot(ioC1TS1,aes(x = sep9023,fill = dev_class_id)) + geom_bar()
 # ggplot(subset(tmp),aes(x = sep,y = AFR*6)) + geom_line()
 # 
-# # C2 ´æ´¢ĞÍ»úÆ÷¸ù¾İ×ÜÁ¿·ÖÀà£¬ÒÔÄê¶ÁĞ´×ÜÁ¿8T·Ö½ç
+# # C2 å­˜å‚¨å‹æœºå™¨æ ¹æ®æ€»é‡åˆ†ç±»ï¼Œä»¥å¹´è¯»å†™æ€»é‡8Tåˆ†ç•Œ
 # ioC2.TS.L <- subset(ioC1,dClass == 'TS' & sep9023 >= 33)
 # ioC2.TS.S <- subset(ioC1,dClass == 'TS' & sep9023 < 33)
 # fC2.TS.L <- subset(fC1,dClass == 'TS' & sep9023 >= 33)
@@ -247,7 +247,7 @@ ggsave(file = file.path(dir_data,'ReadWrite','TS_All.png'), plot=A4, width = 16,
 # write.table(AFR903C,file.path(dir_data,'AFR903C.csv'),quote = F,row.names = F,sep = ',')
 # write.table(AFR902TS,file.path(dir_data,'AFR902TS.csv'),quote = F,row.names = F,sep = ',')
 # write.table(AFR903TS,file.path(dir_data,'AFR903TS.csv'),quote = F,row.names = F,sep = ',')
-# ¶ÁĞ´Õ¼±È¼ÆËã
+# è¯»å†™å æ¯”è®¡ç®—
 # ioC1$rwRateRnd <- round(ioC1$rwRate*100)/100
 # rwRateTable <- colTableX(ioC1,c('rwRateRnd','sep9023'))
 # rwRateTable <- cbind(rwRateTable,splitToDF(rwRateTable$item))

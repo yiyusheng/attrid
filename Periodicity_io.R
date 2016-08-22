@@ -1,4 +1,4 @@
-# ¶ÁĞ´ÖÜÆÚĞÔ¶Ô¹ÊÕÏÂÊÓ°ÏìµÄÑĞ¾¿
+# è¯»å†™å‘¨æœŸæ€§å¯¹æ•…éšœç‡å½±å“çš„ç ”ç©¶
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source(file.path('D:/Git/attrid','attr_config.R'))
@@ -13,7 +13,7 @@ load(file.path(dir_data,'load_ftr_attrid.Rda'))
 source(file.path(dir_code,'AFR_io_prepare.R'))
 load(file.path(dir_data,'fourierTransMThH.Rda'))
 #########################################################################################################
-# P1.ÊÇ·ñÓĞÖÜÆÚĞÔ¶Ô¹ÊÕÏÂÊµÄÓ°Ïì
+# P1.æ˜¯å¦æœ‰å‘¨æœŸæ€§å¯¹æ•…éšœç‡çš„å½±å“
 frT$dClass <- cmdb$dClass[match(frT$svrid,cmdb$svr_asset_id)]
 frT$classs <- 'Normal'
 frT$class[frT$svrid %in% data.f$svr_id] <- 'Failure'
@@ -35,7 +35,7 @@ Tcmdb$item <- as.numeric(levels(Tcmdb$item)[Tcmdb$item])
 ggplot(subset(Tcmdb,count > 100),aes(x = item,y = rate)) + geom_bar(stat = 'identity')
 Tcmdb <- Tcmdb[order(Tcmdb$rate),]
 
-# P2.¹Û²ì¼ÆËã³öÀ´µÄÖÜÆÚÊÇ·ñ×¼È·£¬ÓĞ1000Ì¨¹ÊÕÏ»úµÄIOÊı¾İ£¬ÒÑ×÷Í¼£¬¿ÉÒÔÖ±½Ó¿´
+# P2.è§‚å¯Ÿè®¡ç®—å‡ºæ¥çš„å‘¨æœŸæ˜¯å¦å‡†ç¡®ï¼Œæœ‰1000å°æ•…éšœæœºçš„IOæ•°æ®ï¼Œå·²ä½œå›¾ï¼Œå¯ä»¥ç›´æ¥çœ‹
 ioplot <- function(sid){
   data <- subset(failIO,svrid == as.character(sid))
   data$fPoint <- 'Before Failure'
@@ -73,4 +73,4 @@ count <- 20
 r <- ioplot(as.character(smpSvrid[5]))
 staSmp[count,c('period','corr')] <- c(F,T)
 
-# P3.Ê¹ÓÃSVMÅĞ¶ÏÖÜÆÚĞÔ
+# P3.ä½¿ç”¨SVMåˆ¤æ–­å‘¨æœŸæ€§
