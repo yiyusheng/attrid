@@ -5,7 +5,7 @@ AFR_plot <- function(cm,title){
     geom_bar(stat = 'identity',position = 'dodge') +
     xlab('Disk Age (years)') + ylab('Annual Failure Rate (%)') + 
     # scale_x_continuous(breaks = floor(min(cm$item)):ceiling(max(cm$item))) +
-    scale_y_continuous(breaks = seq(floor(min(cm$AFR)),7,1)) +
+    scale_y_continuous(breaks = seq(floor(min(cm$AFR)),10,1)) +
     guides(fill = guide_legend(title=NULL)) + 
     theme_bw() +
     theme(panel.background = element_rect(color = 'black'),
@@ -15,8 +15,9 @@ AFR_plot <- function(cm,title){
           
           plot.title = element_blank(),
           axis.line = element_line(color = 'black'),
-          axis.text = element_text(size = 24),
+          axis.text = element_text(size = 26),
           axis.title = element_text(size = 26),
+          axis.text.x = element_text(angle = 40,hjust = 1),
           
           legend.key.width = unit(1.5,units = 'line'),
           legend.key.height = unit(1.5,units = 'line'),
@@ -26,7 +27,7 @@ AFR_plot <- function(cm,title){
           legend.background = element_rect(fill = alpha('grey',0.5))
     )
   print(p1)
-  ggsave(file=file.path(dir_data,'sc16',paste(title,'.eps',sep='')), plot=p1, width = 8, height = 6, dpi = 100)
+  ggsave(file=file.path(dir_data,'sc16',paste(title,'.eps',sep='')), plot=p1, width = 10, height = 6, dpi = 100)
   p1
 }
 
@@ -41,8 +42,8 @@ classExchg <- function(df){
 cut3mon <- function(t){
   t1 <- floor(t*4)
   t2 <- t1/4
-  t2 <- t2 + 0.25
-  t2[t2 > 3] <- floor(t2[t2 > 3])
+  # t2 <- t2 + 0.25
+  t2[t2 > 4] <- floor(t2[t2 > 4])
   t2
 }
 

@@ -19,11 +19,13 @@ dirName <- 'attrid'
 if (osFlag){
   dir_code <- paste('D:/Git/',dirName,sep='')
   dir_data <- paste('D:/Data/',dirName,sep='')
+  dir_dataSource <- 'D:/Data/dataLoadforDiskAnalysis'
   source('D:/Git/R_Function/Rfun.R')
 }else{
   dir_code <- paste('/home/yiyusheng/Code/R/',dirName,sep='')
   dir_data <- paste('/home/yiyusheng/Data/',dirName,sep='')
-  source('/home/yiyusheng/Code/R/Rfun.R')
+  dir_dataSource <- '/home/yiyusheng/Data/dataLoadforDiskAnalysis'
+  source('/home/yiyusheng/Code/R/R_Function/Rfun.R')
   # options('width' = 150)
 }
 

@@ -2,25 +2,25 @@
 rm(list = ls())
 #@@@ CONFIGURE @@@#
 source('head.R')
-load(file.path(dir_data,'load_ftr_attrid.Rda'))
+load(file.path(dir_dataSource,'load_ftr_attrid.Rda'))
 useOld <- 1
 
 if (useOld == 1){
-  upperTime <- as.POSIXct('2013-10-01')
   lowerTime <- as.POSIXct('2013-01-01')
+  upperTime <- as.POSIXct('2013-10-01')
   saveName <- 'dataPrepareAFR13.Rda'
 }else{
-  upperTime <- as.POSIXct('2014-08-01')
   lowerTime <- as.POSIXct('2014-06-01')
+  upperTime <- as.POSIXct('2014-08-01')
   saveName <- 'dataPrepareAFR1406_1407.Rda'
 }
 
-
-
 # S1. Failure record prepare
+
 # a wrong failure record makes original result wrong
 # data.f <- subset(data.fMore,(f_time > as.POSIXct('2013-02-02') & f_time < as.POSIXct('2013-12-01')) |
 #                    f_time > as.POSIXct('2014-01-01')) 
+
 data.f <- subset(data.fMore, f_time < upperTime & f_time > lowerTime)
 data.f <- subset(data.f,ip %in% cmdb$ip)
 data.f$use_time <- cmdb$use_time[match(data.f$svr_id,cmdb$svr_asset_id)]
@@ -42,8 +42,8 @@ cmdb$shiptimeToRight <- as.numeric(cmdb$shiptimeToRight)/365
 # a wrong setting
 # cmdb$shTime <- floor(cmdb$shiptimeToLeft + (1/12))
 
-cmdb$shTime <- floor(cmdb$shiptimeToLeft)
-cmdb$shTimeN <- cut(cmdb$shiptimeToLeft,c(0,1/2,1:7),include.lowest = T)
+cmdb$shTime <- floor(cmdb$shiptimeToRight)
+cmdb$shTimeN <- cut(cmdb$shiptimeToRight,c(0,1/2,1:7),include.lowest = T)
 cmdb$shTimeN <- gsub('^\\[|^\\(|,.*$','',cmdb$shTimeN)
 
 
