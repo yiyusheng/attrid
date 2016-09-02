@@ -15,6 +15,7 @@
 #
 #
 osFlag = Sys.info()[1] == 'Windows' 
+setwd(dirname(sys.frame(1)$ofile))
 dirName <- 'attrid'
 if (osFlag){
   dir_code <- paste('D:/Git/',dirName,sep='')

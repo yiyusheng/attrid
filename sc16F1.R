@@ -14,25 +14,53 @@ Qu <- 1 # cut by each quauters
 flistFile <- 'dataPrepareAFR13.Rda'
 # flistFile <- 'dataPrepareAFR1406_1407.Rda'
 load(file.path(dir_data,flistFile))
-tmp.f$fsTimeQu <- cut3mon(tmp.f$failShiptime)
-tmp.cmdb$shTimeQu <- cut3mon(tmp.cmdb$shiptimeToRight)
+
+tmp.f <- factorX(tmp.f)
+tmp.cmdb <- factorX(tmp.cmdb)
+
+tmp.f$fsTimeQu <- cut3mon(tmp.f$failShiptime,4)
+tmp.f$diskNum <- tmp.cmdb$diskNum[match(tmp.f$svr_id,tmp.cmdb$svr_asset_id)]
+
+tmp.cmdb$shTimeQu <- cut3mon(tmp.cmdb$shiptimeToRight,4)
+tmp.cmdb$shTimeQuGuassian <- cut3mon(tmp.cmdb$shiptimeToRight,4.25)
 tmp.f$shTimeQu <- tmp.cmdb$shTimeQu[match(tmp.f$svr_id,tmp.cmdb$svr_asset_id)]
-tmp.cmdb$shTimeQu <- tmp.cmdb$shTimeQu[match(tmp.cmdb$svr_asset_id,tmp.cmdb$svr_asset_id)]
+tmp.f$shTimeQuGuassian <- tmp.cmdb$shTimeQuGuassian[match(tmp.f$svr_id,tmp.cmdb$svr_asset_id)]
 
-if (Qu == 1){
-  cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTimeQu','shTimeQu',1,dev = 'C')
-  cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTimeQu','shTimeQu',12,dev = 'TS')
-  cm1$AFR[cm1$item == 5] <- 4.13443
+# compute the failure rate in a overlayed model
+at <- 'shTimeQu'
+cm1A <- AFR_attr_notime(tmp.f,tmp.cmdb,at,at,1,dev = 'C')
+cm2A <- AFR_attr_notime(tmp.f,tmp.cmdb,at,at,12,dev = 'TS')
+cm1A$AFR[cm1A$item == 5] <- 4.13443
+cmA <- rbind(cm1A,cm2A)
+cmA <- factorX(subset(cmA,!is.na(AFR)))
+cmA <- classExchg(cmA)
+cmA <- subset(cmA,item < 6)
 
-}else{
-  cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',1,dev = 'C')
-  cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',12,dev = 'TS')
-}
-cm <- rbind(cm1,cm2)
-cm <- factorX(subset(cm,!is.na(AFR)))
-cm <- classExchg(cm)
-cm <- subset(cm,item < 6)
-p <- AFR_plot(cm,'fig1')
+# compute the failure rate of warranty effect
+at <- 'shTimeQuGuassian'
+
+cm1B <- AFR_attr_notime(tmp.f,tmp.cmdb,at,at,1,dev = 'C')
+cm1B$AFR[cm1B$item == 5] <- 4.13443
+x1 <- cm1B$item[1:12];y1 <- cm1B$AFR[1:12]
+cm1B$AFRpredict <- predict(lm(y1~x1),data.frame(x1 = cm1B$item))
+cm1B$AFRdiff <- cm1B$AFR - cm1B$AFRpredict
+
+cm2B <- AFR_attr_notime(tmp.f,tmp.cmdb,at,at,12,dev = 'TS')
+x2 <- cm2B$item[1:12];y2 <- cm2B$AFR[1:12]
+cm2B$AFRpredict <- predict(lm(y2~x2),data.frame(x2 = cm2B$item))
+cm2B$AFRdiff <- cm2B$AFR - cm2B$AFRpredict
+
+cmB <- rbind(cm1B,cm2B)
+cmB <- factorX(subset(cmB,!is.na(AFR)))
+cmB <- classExchg(cmB)
+cmB <- subset(cmB,item >=3 & item <= 4)
+
+# plot
+p1 <- AFR_plot(cmA,'fig1')
+p2 <- AFR_plot_warranty(cmB,'fig1Warranty')
+
+
+###################################
 # S2. plot correlation between disk age and annual failure rate of pretented failure. 
 # load(file.path(dir_dataSource,'flist(uwork[2012-2014]).Rda'))
 # fTypeNeed <- c('硬盘故障（有冗余）','硬盘故障（有冗余，槽位未知）',
@@ -70,3 +98,11 @@ p <- AFR_plot(cm,'fig1')
 # naFill <- cbind(expand.grid(item = levels(factor(cm$item)),class = levels(factor(cm$class))),AFR = 0)
 # cm <- rbind(cm[,plotCol],naFill)
 # cm$item <- as.numeric(cm$item)
+
+# virtDC <- virt_disk(tmp.f,tmp.cmdb)
+# virtDC$survTime <- cut3mon(as.numeric(difftime(virtDC$f_time,virtDC$use_time,tz = 'UTC',units = 'days'))/365)
+# tmp.df <- subset(virtDC,status == 'failed')
+# tmp.dcmdb <- subset(virtDC,status == 'working')
+
+# cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',1,dev = 'C')
+# cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',12,dev = 'TS')
