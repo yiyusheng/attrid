@@ -3,6 +3,7 @@ rm(list = ls())
 #@@@ CONFIGURE @@@#
 source('head.R')
 require(ggplot2)
+require(plyr)
 
 #@@@ Function @@@#
 source(file.path(dir_code,'attr_function.R'))
@@ -56,10 +57,24 @@ cmB <- classExchg(cmB)
 cmB <- subset(cmB,item >=3 & item <= 4)
 
 # plot
+cmA$item[cmA$item == 5] <- 4.25
 p1 <- AFR_plot(cmA,'fig1')
 p2 <- AFR_plot_warranty(cmB,'fig1Warranty')
 
-
+# fit a bathtub curve based on cm
+start <- 2.75
+smp <- subset(cmA,item >=start & item <= 3.25 & class == 'Nserv',c('item','AFR'))
+x <- smp$item;y <- smp$AFR
+fit <- lm(y~poly(x,2,raw = T))
+x1 <- seq(start,3.25,0.05)
+y1 <- predict(fit,data.frame(x = x1))
+x2 <- x1 - start
+y2 <- rev(y1)
+fitCurve <- data.frame(item = c(x2,x1),AFR = c(y2,y1),class = 'line')
+# fitCurve <- subset(fitCurve,item %in% cmA$item)
+ggplot(fitCurve,aes(x = item,y = AFR)) + geom_line()
+p1 + geom_line(data = fitCurve,aes(x = item,y = AFR,group = 1)) 
+  stat_smooth(data = fitCurve,aes(x = item,y = AFR),se = F,method = 'lm',formula = y~plot(x,2))
 ###################################
 # S2. plot correlation between disk age and annual failure rate of pretented failure. 
 # load(file.path(dir_dataSource,'flist(uwork[2012-2014]).Rda'))
