@@ -15,26 +15,41 @@
 rm(list = ls())
 source('head.R')
 source('sc16F1Func.R')
-load(file.path(dir_data,'dataPrepareAFR10-13.Rda'))
+
 ####################################
-virtDC <- virt_disk(tmp.f,tmp.cmdb,as.POSIXct('2013-10-01',tz = 'UTC'))
-virtDC$survTime <- round(as.numeric(difftime(virtDC$f_time,virtDC$use_time,tz = 'UTC',units = 'days'))/30)
-ggplot(virtDC,aes(x = survTime)) + stat_ecdf()
+hazRate <- function(fn){
+  load(file.path(dir_data,fn))
+  virtDC$survTime <- as.numeric(difftime(virtDC$f_time,virtDC$use_time,tz = 'UTC',units = 'days'))
+  virtDC$survTime <- round(virtDC$survTime*2/365)/2
+  virtDC <- subset(virtDC,status == 'failed')
+  
+  cdfVirtDC <- melt(table(virtDC$survTime))
+  names(cdfVirtDC) <- c('survDays','count')
+  cdfVirtDC$pdf <- cdfVirtDC$count/sum(cdfVirtDC$count)
+  cdfVirtDC$cumCount <- 1 - cumsum(cdfVirtDC$count)/sum(cdfVirtDC$count)
+  cdfVirtDC$hazRate <- cdfVirtDC$pdf/cdfVirtDC$cumCount
+  
+  p <- ggplot(subset(cdfVirtDC,survDays <= 5),aes(x = survDays,y = hazRate)) + geom_bar(stat = 'identity') +
+    xlab('time(years)') + ylab('Hazard Rate') + ggtitle(gsub('dataPrepare|\\.Rda','',fn))
+  p
+}
 
-cdfVirtDC <- melt(table(round(virtDC$survTime)))
-names(cdfVirtDC) <- c('survDays','count')
-cdfVirtDC$pdf <- cdfVirtDC$count/sum(cdfVirtDC$count)
-cdfVirtDC$cumCount <- 1 - cumsum(cdfVirtDC$count)/sum(cdfVirtDC$count)
-cdfVirtDC$hazRate <- cdfVirtDC$pdf/cdfVirtDC$cumCount
+p13 <- hazRate('dataPrepareAFR13.Rda')
+p14 <- hazRate('dataPrepareAFR14.Rda')
 
-ggplot(cdfVirtDC,aes(x = survDays,y = hazRate)) + geom_line()
+p13A <- hazRate('dataPrepareAFR13A.Rda')
+p13B <- hazRate('dataPrepareAFR13B.Rda')
+p14A <- hazRate('dataPrepareAFR14A.Rda')
+p14B <- hazRate('dataPrepareAFR14B.Rda')
+
+p10_15 <- hazRate('dataPrepareAFR10-15.Rda')
+
+multiplot(p13,p14,p13A,p14A,p13B,p14B,p10_15,cols = 4)
 
 
 
-
-
-tmp.df <- subset(virtDC,status == 'failed')
-tmp.dcmdb <- subset(virtDC,status == 'working')
-
-cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',1,dev = 'C')
-cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',12,dev = 'TS')
+# tmp.df <- subset(virtDC,status == 'failed')
+# tmp.dcmdb <- subset(virtDC,status == 'working')
+# 
+# cm1 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',1,dev = 'C')
+# cm2 <- AFR_attr_notime(tmp.f,tmp.cmdb,'shTime','shTime',12,dev = 'TS')

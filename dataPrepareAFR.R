@@ -5,13 +5,14 @@ library(ggplot2)
 
 #@@@ CONFIGURE @@@#
 load(file.path(dir_dataSource,'load_ftr_attrid.Rda'))
+source('sc16F1Func.R')
 
 #test
 lowerTime <- as.POSIXct('2013-07-01')
 upperTime <- as.POSIXct('2013-09-01')
 saveName <- 'dataPrepareAFR1307_1308.Rda'
 
-dataPrepare <- function(lowerTime,upperTime,saveName){
+dataPrepare <- function(lowerTime,upperTime,saveName,flSource = '0'){
   # S1. Failure record prepare
   data.f <- subset(data.flist, f_time < upperTime & f_time > lowerTime)
   data.f <- subset(data.f,ip %in% cmdb$ip & svr_id %in% cmdb$svr_asset_id)
@@ -94,38 +95,50 @@ dataPrepare <- function(lowerTime,upperTime,saveName){
   tmp.disk$dClass <- cmdbio$dClass[match(tmp.disk$ip,cmdbio$ip)]
   tmp.disk <- factorX(tmp.disk)
   
+  # S5.virtDC
+  if (flSource == '0'){
+    virtDC <- virt_disk(tmp.f,tmp.cmdb,upperTime)
+  }else if(flSource != '0'){
+    virtDC <- virt_disk(factorX(subset(tmp.f,grepl(flSource,group))),tmp.cmdb,upperTime)
+  }
+  
+  
   # S5. Save
-  save(tmp.cmdb,tmp.f,tmp.io,tmp.disk,cmdb,data.f,file = file.path(dir_data,saveName))
+  save(tmp.cmdb,tmp.f,tmp.io,tmp.disk,cmdb,data.f,virtDC,file = file.path(dir_data,saveName))
   # list(tmp.cmdb,tmp.f,tmp.io,tmp.disk,cmdb,data.f)
 }
 
 # All Data
-dataPrepare(as.POSIXct('2010-01-01'),as.POSIXct('2013-10-01'),'dataPrepareAFR10-13.Rda')
+dataPrepare(as.POSIXct('2010-01-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR10-15.Rda')
 
-# Full Year
-dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-10-01'),'dataPrepareAFR13.Rda')
-dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR14.Rda')
+# Two data record source
+dataPrepare(as.POSIXct('2010-01-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR10-15_uwork.Rda','uwork')
+dataPrepare(as.POSIXct('2010-01-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR10-15_helper.Rda','helper')
 
-# Half Year
-dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-07-01'),'dataPrepareAFR13A.Rda')
-dataPrepare(as.POSIXct('2013-07-01'),as.POSIXct('2014-01-01'),'dataPrepareAFR13B.Rda')
-dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2014-07-01'),'dataPrepareAFR14A.Rda')
-dataPrepare(as.POSIXct('2014-07-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR14B.Rda')
-
-# two month with io and smart
-dataPrepare(as.POSIXct('2014-06-01'),as.POSIXct('2014-08-01'),'dataPrepareAFR1406_1407.Rda')
-
-# two month
-dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-03-01'),'dataPrepareAFR1301_1302.Rda')
-dataPrepare(as.POSIXct('2013-03-01'),as.POSIXct('2013-05-01'),'dataPrepareAFR1303_1304.Rda')
-dataPrepare(as.POSIXct('2013-05-01'),as.POSIXct('2013-07-01'),'dataPrepareAFR1305_1306.Rda')
-dataPrepare(as.POSIXct('2013-07-01'),as.POSIXct('2013-09-01'),'dataPrepareAFR1307_1308.Rda')
-dataPrepare(as.POSIXct('2013-09-01'),as.POSIXct('2013-11-01'),'dataPrepareAFR1309_1310.Rda')
-
-dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2014-03-01'),'dataPrepareAFR1401_1402.Rda')
-dataPrepare(as.POSIXct('2014-03-01'),as.POSIXct('2014-05-01'),'dataPrepareAFR1403_1404.Rda')
-dataPrepare(as.POSIXct('2014-05-01'),as.POSIXct('2014-07-01'),'dataPrepareAFR1405_1406.Rda')
-dataPrepare(as.POSIXct('2014-07-01'),as.POSIXct('2014-09-01'),'dataPrepareAFR1407_1408.Rda')
-dataPrepare(as.POSIXct('2014-09-01'),as.POSIXct('2014-11-01'),'dataPrepareAFR1409_1410.Rda')
-dataPrepare(as.POSIXct('2014-11-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR1411_1412.Rda')
-
+# # Full Year
+# dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-10-01'),'dataPrepareAFR13.Rda')
+# dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR14.Rda')
+# 
+# # Half Year
+# dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-07-01'),'dataPrepareAFR13A.Rda')
+# dataPrepare(as.POSIXct('2013-07-01'),as.POSIXct('2014-01-01'),'dataPrepareAFR13B.Rda')
+# dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2014-07-01'),'dataPrepareAFR14A.Rda')
+# dataPrepare(as.POSIXct('2014-07-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR14B.Rda')
+# 
+# # two month with io and smart
+# dataPrepare(as.POSIXct('2014-06-01'),as.POSIXct('2014-08-01'),'dataPrepareAFR1406_1407.Rda')
+# 
+# # two month
+# dataPrepare(as.POSIXct('2013-01-01'),as.POSIXct('2013-03-01'),'dataPrepareAFR1301_1302.Rda')
+# dataPrepare(as.POSIXct('2013-03-01'),as.POSIXct('2013-05-01'),'dataPrepareAFR1303_1304.Rda')
+# dataPrepare(as.POSIXct('2013-05-01'),as.POSIXct('2013-07-01'),'dataPrepareAFR1305_1306.Rda')
+# dataPrepare(as.POSIXct('2013-07-01'),as.POSIXct('2013-09-01'),'dataPrepareAFR1307_1308.Rda')
+# dataPrepare(as.POSIXct('2013-09-01'),as.POSIXct('2013-11-01'),'dataPrepareAFR1309_1310.Rda')
+# 
+# dataPrepare(as.POSIXct('2014-01-01'),as.POSIXct('2014-03-01'),'dataPrepareAFR1401_1402.Rda')
+# dataPrepare(as.POSIXct('2014-03-01'),as.POSIXct('2014-05-01'),'dataPrepareAFR1403_1404.Rda')
+# dataPrepare(as.POSIXct('2014-05-01'),as.POSIXct('2014-07-01'),'dataPrepareAFR1405_1406.Rda')
+# dataPrepare(as.POSIXct('2014-07-01'),as.POSIXct('2014-09-01'),'dataPrepareAFR1407_1408.Rda')
+# dataPrepare(as.POSIXct('2014-09-01'),as.POSIXct('2014-11-01'),'dataPrepareAFR1409_1410.Rda')
+# dataPrepare(as.POSIXct('2014-11-01'),as.POSIXct('2015-01-01'),'dataPrepareAFR1411_1412.Rda')
+# 

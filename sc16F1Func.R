@@ -198,7 +198,7 @@ virt_disk <- function(df,dc,lastTime){
   
   tmpCol <- list()
   newvirtDCF <- lapply(seq_len(length(svridF)),function(i){
-    print(i)
+    # print(i)
     f <- df[splitF[[i]],]
     c <- virtDCF[splitC[[i]],]
     len.f <- nrow(f)
