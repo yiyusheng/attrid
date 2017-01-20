@@ -1,0 +1,17 @@
+1.load disk info and svr info from ym's record
+../tencprocess/diskInfoLoad.R
+
+2.locate_fail.R 
+Locate faild disk id from ym's record 
+
+3.virtdisk_norm.R
+simulate normal disks by bootstraping to generate normal virtual disk
+
+4.generate virtual disks for server with failed disks
+virtdisk_fail.R
+
+5.function to generate hazard rate
+hazard_rate.R
+
+6.main script to generate hazard rate
+main_hr.R

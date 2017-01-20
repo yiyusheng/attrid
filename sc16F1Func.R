@@ -177,7 +177,7 @@ virt_disk <- function(df,dc,lastTime){
   virtDC <- virtDC[order(virtDC$svr_asset_id),]
   virtDC$id <- seq_len(nrow(virtDC))
   
-  # divide into F and N. not all disks in F are failed but some disks from the server must failed
+  # divide into F and N. not all disks in F failed.Only a few disks of the server failed
   virtDCF <- factorX(subset(virtDC,svr_asset_id %in% df$svr_id))
   virtDCN <- factorX(subset(virtDC,!(svr_asset_id %in% df$svr_id)))
   

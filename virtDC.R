@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: virtDC.R
 #
-# Description: 
+# Description: Useless. I generate hazard rate myself in this file.
 #
 # Copyright (c) 2016, Yusheng Yi <yiyusheng.hust@gmail.com>
 #

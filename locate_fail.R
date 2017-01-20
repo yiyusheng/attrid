@@ -7,7 +7,7 @@
 # We have two failure records(ykliu and ym). 
 # ykliu have svrid and sn. ym does not contain svrid but a server id of integer instead.
 # Objective of ykliu's databases is disk instead of server from ym's database. 
-# But what we are about to analyze need the svrid to identify servers.
+# But what we are about to analyze needs the svrid to identify servers.
 # Thus, we need to find the svrid for each item of ykliu's record. of them are contradictive.
 
 # 2.[Unsolved]locate disk in ym's record
@@ -21,7 +21,7 @@
 #
 # Initial created: 2016-12-19 16:50:32
 #
-# Last   modified: 2016-12-19 16:50:34
+# Last   modified: 2017-01-13 11:29:20
 #
 #
 #
