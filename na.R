@@ -66,3 +66,26 @@
 # sum(cm$count_f[cm$class == 'Nserv'])/sum(cm$count_io[cm$class == 'Nserv'])*100
 # sum(cm$count_f[cm$class == 'Sserv'])/sum(cm$count_io[cm$class == 'Sserv'])/12*100
 
+# A1.plot
+# analysis_sta <- function(sul,zero.rm){
+#   if(zero.rm == T)sul[,names(sul) == 'X0'] <- NULL
+#   sul_stdd <- cbind(sul$svrid,data.frame(t(apply(sul[,!grepl('svrid',names(sul))],1,function(x)c(round(x/sum(x)*100,digits = 4),sum(x))))))
+#   names(sul_stdd)[ncol(sul_stdd)] <- 'sum';names(sul_stdd)[1] <- 'svrid'
+#   sul_stdd <- subset(sul_stdd,sum > 50000)
+#   
+#   sul <- subset(sul,svrid %in% sul_stdd$svrid)
+#   cut_util <- c(0,0,3,100,102,103)
+#   sul_cut <- data.frame(svrid = sul$svrid,
+#                         # low = apply(sul[,names(sul) %in% paste('X',cut_util[1]:cut_util[2],sep='')],1,sum),
+#                         low = sul$X0,
+#                         media = apply(sul[,names(sul) %in% paste('X',(cut_util[2]+1):cut_util[3],sep='')],1,sum),
+#                         high = apply(sul[,names(sul) %in% paste('X',(cut_util[3]+1):cut_util[4],sep='')],1,sum))
+#   sul_cut[,-1] <- t(conv_row_percent(sul_cut[,-1]))
+#   ggplot(sul_cut,aes(x = low,y = high)) + geom_point(alpha = 0.01)
+#   sul_cut$round_low <- factor(round(sul_cut$low))
+#   ggplot(sul_cut,aes(x = round_low)) + geom_boxplot(aes(y = high))
+#   
+#   sul_mean <- data.frame(svrid = sul$svrid,
+#                          mean = apply(sul[,-1],1,function(x)round(sum(x * 0:100)/sum(x),digits = 2)))
+#   ggplot(sul_mean,aes(mean)) + stat_ecdf() + geom_point()
+# }
