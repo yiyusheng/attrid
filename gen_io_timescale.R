@@ -17,10 +17,10 @@
 
 rm(list = ls())
 source('head.R')
-source('iops_dcast_clear.R')
-dir_dataten <- '/home/yiyusheng/Data/tencProcess/mergePartSvrid/'
 dir_datatendcast <- '/home/yiyusheng/Data/tencProcess/mergePartSvridDcast/'
 fname <- setdiff(list.files(dir_datatendcast),'d1test.Rda')
+
+# dir_dataten <- '/home/yiyusheng/Data/tencProcess/mergePartSvrid/'
 # fname <- setdiff(fname,list.files(file.path(dir_data,'timescale_dd')))
 
 timescale_dd <- function(i){
@@ -29,7 +29,7 @@ timescale_dd <- function(i){
   
   # days
   dd_day <- dd
-  dd_day$time <- as.Date(dd_day$time)
+  dd_day$time <- round.POSIXt(dd_day$time)
   dd_day <- aggregate(dd_day[grepl('ps|util|iops',names(dd_day))],by = list(dd_day$svrid,dd_day$time),
                       function(x)round(mean(x,na.rm = T),digits = 4))
   names(dd_day) <- names(dd)
@@ -52,7 +52,7 @@ timescale_dd <- function(i){
   names(dd_month) <- names(dd)
   
   cat(sprintf('%s\n',fname[i]))
-  save(dd_day,dd_week,dd_month,file = file.path(dir_data,'timescale_dd',fname[i]))
+  # save(dd_day,dd_week,dd_month,file = file.path(dir_data,'timescale_dd',fname[i]))
   return(list(d1 = dd_day,d2 = dd_week,d3 = dd_month))
 }
 
@@ -63,3 +63,12 @@ registerDoParallel(ck)
 r <- foreach(i = idx,.verbose = F) %dopar% timescale_dd(i)
 stopCluster(ck)
 save(r,file = file.path(dir_data,'io_timescale.Rda'))
+
+###### LOAD MONTH DATA ######
+fname <- list.files(file.path(dir_data,'timescale_dd'))
+dd_month_all <- lapply(seq_len(length(fname)),function(i){
+  load(file.path(dir_data,'timescale_dd',fname[i]))
+  iops_aggragate(dd_month)
+})
+data_month_dcast <- do.call(rbind,dd_month_all)
+save(data_month_dcast,file = file.path(dir_data,'data_month_dcast.Rda'))

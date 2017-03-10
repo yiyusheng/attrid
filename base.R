@@ -1,8 +1,9 @@
 iops_aggragate <- function(df){
   df$iopsr <- rowSums(df[,grepl('iopsr',names(df))])
   df$iopsw <- rowSums(df[,grepl('iopsw',names(df))])
-  df$xps <- df$rps + df$wps
   df$iops <- df$iopsr + df$iopsw
+  df$xps <- df$rps + df$wps
+  
   df[,grepl('iops.*_.*',names(df))] <- NULL
   df
 }
@@ -42,4 +43,8 @@ iops_dcast_clear <- function(dt_dcast){
     dt_dcast[grepl('iops',names(dt_dcast))][dt_dcast[grepl('iops',names(dt_dcast))] > 1e5] <- NA
   }
   dt_dcast
+}
+
+get_fname <- function(svrid){
+  r_sta$fn[match(svrid,r_sta$svr_id)]
 }

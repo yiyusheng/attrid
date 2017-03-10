@@ -51,7 +51,7 @@ get_svrid <- function(dx,id){
 
 ###### ANALYSIS MAIN ######
 source('head.R')
-source('iops_clear.R')
+# source('iops_clear.R')
 library(plyr)
 load(file.path(dir_data,'perday_201608.Rda'))
 
@@ -77,6 +77,9 @@ save(r_count_ai,r_mean_ai,r_sd_ai,r_sum_ai,
      r_count_ad,r_mean_ad,r_sd_ad,r_sum_ad,
      r_count_aid,r_mean_aid,r_sd_aid,r_sum_aid,r_sta,
      file = file.path(dir_data,'aggregate_svrid_iops.Rda'))
+save(r_count_aid,r_mean_aid,r_sd_aid,r_sum_aid,file = file.path(dir_data,'aggregate_aid.Rda'))
+
+
 # list[me_day,sd_day,su_day,co_day,sid_info] <- get_sta('d2',4820)
 # 
 # me_cast <- melt(me1[,-c(2,3,4)],id.vars = 'Group.1')

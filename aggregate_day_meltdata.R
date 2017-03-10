@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# Filename: aggregate_day.R
+# Filename: aggregate_day_meltdata.R
 #
 # Description: statistic data of 201608 to aggreate sum,count,sd,mean for each day
 #
@@ -16,7 +16,6 @@
 #
 rm(list = ls())
 source('head.R')
-source('iops_clear.R')
 library(plyr)
 
 day_aggre <- function(df,aggr){
@@ -97,5 +96,5 @@ r_mean <- reduce_sta(lapply(r,'[[',2))
 r_sd <- reduce_sta(lapply(r,'[[',3))
 r_sum <- reduce_sta(lapply(r,'[[',4))
 r_count <- reduce_sta(lapply(r,'[[',5))
-save(r_sta,r_mean,r_sd,r_sum,r_count,file = file.path(dir_data,'perday_201608.Rda'))
+save(r_sta,r_mean,r_sd,r_sum,r_count,file = file.path(dir_data,'perday_201608_melt.Rda'))
 
