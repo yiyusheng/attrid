@@ -30,6 +30,7 @@ if (osFlag){
   dir_dataSource <- '/home/yiyusheng/Data/dataLoadforDiskAnalysis'
   dir_dataten <- '/home/yiyusheng/Data/tencProcess/mergePartSvrid/'
   dir_datatendcast <- '/home/yiyusheng/Data/tencProcess/mergePartSvridDcast/'
+  dir_datatendcastClear <- '/home/yiyusheng/Data/tencProcess/mergePartSvridDcastClear/'
   source('/home/yiyusheng/Code/R/R_Function/Rfun.R')
   # options('width' = 150)
 }

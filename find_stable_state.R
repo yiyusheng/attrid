@@ -51,6 +51,8 @@ hard_perday <- factorX(subset(r_mean_day,svrid %in% hard_io_svrid$svrid))
 splitHP <- split(hard_perday,hard_perday$svrid)
 a <- splitHP[[1]]
 a1 <- aggregate(hard_perday[,-c(1,2)],by = list(hard_perday$svrid),function(x)round(mean(x,na.rm = T),digits = 4))
+a2 <- aggregate(hard_perday[,-c(1,2)],by = list(hard_perday$svrid),function(x)round(coef_var(x),digits = 4))
+
 
 ###### PLOT ######
 ggplot(subset(a,Var1 == '60'),aes(Var3,Var2)) + geom_raster(aes(fill = value))

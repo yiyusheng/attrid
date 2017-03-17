@@ -1,141 +1,200 @@
-starting worker pid=21622 on localhost:11485 at 16:46:14.193
-starting worker pid=21623 on localhost:11485 at 16:46:14.285
-starting worker pid=21624 on localhost:11485 at 16:46:14.376
-starting worker pid=21625 on localhost:11485 at 16:46:14.457
-starting worker pid=21626 on localhost:11485 at 16:46:14.549
-starting worker pid=21627 on localhost:11485 at 16:46:14.641
-starting worker pid=21628 on localhost:11485 at 16:46:14.736
-starting worker pid=21629 on localhost:11485 at 16:46:14.825
-starting worker pid=21630 on localhost:11485 at 16:46:14.907
-starting worker pid=21631 on localhost:11485 at 16:46:14.997
-starting worker pid=21632 on localhost:11485 at 16:46:15.088
-starting worker pid=21633 on localhost:11485 at 16:46:15.177
-starting worker pid=21634 on localhost:11485 at 16:46:15.267
-starting worker pid=21635 on localhost:11485 at 16:46:15.369
-starting worker pid=21636 on localhost:11485 at 16:46:15.471
-starting worker pid=21637 on localhost:11485 at 16:46:15.567
-starting worker pid=21638 on localhost:11485 at 16:46:15.661
-starting worker pid=21639 on localhost:11485 at 16:46:15.757
-starting worker pid=21640 on localhost:11485 at 16:46:15.853
-starting worker pid=21641 on localhost:11485 at 16:46:15.938
-starting worker pid=21642 on localhost:11485 at 16:46:16.024
-starting worker pid=21643 on localhost:11485 at 16:46:16.116
-starting worker pid=21644 on localhost:11485 at 16:46:16.204
-starting worker pid=21645 on localhost:11485 at 16:46:16.294
-starting worker pid=21646 on localhost:11485 at 16:46:16.382
-starting worker pid=21647 on localhost:11485 at 16:46:16.480
-starting worker pid=21648 on localhost:11485 at 16:46:16.580
-starting worker pid=21649 on localhost:11485 at 16:46:16.677
-starting worker pid=21650 on localhost:11485 at 16:46:16.763
-starting worker pid=21651 on localhost:11485 at 16:46:16.863
-starting worker pid=21652 on localhost:11485 at 16:46:16.955
-starting worker pid=21653 on localhost:11485 at 16:46:17.045
-starting worker pid=21654 on localhost:11485 at 16:46:17.136
-starting worker pid=21655 on localhost:11485 at 16:46:17.227
-starting worker pid=21656 on localhost:11485 at 16:46:17.319
-starting worker pid=21657 on localhost:11485 at 16:46:17.408
-starting worker pid=21658 on localhost:11485 at 16:46:17.497
-starting worker pid=21659 on localhost:11485 at 16:46:17.584
-starting worker pid=21660 on localhost:11485 at 16:46:17.670
-starting worker pid=21661 on localhost:11485 at 16:46:17.770
-[Fri Mar 10 16:47:31 2017]	d1.Rda:START
-[Fri Mar 10 16:47:48 2017]	c7.Rda:START
-[Fri Mar 10 16:47:51 2017]	c3.Rda:START
-[Fri Mar 10 16:47:56 2017]	d11.Rda:START
-[Fri Mar 10 16:48:03 2017]	d2.Rda:START
-[Fri Mar 10 16:48:04 2017]	c2.Rda:START
-[Fri Mar 10 16:48:06 2017]	c1.Rda:START
-[Fri Mar 10 16:48:13 2017]	d13.Rda:START
-[Fri Mar 10 16:48:14 2017]	d15.Rda:START
-[Fri Mar 10 16:48:22 2017]	c6.Rda:START
-[Fri Mar 10 16:48:24 2017]	d12.Rda:START
-[Fri Mar 10 16:48:28 2017]	b12.Rda:START
-[Fri Mar 10 16:48:31 2017]	c5.Rda:START
-[Fri Mar 10 16:48:33 2017]	c4.Rda:START
-[Fri Mar 10 16:48:38 2017]	d19.Rda:START
-[Fri Mar 10 16:48:40 2017]	d10.Rda:START
-[Fri Mar 10 16:48:44 2017]	d20.Rda:START
-[Fri Mar 10 16:48:45 2017]	b6.Rda:START
-[Fri Mar 10 16:48:45 2017]	d14.Rda:START
-[Fri Mar 10 16:48:49 2017]	d17.Rda:START
-[Fri Mar 10 16:48:56 2017]	d16.Rda:START
-[Fri Mar 10 16:48:58 2017]	b11.Rda:START
-[Fri Mar 10 16:48:58 2017]	b1.Rda:START
-[Fri Mar 10 16:48:58 2017]	b9.Rda:START
-[Fri Mar 10 16:48:59 2017]	d18.Rda:START
-[Fri Mar 10 16:49:07 2017]	b2.Rda:START
-[Fri Mar 10 16:49:09 2017]	b7.Rda:START
-[Fri Mar 10 16:49:11 2017]	b3.Rda:START
-[Fri Mar 10 16:49:15 2017]	b5.Rda:START
-[Fri Mar 10 16:49:15 2017]	b8.Rda:START
-[Fri Mar 10 16:49:16 2017]	b10.Rda:START
-[Fri Mar 10 16:51:16 2017]	d1.Rda:END
-[Fri Mar 10 16:52:13 2017]	c2.Rda:END
-[Fri Mar 10 16:52:56 2017]	c7.Rda:END
-[Fri Mar 10 16:53:20 2017]	b4.Rda:START
-[Fri Mar 10 16:53:21 2017]	c3.Rda:END
-[Fri Mar 10 16:53:31 2017]	d21.Rda:START
-[Fri Mar 10 16:53:35 2017]	b12.Rda:END
-[Fri Mar 10 16:53:48 2017]	d15.Rda:END
-[Fri Mar 10 16:53:55 2017]	c1.Rda:END
-[Fri Mar 10 16:53:56 2017]	d2.Rda:END
-[Fri Mar 10 16:54:09 2017]	a3.Rda:START
-[Fri Mar 10 16:54:12 2017]	c5.Rda:END
-[Fri Mar 10 16:54:16 2017]	d13.Rda:END
-[Fri Mar 10 16:54:30 2017]	d22.Rda:START
-[Fri Mar 10 16:54:36 2017]	a1.Rda:START
-[Fri Mar 10 16:54:42 2017]	a4.Rda:START
-[Fri Mar 10 16:54:50 2017]	d12.Rda:END
-[Fri Mar 10 16:54:56 2017]	c4.Rda:END
-[Fri Mar 10 16:54:58 2017]	d11.Rda:END
-[Fri Mar 10 16:54:58 2017]	d23.Rda:START
-[Fri Mar 10 16:55:01 2017]	c6.Rda:END
-[Fri Mar 10 16:55:09 2017]	a2.Rda:START
-[Fri Mar 10 16:55:18 2017]	b6.Rda:END
-[Fri Mar 10 16:55:24 2017]	d19.Rda:END
-[Fri Mar 10 16:55:29 2017]	d24.Rda:START
-[Fri Mar 10 16:55:35 2017]	a8.Rda:START
-[Fri Mar 10 16:55:38 2017]	d3.Rda:START
-[Fri Mar 10 16:55:43 2017]	d26.Rda:START
-[Fri Mar 10 16:55:45 2017]	d25.Rda:START
-[Fri Mar 10 16:55:55 2017]	d14.Rda:END
-[Fri Mar 10 16:55:58 2017]	d10.Rda:END
-[Fri Mar 10 16:56:02 2017]	a7.Rda:START
-[Fri Mar 10 16:56:03 2017]	a6.Rda:START
-[Fri Mar 10 16:56:10 2017]	d20.Rda:END
-[Fri Mar 10 16:56:11 2017]	b1.Rda:END
-[Fri Mar 10 16:56:18 2017]	d27.Rda:START
-[Fri Mar 10 16:56:18 2017]	d28.Rda:START
-[Fri Mar 10 16:56:22 2017]	b3.Rda:END
-[Fri Mar 10 16:56:24 2017]	b2.Rda:END
-[Fri Mar 10 16:56:32 2017]	d29.Rda:START
-[Fri Mar 10 16:56:35 2017]	b7.Rda:END
-[Fri Mar 10 16:56:43 2017]	d18.Rda:END
-[Fri Mar 10 16:56:49 2017]	b9.Rda:END
-[Fri Mar 10 16:56:53 2017]	d17.Rda:END
-[Fri Mar 10 16:56:55 2017]	a5.Rda:START
-[Fri Mar 10 16:56:57 2017]	b5.Rda:END
-[Fri Mar 10 16:56:59 2017]	b11.Rda:END
-[Fri Mar 10 16:57:00 2017]	d16.Rda:END
-[Fri Mar 10 16:57:06 2017]	d31.Rda:START
-[Fri Mar 10 16:57:09 2017]	d30.Rda:START
-[Fri Mar 10 16:57:24 2017]	d32.Rda:START
-[Fri Mar 10 16:57:27 2017]	b8.Rda:END
-[Fri Mar 10 16:57:28 2017]	d33.Rda:START
-[Fri Mar 10 16:57:36 2017]	b10.Rda:END
-[Fri Mar 10 16:57:45 2017]	d34.Rda:START
-[Fri Mar 10 16:57:47 2017]	d35.Rda:START
-[Fri Mar 10 16:57:55 2017]	d4.Rda:START
-[Fri Mar 10 16:58:23 2017]	d37.Rda:START
-[Fri Mar 10 16:58:30 2017]	d38.Rda:START
-[Fri Mar 10 16:58:36 2017]	d40.Rda:START
-[Fri Mar 10 16:58:43 2017]	d36.Rda:START
-[Fri Mar 10 16:58:43 2017]	d39.Rda:START
-[Fri Mar 10 16:58:53 2017]	d41.Rda:START
-[Fri Mar 10 16:58:57 2017]	d42.Rda:START
-[Fri Mar 10 16:59:14 2017]	d43.Rda:START
-[Fri Mar 10 16:59:25 2017]	d47.Rda:START
-[Fri Mar 10 16:59:27 2017]	d46.Rda:START
-[Fri Mar 10 16:59:37 2017]	d44.Rda:START
-[Fri Mar 10 16:59:47 2017]	d48.Rda:START
-[Fri Mar 10 16:59:48 2017]	d45.Rda:START
+starting worker pid=35901 on localhost:11485 at 20:17:10.956
+starting worker pid=35902 on localhost:11485 at 20:17:11.107
+starting worker pid=35903 on localhost:11485 at 20:17:11.257
+starting worker pid=35904 on localhost:11485 at 20:17:11.390
+starting worker pid=35905 on localhost:11485 at 20:17:11.547
+starting worker pid=35906 on localhost:11485 at 20:17:11.706
+starting worker pid=35907 on localhost:11485 at 20:17:11.873
+starting worker pid=35908 on localhost:11485 at 20:17:12.024
+starting worker pid=35909 on localhost:11485 at 20:17:12.154
+starting worker pid=35910 on localhost:11485 at 20:17:12.296
+starting worker pid=35911 on localhost:11485 at 20:17:12.456
+starting worker pid=35912 on localhost:11485 at 20:17:12.606
+starting worker pid=35913 on localhost:11485 at 20:17:12.757
+starting worker pid=35914 on localhost:11485 at 20:17:12.919
+starting worker pid=35915 on localhost:11485 at 20:17:13.077
+starting worker pid=35916 on localhost:11485 at 20:17:13.237
+starting worker pid=35917 on localhost:11485 at 20:17:13.379
+starting worker pid=35918 on localhost:11485 at 20:17:13.539
+starting worker pid=35919 on localhost:11485 at 20:17:13.704
+starting worker pid=35920 on localhost:11485 at 20:17:13.857
+starting worker pid=35921 on localhost:11485 at 20:17:13.998
+starting worker pid=35922 on localhost:11485 at 20:17:14.151
+starting worker pid=35923 on localhost:11485 at 20:17:14.307
+starting worker pid=35924 on localhost:11485 at 20:17:14.459
+starting worker pid=35925 on localhost:11485 at 20:17:14.604
+starting worker pid=35926 on localhost:11485 at 20:17:14.757
+starting worker pid=35927 on localhost:11485 at 20:17:14.908
+starting worker pid=35928 on localhost:11485 at 20:17:15.059
+starting worker pid=35929 on localhost:11485 at 20:17:15.220
+starting worker pid=35930 on localhost:11485 at 20:17:15.358
+starting worker pid=35931 on localhost:11485 at 20:17:15.510
+starting worker pid=35932 on localhost:11485 at 20:17:15.665
+starting worker pid=35933 on localhost:11485 at 20:17:15.807
+starting worker pid=35934 on localhost:11485 at 20:17:15.960
+starting worker pid=35935 on localhost:11485 at 20:17:16.111
+starting worker pid=35936 on localhost:11485 at 20:17:16.257
+starting worker pid=35937 on localhost:11485 at 20:17:16.404
+starting worker pid=35938 on localhost:11485 at 20:17:16.558
+starting worker pid=35939 on localhost:11485 at 20:17:16.709
+starting worker pid=35940 on localhost:11485 at 20:17:16.852
+[Fri Mar 10 20:18:41 2017]	c3.Rda:START
+[Fri Mar 10 20:18:41 2017]	d1.Rda:START
+[Fri Mar 10 20:18:49 2017]	c7.Rda:START
+[Fri Mar 10 20:18:56 2017]	c4.Rda:START
+[Fri Mar 10 20:18:57 2017]	c2.Rda:START
+[Fri Mar 10 20:19:03 2017]	c5.Rda:START
+[Fri Mar 10 20:19:07 2017]	c6.Rda:START
+[Fri Mar 10 20:19:08 2017]	c1.Rda:START
+[Fri Mar 10 20:19:11 2017]	d2.Rda:START
+[Fri Mar 10 20:19:13 2017]	d12.Rda:START
+[Fri Mar 10 20:19:17 2017]	d19.Rda:START
+[Fri Mar 10 20:19:19 2017]	b12.Rda:START
+[Fri Mar 10 20:19:31 2017]	d14.Rda:START
+[Fri Mar 10 20:19:32 2017]	b8.Rda:START
+[Fri Mar 10 20:19:33 2017]	d10.Rda:START
+[Fri Mar 10 20:19:33 2017]	b6.Rda:START
+[Fri Mar 10 20:19:35 2017]	d11.Rda:START
+[Fri Mar 10 20:19:36 2017]	d16.Rda:START
+[Fri Mar 10 20:19:38 2017]	d13.Rda:START
+[Fri Mar 10 20:19:43 2017]	d15.Rda:START
+[Fri Mar 10 20:19:43 2017]	d20.Rda:START
+[Fri Mar 10 20:19:44 2017]	b1.Rda:START
+[Fri Mar 10 20:19:53 2017]	d18.Rda:START
+[Fri Mar 10 20:19:56 2017]	b9.Rda:START
+[Fri Mar 10 20:19:59 2017]	b3.Rda:START
+[Fri Mar 10 20:20:02 2017]	d17.Rda:START
+[Fri Mar 10 20:20:04 2017]	b2.Rda:START
+[Fri Mar 10 20:20:06 2017]	b10.Rda:START
+[Fri Mar 10 20:20:08 2017]	b5.Rda:START
+[Fri Mar 10 20:20:09 2017]	b7.Rda:START
+[Fri Mar 10 20:20:14 2017]	b11.Rda:START
+[Fri Mar 10 20:22:35 2017]	d1.Rda:END
+[Fri Mar 10 20:23:43 2017]	c7.Rda:END
+[Fri Mar 10 20:23:51 2017]	b12.Rda:END
+[Fri Mar 10 20:24:01 2017]	c2.Rda:END
+[Fri Mar 10 20:24:05 2017]	c5.Rda:END
+[Fri Mar 10 20:24:08 2017]	c6.Rda:END
+[Fri Mar 10 20:24:08 2017]	b4.Rda:START
+[Fri Mar 10 20:24:17 2017]	c3.Rda:END
+[Fri Mar 10 20:24:18 2017]	c1.Rda:END
+[Fri Mar 10 20:24:40 2017]	c4.Rda:END
+[Fri Mar 10 20:24:45 2017]	a3.Rda:START
+[Fri Mar 10 20:24:55 2017]	b1.Rda:END
+[Fri Mar 10 20:24:55 2017]	a2.Rda:START
+[Fri Mar 10 20:25:05 2017]	d2.Rda:END
+[Fri Mar 10 20:25:09 2017]	a1.Rda:START
+[Fri Mar 10 20:25:28 2017]	d15.Rda:END
+[Fri Mar 10 20:25:28 2017]	d18.Rda:END
+[Fri Mar 10 20:25:32 2017]	d12.Rda:END
+[Fri Mar 10 20:25:45 2017]	a8.Rda:START
+[Fri Mar 10 20:25:54 2017]	d19.Rda:END
+[Fri Mar 10 20:25:56 2017]	a4.Rda:START
+[Fri Mar 10 20:26:02 2017]	d10.Rda:END
+[Fri Mar 10 20:26:05 2017]	d13.Rda:END
+[Fri Mar 10 20:26:08 2017]	d20.Rda:END
+[Fri Mar 10 20:26:13 2017]	d11.Rda:END
+[Fri Mar 10 20:26:15 2017]	d14.Rda:END
+[Fri Mar 10 20:26:18 2017]	a6.Rda:START
+[Fri Mar 10 20:26:30 2017]	b2.Rda:END
+[Fri Mar 10 20:26:31 2017]	b7.Rda:END
+[Fri Mar 10 20:26:33 2017]	a7.Rda:START
+[Fri Mar 10 20:26:34 2017]	b6.Rda:END
+[Fri Mar 10 20:26:35 2017]	d16.Rda:END
+[Fri Mar 10 20:26:46 2017]	b3.Rda:END
+[Fri Mar 10 20:26:48 2017]	a5.Rda:START
+[Fri Mar 10 20:26:56 2017]	b10.Rda:END
+[Fri Mar 10 20:26:57 2017]	b5.Rda:END
+[Fri Mar 10 20:27:08 2017]	b9.Rda:END
+[Fri Mar 10 20:27:09 2017]	b8.Rda:END
+[Fri Mar 10 20:27:10 2017]	d17.Rda:END
+[Fri Mar 10 20:27:32 2017]	b11.Rda:END
+[Fri Mar 10 20:29:47 2017]	b4.Rda:END
+[Fri Mar 10 20:35:16 2017]	a1.Rda:END
+[Fri Mar 10 20:35:34 2017]	a3.Rda:END
+[Fri Mar 10 20:36:13 2017]	a2.Rda:END
+[Fri Mar 10 20:36:48 2017]	a8.Rda:END
+[Fri Mar 10 20:37:05 2017]	a4.Rda:END
+[Fri Mar 10 20:38:47 2017]	a5.Rda:END
+[Fri Mar 10 20:38:55 2017]	a6.Rda:END
+[Fri Mar 10 20:39:09 2017]	a7.Rda:END
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
+Error in serialize(data, node$con, xdr = FALSE) : 
+  error writing to connection
