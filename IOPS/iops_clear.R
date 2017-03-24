@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: iops_clear.R
 #
-# Description: clear dcast-format io data including iops
+# Description: [useless. merged in to base.R]clear dcast-format io data including iops
 #
 # Copyright (c) 2016, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
@@ -10,7 +10,7 @@
 #
 # Initial created: 2016-12-15 09:30:41
 #
-# Last   modified: 2017-02-13 11:04:22
+# Last   modified: 2017-03-20 11:55:31
 #
 #
 #

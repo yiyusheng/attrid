@@ -1,3 +1,4 @@
+###### FUNCTIONS######
 iops_aggragate <- function(df){
   x <- ifelse(sum(grepl('iopsr',names(df))) != 1,df$iopsr <- rowSums(df[,grepl('iopsr',names(df))]),names(df)[grepl('iopsr',names(df))] <- 'iopsr')
   x <- ifelse(sum(grepl('iopsw',names(df))) != 1,df$iopsw <- rowSums(df[,grepl('iopsw',names(df))]),names(df)[grepl('iopsw',names(df))] <- 'iopsw')
@@ -25,6 +26,7 @@ iops_melt_clear <- function(data){
   data$value[data$attrid %in% attrid_ps & data$value > 1e6] <- NA
   data$value[data$attrid %in% attrid_iops & data$value > 1e6] <- NA
   data$value[data$attrid == 999 & data$value > 100] <- 100
+  
   data
 }
 
@@ -53,4 +55,19 @@ iops_dcast_clear <- function(dt_dcast,fn){
 
 get_fname <- function(svrid){
   r_sta$fn[match(svrid,r_sta$svr_id)]
+}
+
+filter_badiops_NA <- function(df,attrName){
+  load(file.path(dir_data,'sta_dcastClear_result.Rda'))
+  dd <- remove_line_byvalue(df[,c('svrid','time',attrName)])
+  dd <- factorX(subset(dd,!(svrid %in% invalid_iopsw$svrid)))
+}
+
+cut_level <- function(arr,cut,f2n = T){
+  if(f2n){
+    return(fct2num(cut(arr,cut,cut[-length(cut)],right = F)))
+  }else{
+    return(cut(arr,cut,cut[-length(cut)],right = F))
+  }
+  
 }

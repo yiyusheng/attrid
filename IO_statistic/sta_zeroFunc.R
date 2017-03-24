@@ -15,6 +15,7 @@ sta_eachzero <- function(i){
   cat(sprintf('[%s]\tfile:%s\tSATRT!!!\n',date(),fn))
   load(file.path(dir_datatendcastClear,fn))
   dd <- remove_line_byvalue(dt_dcast[,c('svrid','time','util','rps','iopsr','wps','iopsw')])
+  dd <- factorX(subset(dd,!(svrid %in% invalid_iopsw$svrid)))
   
   flag_zero <- expand.grid(c(0,1),c(0,1),c(0,1),c(0,1),c(0,1))
   names(flag_zero) <- c('util','rps','iopsr','wps','iopsw')
@@ -45,8 +46,8 @@ sta_eachzero <- function(i){
   r2
 }
 
-get_lines <- function(arr){
-  subset(sta_ez_valid,util == arr[1] & rps == arr[2] & iopsr == arr[3] & wps == arr[4] & iopsw == arr[5])
+get_lines <- function(arr,df = sta_ez){
+  subset(subset(df,count > 0),util == arr[1] & rps == arr[2] & iopsr == arr[3] & wps == arr[4] & iopsw == arr[5])
 }
 
 get_lines_dd <- function(arr){
@@ -73,4 +74,10 @@ gen_meaningful_flag <- function(df){
   df1 <- create_mirror_df(df,0)
   df1[,colz] <- round(mf1 + mf2)
   df1
+}
+
+###### STA_LEVEL ######
+get_attr_pair <- function(attr1,attr2,value = -1,df = sta_level){
+  x <- ifelse(value == -1,return(subset(df,a1 == attr1 & a2 == attr2)),
+              return(subset(df,a1 == attr1 & a2 == attr2 & a1_value == value)))
 }
