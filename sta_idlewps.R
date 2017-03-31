@@ -64,3 +64,10 @@ sid_select <- subsetX(sta_wps,svrid %in% c('4398','4420','4429','4430'))
 
 # trend of wps in the range
 sta_wps_svrid <- list2df(tapply(sta_wps$count,sta_wps$svrid,mean),n = c('mean_count','svrid'))
+quan_count <- quantileX(sta_wps_svrid$mean_count)
+ggplot(sta_wps_svrid,aes(mean_count)) + geom_histogram(binwidth = 4,fill = cbPalette[4])
+
+wps_range90 <- subsetX(sta_wps,svrid %in% sta_wps_svrid$svrid[sta_wps_svrid > 288 *0.9] & fn == 'd9.Rda')
+wps_range50 <- subsetX(sta_wps,svrid %in% sta_wps_svrid$svrid[sta_wps_svrid > 288 *0.45 & sta_wps_svrid < 288 *0.55] & fn == 'd9.Rda')
+wps_range10 <- subsetX(sta_wps,svrid %in% sta_wps_svrid$svrid[sta_wps_svrid < 288 *0.1] & fn == 'd9.Rda')
+save(wps_range10,wps_range50,wps_range90,file = file.path(dir_data,'wps_range_d9.Rda'))

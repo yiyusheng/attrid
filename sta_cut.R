@@ -46,20 +46,27 @@ sta_attrid <- function(dd,aid,fnm){
 
 sta_cut <- function(i){
   fn <- fname[i]
-  cat(sprintf('[%s]\tfile:%s\tSATRT!!!\n',date(),fn))
+  cat(sprintf('[%s]\tfile:%s\tSTART!!!\n',date(),fn))
   load(file.path(dir_datatendcastClear,fn))
-  dd <- filter_badiops_NA(dt_dcast,attrName)
+  dd <- dt_dcast
+  # dd <- subsetX(dd,svrid %in% levels(dd$svrid)[1:10])
+  dd <- filter_badiops_NA(dd,attrName,fn)
   dd$time <- as.Date(dd$time)
-  # dd <- factorX(subset(dd,svrid %in% levels(dd$svrid)[1:10]))
+  dd$sizer <- dd$rps/dd$iopsr;dd$sizer[is.na(dd$sizer) | is.infinite(dd$sizer)] <- 0
+  dd$sizew <- dd$wps/dd$iopsw;dd$sizew[is.na(dd$sizew) | is.infinite(dd$sizew)] <- 0
   
-  list[sta_util_svrid,sta_util_day] <- sta_attrid(dd,'util')
-  list[sta_rps_svrid,sta_rps_day] <- sta_attrid(dd,'rps')
-  list[sta_iopsr_svrid,sta_iopsr_day] <- sta_attrid(dd,'iopsr')
-  list[sta_wps_svrid,sta_wps_day] <- sta_attrid(dd,'wps')
-  list[sta_iopsw_svrid,sta_iopsw_day] <- sta_attrid(dd,'iopsw')
   
-  sta_day <- list(sta_util_day,sta_rps_day,sta_iopsr_day,sta_wps_day,sta_iopsw_day)
-  sta_svrid <- list(sta_util_svrid,sta_rps_svrid,sta_iopsr_svrid,sta_wps_svrid,sta_iopsw_svrid)
+  list[sta_util_svrid,sta_util_day] <- sta_attrid(dd,'util',fn)
+  list[sta_rps_svrid,sta_rps_day] <- sta_attrid(dd,'rps',fn)
+  list[sta_iopsr_svrid,sta_iopsr_day] <- sta_attrid(dd,'iopsr',fn)
+  list[sta_wps_svrid,sta_wps_day] <- sta_attrid(dd,'wps',fn)
+  list[sta_iopsw_svrid,sta_iopsw_day] <- sta_attrid(dd,'iopsw',fn)
+  
+  list[sta_sizer_svrid,sta_sizer_day] <- sta_attrid(dd,'sizer',fn)
+  list[sta_sizew_svrid,sta_sizew_day] <- sta_attrid(dd,'sizew',fn)
+  
+  sta_day <- list(sta_util_day,sta_rps_day,sta_iopsr_day,sta_wps_day,sta_iopsw_day,sta_sizer_day,sta_sizew_day)
+  sta_svrid <- list(sta_util_svrid,sta_rps_svrid,sta_iopsr_svrid,sta_wps_svrid,sta_iopsw_svrid,sta_sizer_svrid,sta_sizew_svrid)
   cat(sprintf('[%s]\tfile:%s\tEND!!!\n',date(),fn))
   list(sta_day,sta_svrid)
 }
@@ -67,56 +74,12 @@ sta_cut <- function(i){
 ###### MAIN STATISTIC ######
 load(file.path(dir_data,'sta_dcastClear.Rda'))
 fname <- list.files(dir_datatendcastClear)
-fname <- fname[!grepl('a\\d.*',fname)]
+# fname <- fname[!grepl('a\\d.*',fname)]
 attrName <- c('util','rps','iopsr','wps','iopsw')
-cutList <- list(cut_util = sort(c(0,3,2^(0:6),95,101)),cut_rps = c(0,2^(seq(0,16,1)),1e6),cut_iopsr = c(0,2^(seq(0,16,1)),1e6),
-                cut_wps = c(0,2^(seq(0,16,1)),1e6),cut_iopsw = c(0,2^(seq(0,16,1)),1e6))
+cutList <- list(cut_util = sort(c(0,3,2^(0:6),95,101)),
+                cut_rps = c(0,2^(seq(0,16,1)),1e6),cut_iopsr = c(0,2^(seq(0,16,1)),1e6),cut_sizer = roundX(c(0,2^(seq(-6.5,1.5,0.5)),10)),
+                cut_wps = c(0,2^(seq(0,16,1)),1e6),cut_iopsw = c(0,2^(seq(0,16,1)),1e6),cut_sizew = roundX(c(0,2^(seq(-6.5,1.5,0.5)),10)))
 idx <- seq_len(length(fname))
 r <- foreachX(idx,'sta_cut')
-save(r,file = file.path(dir_data,'sta_cut.Rda'))
+save(cutList,r,file = file.path(dir_data,'sta_cut.Rda'))
 
-###### ANALYSIS ######
-ss_util <- lapplyX(lapply(r,'[[',2),'[[',1)
-ss_rps <- lapplyX(lapply(r,'[[',2),'[[',2)
-ss_iopsr <- lapplyX(lapply(r,'[[',2),'[[',3)
-ss_wps <- lapplyX(lapply(r,'[[',2),'[[',4)
-ss_iopsw <- lapplyX(lapply(r,'[[',2),'[[',5)
-
-# idle of write
-col_value <- names(ss_wps)[grepl('X\\d+',names(ss_wps))]
-ss_wps$count <- apply(ss_wps[,col_value],1,sum)
-ss_wps$max <- apply(ss_wps[,col_value],1,function(x)names(ss_wps[,col_value])[which.max(x)])
-table_wps <- melt(table(ss_wps$max))
-ss_wps$bts_wtn <- as.numeric((as.matrix(ss_wps[,col_value]) %*% cutList$cut_wps[-length(cutList$cut_wps)])*300/1e6)
-ss_wps$fn <- factor(r_sta_svrid$fn[match(ss_wps$svrid,r_sta_svrid$svrid)])
-ss_wps$fclass <- gsub('\\d.*','',ss_wps$fn)
-ss_wps$max <- factor(ss_wps$max)
-
-# for different type of files
-frac_max <- do.call(rbind,tapply(ss_wps$max,ss_wps$fclass,function(x)array_rate(table(x))))
-frac_max <- melt(frac_max);frac_max$cut_value <- as.numeric(gsub('X','',frac_max$Var2))
-ggplot(frac_max,aes(x = Var1,y = value,fill = factor(cut_value))) + geom_bar(stat = 'identity') + scale_fill_brewer(palette="Spectral")
-
-# for rate [used in xmind]
-ss_wps_rate <- ss_wps
-ss_wps_rate[,col_value] <- roundX(ss_wps_rate[,col_value]/ss_wps_rate$count)
-sub_idle <- subset(ss_wps_rate,max %in% c('X16','X32'))
-sub_idle$frac_idle <- sub_idle$X16 + sub_idle$X32
-summary(sub_idle$X16 + sub_idle$X32)
-idle_range <- c(8*86400*365/1e6,64*86400*365/1e6)
-ggplot(sub_idle,aes(log2(bts_wtn))) + geom_histogram(binwidth = 0.1) 
-wps_idle <- sub_idle
-save(wps_idle, file = file.path(dir_data,'sc_wps_idle.Rda'))
-
-# what about read for these wps idle server
-col_value <- names(ss_rps)[grepl('X\\d+',names(ss_rps))]
-ss_rps_idlewps <- factorX(subset(ss_rps,svrid %in% sub_idle$svrid[sub_idle$frac_idle > median(sub_idle$frac_idle)]))
-sri_rate <- ss_rps_idlewps
-sri_rate$count <- apply(sri_rate[,col_value],1,sum)
-sri_rate[,col_value] <- roundX(sri_rate[,col_value]/sri_rate$count)
-sri_rate$max <- apply(sri_rate[,col_value],1,function(x)names(sri_rate[,col_value])[which.max(x)])
-table_rps <- melt(table(sri_rate$max))
-sri_rate$bts_wtn <- as.numeric((as.matrix(sri_rate[,col_value]) %*% cutList$cut_wps[-length(cutList$cut_wps)])*300/1e6)
-sri_rate$fn <- factor(r_sta_svrid$fn[match(sri_rate$svrid,r_sta_svrid$svrid)])
-sri_rate$fclass <- gsub('\\d.*','',sri_rate$fn)
-sri_rate$max <- factor(sri_rate$max)

@@ -57,10 +57,11 @@ get_fname <- function(svrid){
   r_sta$fn[match(svrid,r_sta$svr_id)]
 }
 
-filter_badiops_NA <- function(df,attrName){
+filter_badiops_NA <- function(df,attrName,fn = 'd1.Rda'){
   load(file.path(dir_data,'sta_dcastClear_result.Rda'))
-  dd <- remove_line_byvalue(df[,c('svrid','time',attrName)])
-  dd <- factorX(subset(dd,!(svrid %in% invalid_iopsw$svrid)))
+  df <- remove_line_byvalue(df[,c('svrid','time',attrName)])
+  if(!grepl('a\\d+',fn))df <- factorX(subset(df,!(svrid %in% invalid_iopsw$svrid)))
+  df
 }
 
 cut_level <- function(arr,cut,f2n = T){
@@ -69,5 +70,11 @@ cut_level <- function(arr,cut,f2n = T){
   }else{
     return(cut(arr,cut,cut[-length(cut)],right = F))
   }
-  
+}
+
+rate_data <- function(df,regstr = 'X\\d+'){
+  col_value <- names(df)[grepl(regstr,names(df))]
+  df$count <- apply(df[,col_value],1,sum)
+  df[,col_value] <- roundX(df[,col_value]/df$count)
+  df
 }
