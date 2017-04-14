@@ -1,4 +1,4 @@
-#@@@ FUNCTION @@@#
+b#@@@ FUNCTION @@@#
 # F0.data load
 dataLoadF1 <- function(fn,qu = 1){
   load(file.path(dir_data,fn))

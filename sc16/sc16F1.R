@@ -1,13 +1,25 @@
-# Plot for sc16
-rm(list = ls())
-#@@@ CONFIGURE @@@#
-source('head.R')
-require(ggplot2)
-require(plyr)
+#!/usr/bin/env python2                                                                      
+# -*- coding: utf-8 -*-
+# Filename: find_standby_pair.R
+#
+# Description: [2014] data process and figure plot for sc16. there is a function file sc16F1Func.R
+#
+# Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
+#
+# Version 1.0
+#
+# Initial created: 2017-04-10 17:28:21
+#
+# Last   modified: 2017-04-10 17:28:23
+#
+#
+#
+
+rm(list = ls());setwd('~/Code/R/Disk_Workload_201406-201407/sc16/');source('~/rhead')
 
 #@@@ Function @@@#
-source(file.path(dir_code,'attr_function.R'))
-source(file.path(dir_code,'sc16F1Func.R'))
+source('attr_function.R')
+source('sc16F1Func.R')
 
 #####################################################################################################
 list[tmp.fC,tmp.cmdbC,tmp.fTS,tmp.cmdbTS] <- dataLoadF1('dataPrepareAFR13.Rda')

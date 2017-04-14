@@ -28,8 +28,7 @@ ss_iopsw <- lapplyX(lapply(r,'[[',2),'[[',5)
 ss_sizer <- lapplyX(lapply(r,'[[',2),'[[',6)
 ss_sizew <- lapplyX(lapply(r,'[[',2),'[[',7)
 
-
-###### idle of write ######
+###### S1.idle of write ######
 col_value <- names(ss_wps)[grepl('X\\d+',names(ss_wps))]
 ss_wps$count <- apply(ss_wps[,col_value],1,sum)
 ss_wps$max <- apply(ss_wps[,col_value],1,function(x)names(ss_wps[,col_value])[which.max(x)])
@@ -96,7 +95,7 @@ idle_iopsw <- subset(ss_iopsw,svrid %in% wps_idle$svrid)
 array_rate(colSums(idle_iopsw[,col_value]))
 idle_iopsw <- rate_data(idle_iopsw)
 
-###### idle of read ######
+###### S2.idle of read ######
 col_value <- names(ss_rps)[grepl('X\\d+',names(ss_rps))]
 ss_rps$count <- apply(ss_rps[,col_value],1,sum)
 ss_rps$max <- apply(ss_rps[,col_value],1,function(x)names(ss_rps[,col_value])[which.max(x)])
@@ -115,27 +114,63 @@ rps_count$count <- array_rate(rps_count$count)
 rps_count$id <- sort_level(factor(gsub('X','',rps_count$id)))
 ggplot(rps_count,aes(x = id,y = count)) + geom_bar(stat = 'identity')
 
-###### idle_rps and idle_wps ######
-# distribution of idle rps and idle xps [finding in xmind]
-sw_idle <- rate_data(ss_wps)[,c('svrid','X8','X16','X32','X64')];sw_idle$idlew <- with(sw_idle,X16 + X32)
-sr_idle <- rate_data(ss_rps)[,c('svrid','X0')];sr_idle$idler <- sr_idle$X0
-ss_xps_idle <- merge(sw_idle[,c('svrid','idlew')],sr_idle[,c('svrid','idler')],by = 'svrid')
-names(ss_xps_idle) <- c('svrid','idle_wps','idle_rps')
-ss_xps_idle$idler_level <- fct2num(cut(ss_xps_idle$idle_rps,c(0,.1,.9,1),c(0,.1,.9),right = F))
-ss_xps_idle$idlew_level <- fct2num(cut(ss_xps_idle$idle_wps,c(0,.1,.9,1),c(0,.1,.9),right = F))
-table_sxi <- as.data.frame.matrix(table(ss_xps_idle$idler_level,ss_xps_idle$idlew_level));table_sxi <- roundX(table_sxi/sum(table_sxi))
+###### S3.idle_rps and idle_wps ######
+fraction_xps <- function(ss_wps,wri,bound_low){
+  # distribution of idle rps and idle xps [finding in xmind]
+  bound_up <- 1 - bound_low
+  sw_idle <- rate_data(ss_wps)[,c('svrid',paste('X',2^(3:16),sep=''))]
+  sr_idle <- rate_data(ss_rps)[,c('svrid','X0')]
+  x <- ifelse(length(wri) == 1,sw_idle$idlew <- sw_idle[,wri],sw_idle$idlew <- rowSums(sw_idle[,wri]))
+  sr_idle$idler <- sr_idle$X0
+  ss_xps_idle <- merge(sw_idle[,c('svrid','idlew')],sr_idle[,c('svrid','idler')],by = 'svrid')
+  names(ss_xps_idle) <- c('svrid','idle_wps','idle_rps')
+  
+  
+  # p1.fraction of idle reading and fraction of idle writing
+  table_sxi <- melt(table(round(ss_xps_idle$idle_rps,digits = 2),round(ss_xps_idle$idle_wps,digits = 2)))
+  table_sxi$value[table_sxi$value == 0] <- 0.25
+  table_sxi_limited <- subset(table_sxi,Var1 <= bound_up & Var1 >= bound_low & Var2 <= bound_up & Var2 >= bound_low)
+  p1 <- ggplot(table_sxi_limited,aes(x = Var1,y = Var2,fill = log2(value))) + geom_raster() #useful
+  
+  # p2.difference of fraction of idle reading and fraction of idle writing in each server.
+  table_sxi_limited$diff <- round(table_sxi_limited$Var1 - table_sxi_limited$Var2,digits = 1)
+  rwidle_similar <- list2df(tapply(table_sxi_limited$value,table_sxi_limited$diff,sum),n = c('count','diff'))
+  rwidle_similar$count1 <- rwidle_similar$count
+  rwidle_similar$count <- array_rate(rwidle_similar$count)
+  p2 <- ggplot(rwidle_similar,aes(x = as.numeric(diff),y = count1)) + geom_bar(stat = 'identity')                     
+  
+  # p3. wps distribution when diff is small.
+  rate <- sum(rwidle_similar$count[abs(as.numeric(rwidle_similar$diff)) <= 0.1])  #xmind
+  # similar_xps <- subsetX(ss_xps_idle,abs(idle_wps - idle_rps) <= 0.1 & idle_wps < bound_up & idle_wps >= bound_low & idle_rps < bound_up & idle_rps > bound_low)
+  # p3 <- ggplot(similar_xps,aes(x = idle_wps)) + geom_histogram(binwidth = 0.1)
+  p3 <- 0
+  
+  rwidle_similar$class <- paste(names(sw_idle)[wri],collapse = '_')
+  return(list(p1,p2,p3,rwidle_similar,rate))
+}
+wps_range_id <- list(2,3:4,5:6,7:8,9:10)
+fx <- lapply(wps_range_id,function(x)fraction_xps(ss_wps,x,0))
+p1 <- lapply(fx,'[[',1);p2 <- lapply(fx,'[[',2);rate_simi <- lapply(fx,'[[',5)
+data_diff_frac <- lapplyX(fx,'[[',4)
+ggplot(data_diff_frac,aes(x = as.numeric(diff),y = count,color = class)) + 
+  geom_line() + geom_point(aes(shape = class)) + scale_color_brewer(palette='Spectral') +
+  xlab('Difference') + ylab('Fraction') + guides(color = guide_legend(title = NULL),shape = guide_legend(title = NULL))
+save(fx, file = file.path(dir_data,'sca_similar_xps.Rda'))
 
-table_sxi <- melt(table(round(ss_xps_idle$idle_rps,digits = 2),round(ss_xps_idle$idle_wps,digits = 2)))
-table_sxi$value[table_sxi$value == 0] <- 0.25
-table_sxi_limited <- subset(table_sxi,Var1 < 0.8 & Var1 >= 0.2 & Var2 < 0.8 & Var2 > 0.2)
-ggplot(table_sxi_limited,aes(x = Var1,y = Var2,fill = log2(value))) + geom_raster() #useful
+###### S4.Compare cut of 14 and 15 ######
+load(file.path(dir_data,'sta_cut.Rda'));r15 <- r
+load(file.path(dir_data,'sta_cut14.Rda'));r14 <- r
+ss15_util <- lapplyX(lapply(r15,'[[',2),'[[',1)
+ss15_rps <- lapplyX(lapply(r15,'[[',2),'[[',2)
+ss15_wps <- lapplyX(lapply(r15,'[[',2),'[[',4)
+ss14_util <- lapplyX(lapply(r14,'[[',2),'[[',1)
+ss14_rps <- lapplyX(lapply(r14,'[[',2),'[[',2)
+ss14_wps <- lapplyX(lapply(r14,'[[',2),'[[',3)
 
-table_sxi_limited$diff <- round(table_sxi_limited$Var1 - table_sxi_limited$Var2,digits = 2)
-rwidle_similar <- list2df(tapply(table_sxi_limited$value,table_sxi_limited$diff,sum),n = c('count','diff'))
-rwidle_similar$count <- array_rate(rwidle_similar$count)
-ggplot(rwidle_similar,aes(x = as.numeric(diff),y = count)) + geom_bar(stat = 'identity')                     
-
-sum(rwidle_similar$count[abs(as.numeric(rwidle_similar$diff)) < 0.1])  #xmind
-similar_xps <- subsetX(ss_xps_idle,abs(idle_wps - idle_rps) <= 0.1 & idle_wps < 0.7 & idle_wps >= 0.3 & idle_rps < 0.7 & idle_rps > 0.3)
-ggplot(similar_xps,aes(x = idle_wps)) + geom_histogram(binwidth = 0.1)
-save(similar_xps, file = file.path(dir_data,'sca_similar_xps.Rda'))
+# C1. util
+col_value <- names(ss14_util)[grepl('X\\d+',names(ss14_util))]
+ss14_utilr <- ss14_util;ss15_utilr <- ss15_util
+ss14_utilr[,col_value] <- t(apply(ss14_util[,col_value],1,array_rate))
+ss15_utilr[,col_value] <- t(apply(ss15_util[,col_value],1,array_rate))
+ggplot(ss14_utilr,aes(x = X0)) + geom_histogram(binwidth = 0.1)
+ggplot(ss15_utilr,aes(x = X0)) + geom_histogram(binwidth = 0.1)

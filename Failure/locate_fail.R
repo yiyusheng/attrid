@@ -6,7 +6,7 @@
 # 1.[Solved]Match server id with svrid
 # We have two failure records(ykliu and ym). 
 # ykliu have svrid and sn. ym does not contain svrid but a server id of integer instead.
-# Objective of ykliu's databases is disk instead of server from ym's database. 
+# Objective of ykliu's databases is disk instead of server, which is the target of ym's database. 
 # But what we are about to analyze needs the svrid to identify servers.
 # Thus, we need to find the svrid for each item of ykliu's record. of them are contradictive.
 
@@ -14,6 +14,8 @@
 # The ym's record contains only failure of servers. But failure of disks is what we need.
 # The ym's record contains a column called eventinfo which may describe the failed disk.
 # We are going to extract the disk info from this column and determine whether we use the ym's record.
+
+# 3.[20170414COMMENT]the variable ext_disk contains all parsed disk position from ym's failure record[201401-201412]. It's useful.
 
 # Copyright (c) 2016, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
@@ -25,12 +27,11 @@
 #
 #
 #
-rm(list = ls())
-source('head.R')
-source('iopsFunc.R')
-dir_iops <- '/home/yiyusheng/Data/tencProcess/mergePartSvrid'
+rm(list = ls());setwd('/home/yiyusheng/Code/R/Disk_Workload_201406-201407/');source('~/rhead')
+source('IO_statistic/iopsFunc.R')
+dir_iops <- dir_data15
 dir_smart <- '/home/yiyusheng/Data/SMART'
-dir_ten <- "/home/yiyusheng/Data/tencProcess"
+dir_ten <- "/home/yiyusheng/Data/Load_Data_2015"
 
 load(file.path(dir_smart,'ykliu_smart.Rda'))
 load(file.path(dir_smart,'diskInfo.Rda'))
@@ -41,10 +42,12 @@ fname <- list.files(dir_iops)
 
 # S1.1. generate relation between sn and svrid for failed disk (smart from ykliu)
 pos_disk <- factorX(subset(diskInfo,sn %in% smart$sn))
+
 smart_dup <- smart[!duplicated(smart[,c('sn','failed_time')]),c('sn','failed_time')]
-smart_dup <- list2df(tapply(smart_dup$failed_time,smart_dup$sn,max),n = c('failed_time','sn'))
+smart_dup <- list2df(tapply(smart_dup$failed_time,smart_dup$sn,max),n = c('failed_time','sn')) #only the last failure
 smart_dup$failed_time <- as.POSIXct(smart_dup$failed_time,tz = 'UTC',origin = '1970-01-01')
-pos_disk <- merge(pos_disk,smart_dup)
+
+pos_disk <- merge(pos_disk,smart_dup,all.y = T)
 pos_disk$dev_id <- as.numeric(factor(gsub('sd','',pos_disk$device)))
 
 # S1.2. failure record from ym2016-08

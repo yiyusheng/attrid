@@ -6,6 +6,9 @@
 # 1.observe single disk servers
 # 2.observe intersect disks from yk's failure record and ym's failure record
 #
+# [2017/04/14]After I scan this script, I find it do not find the relationship between io and failure. 
+# But find the number of servers in each day. If data of the servers is missing, the counter add 1.
+#
 # Copyright (c) 2016, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
 # Version 1.0
@@ -17,12 +20,11 @@
 #
 #
 
-rm(list = ls())
-source('head.R')
-source('iopsFunc.R')
-dir_iops <- '/home/yiyusheng/Data/tencProcess/mergePartSvrid'
-dir_datasource <- '/home/yiyusheng/Data/dataLoadforDiskAnalysis/'
-dir_ten <- "/home/yiyusheng/Data/tencProcess"
+rm(list = ls());setwd('/home/yiyusheng/Code/R/Disk_Workload_201406-201407/');source('~/rhead')
+source('IO_statistic/iopsFunc.R')
+dir_iops <- dir_data15
+dir_datasource <- '/home/yiyusheng/Data/Load_Data_2014/Config_Failure_2014'
+dir_ten <- "/home/yiyusheng/Data/Load_Data_2015"
 
 load(file.path(dir_iops,'d3.Rda'))
 load(file.path(dir_datasource,'load_ftr_attrid.Rda'))
