@@ -36,8 +36,8 @@ names(f2015) <- c('svrid','finfo','ftype','ftime');f2015 <- f2015[,c('svrid','ft
 f2014_06_09_vm <- factorX(f2014_06_09[check_vm(f2014_06_09$svrid),])
 f2014_06_09 <- factorX(f2014_06_09[!check_vm(f2014_06_09$svrid),])
 
-f2014_06_09_no_disk_replacing <- factorX(f2014_06_09[!check_disk_replacement(f2014_06_09),])
-f2014_06_09 <- factorX(f2014_06_09[check_disk_replacement(f2014_06_09),])
+f2014_06_09_no_disk_replacing <- check_disk_replacement(f2014_06_09,valid = -1)
+f2014_06_09 <- check_disk_replacement(f2014_06_09,valid = 1)
 
 svrid_ftime_2014_06_09 <- paste(f2014_06_09$svrid,f2014_06_09$ftime,sep='-')
 svrid_ftime_2014 <- paste(f2014$svrid,f2014$ftime,sep='-')
@@ -46,8 +46,8 @@ idx_dif <- match(setdiff(svrid_ftime_2014_06_09,svrid_ftime_2014),svrid_ftime_20
 f2014_06_09_non_intersect <- factorX(f2014_06_09[idx_dif,])
 
 # C2. compare number of failure between [2013] and [2014_06_09]. They are very similar in number. But they are different to [2014] and [2015]
-f2013_no_disk_replacing <- factorX(f2013[!check_disk_replacement(f2013),])
-f2013 <- factorX(f2013[check_disk_replacement(f2013),])
+f2013_no_disk_replacing <- check_disk_replacement(f2013,valid = 0)
+f2013 <- check_disk_replacement(f2013)
 fnum_month_2013 <- melt(table(cut.POSIXt(f2013$ftime,breaks = 'month')))
 fnum_month_2014_06_09 <- melt(table(cut.POSIXt(f2014_06_09$ftime,breaks = 'month')))
 fnum_month_2014 <- melt(table(cut.POSIXt(f2014$ftime,breaks = 'month')))
