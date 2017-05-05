@@ -16,14 +16,14 @@
 #
 
 rm(list = ls());source('~/rhead')
-load(file.path(dir_data,'sta_cut.Rda'))
+load(file.path(dir_data,'sta_cut14DC.Rda'))
 load(file.path(dir_data,'sta_dcastClear.Rda'))
 
 ###### ANALYSIS ######
 ss_util <- lapplyX(lapply(r,'[[',2),'[[',1)
 ss_rps <- lapplyX(lapply(r,'[[',2),'[[',2)
-ss_iopsr <- lapplyX(lapply(r,'[[',2),'[[',3)
-ss_wps <- lapplyX(lapply(r,'[[',2),'[[',4)
+ss_wps <- lapplyX(lapply(r,'[[',2),'[[',3)
+ss_iopsr <- lapplyX(lapply(r,'[[',2),'[[',4)
 ss_iopsw <- lapplyX(lapply(r,'[[',2),'[[',5)
 ss_sizer <- lapplyX(lapply(r,'[[',2),'[[',6)
 ss_sizew <- lapplyX(lapply(r,'[[',2),'[[',7)

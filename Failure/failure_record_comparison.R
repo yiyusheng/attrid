@@ -29,8 +29,7 @@ load(file.path(dir_dataCF,'uwork2014.Rda'))
 load(file.path(dir_dataCF,'merge_id_svrid.Rda'));f2014M <- merge_id_svrid;rm(merge_id_svrid);
 names(f2014M) <- c('ftime','ftype','finfo','svrid','ip','tag','svrnum'); f2014M <- f2014M[,c('svrid','ftime','ftype','finfo','svrnum','ip','tag')]
 #D.[2015]
-load(file.path(dir_dataCF,'failRecord_1407-1506.Rda'));f2015 <- failRecord;rm(failRecord) 
-names(f2015) <- c('svrid','finfo','ftype','ftime');f2015 <- f2015[,c('svrid','ftime','ftype','finfo')]
+load(file.path(dir_dataCF,'uwork2015.Rda'))
 
 # C1. compare B and C1/C2 in order to tell if disk failure of B is included by C1/C2. The Answer is YES. 
 f2014_06_09_vm <- factorX(f2014_06_09[check_vm(f2014_06_09$svrid),])
