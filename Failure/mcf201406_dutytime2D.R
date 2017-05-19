@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# Filename: MCF.R
+# Filename: mcf201406_dutytime2D.R
 #
-# Description: 
+# Description: generate mcf with an 2D time view (age + duty time). failure list is from 201406-201409
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
@@ -47,24 +47,24 @@ cmdb_censor$ageE <- round(as.numeric(difftime(dateE,cmdb_censor$utime)))
 DT_mean$util_level <- cut_level(DT_mean$utilM,c(0,1,2,5,10,20,50,101),f2n = F)
 # DT_mean$util_level <- cut_level(DT_mean$utilM,seq(0,101))
 
-# S4. generate mcf
+# S4. data preparation
 life_censored <- cmdb_censor[,c('svrid','ageS','ageE')]
-life_censored <- subsetX(life_censored,svrid %in% DT_mean$svrid & ageE < 365*5) #124677
+life_censored$util <- roundX(DT_mean$utilM[match(life_censored$svrid,DT_mean$svrid)])
+life_censored <- subsetX(life_censored,svrid %in% DT_mean$svrid & ageE < 365*5 & !is.na(util)) #124677
+life_censored$dutyS <- round(life_censored$ageS*life_censored$util/100,digits = 0)
+life_censored$dutyE <- round(life_censored$ageE*life_censored$util/100,digits = 0)
+
 event_info <- FR[,c('svrid','life')]
-event_info <- subsetX(event_info, svrid %in% life_censored$svrid) #3811
+event_info$util <- roundX(DT_mean$utilM[match(event_info$svrid,DT_mean$svrid)])
+event_info <- subsetX(event_info, svrid %in% life_censored$svrid & !is.na(util)) #3811
+event_info$duty <- round(event_info$life*event_info$util/100,digits = 0)
 
-# For all
-mcf_df <- mcf_cencored(event_info,life_censored)
-ggplot(mcf_df,aes(x = age)) + geom_line(aes(y = mcf)) + geom_bar(aes(y = rate_day*100),stat = 'identity') + ylim(c(0,1))
+# generate mcf For all
+atrisk7 <- mcf_cencored2D(event_info,life_censored,7)
+atrisk30 <- mcf_cencored2D(event_info,life_censored,30)
 
-# For util_level [figure in paper]
-mcf_util_level <- mcf_group(event_info,life_censored,DT_mean,'util_level')
-mcf_util_level$util_level <- sort_level(mcf_util_level$util_level)
-p <- ggplot(mcf_util_level,aes(x = age/365)) + 
-  geom_line(aes(y = mcf,group = util_level,color = util_level)) + geom_hline(aes(yintercept = 1),linetype = 2) + 
-  scale_x_continuous(breaks = seq(0,5,0.5)) + scale_y_continuous(breaks = seq(0,3,0.5)) + scale_color_brewer(palette = 'Greens') +
-  guides(color = guide_legend(title = 'group of\nutilization')) +
-  xlab('Age (yeas)') + ylab('Mean Cumulative Function') + 
-  theme(legend.position = c(0.05,0.95), legend.justification = c(0,1), legend.background = element_rect(fill = alpha('grey',0.5)),
-        axis.text = element_text(size = 24),axis.title = element_text(size = 26),legend.text = element_text(size = 20),legend.title = element_text(size = 20))
-ggsave(file = file.path(dir_data,'paper1','MCF_util.eps'),plot = p,width = 10, height = 6, dpi = 100)
+at <- subset(atrisk7,count != 0)
+at$count[at$count > 100] <- 100
+a <- dcast(age~duty,data = atrisk30,value.var = 'count')
+ggplot(at,aes(age,duty,fill = count)) + geom_raster() + geom_abline(slope = 1,color = 'red')
+
