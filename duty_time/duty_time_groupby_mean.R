@@ -25,8 +25,13 @@ duty_time_groupby_mean <- function(i){
   
   DT_mean <- data.frame(svrid = levels(DT$svrid),
                         utilM = as.numeric(tapply(DT$util,DT$svrid,mean)),
+                        utilS = as.numeric(tapply(DT$util,DT$svrid,sd)),
                         rpsM = as.numeric(tapply(DT$rps,DT$svrid,mean)),
-                        wpsM = as.numeric(tapply(DT$wps,DT$svrid,mean)))
+                        wpsM = as.numeric(tapply(DT$wps,DT$svrid,mean)),
+                        count = as.numeric(tapply(DT$util,DT$svrid,length)))
+  DT_mean$utilCV <- with(DT_mean,utilS/utilM)
+  DT_mean <- DT_mean[,c('svrid','count','utilM','utilS','utilCV','rpsM','wpsM')]
+  DT_mean$fn <- fn
   cat(sprintf('[%s]\tfile:%s\tEND!!!\n',date(),fn))
   return(DT_mean)
 }

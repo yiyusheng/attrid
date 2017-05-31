@@ -3,6 +3,7 @@
 # Filename: mcf201406_dutytime2D.R
 #
 # Description: generate mcf with an 2D time view (age + duty time). failure list is from 201406-201409
+# [useless]because range of age+duty time should be a line instead of an rectangle, it is the same with age when generating the mcf
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
