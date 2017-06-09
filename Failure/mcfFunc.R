@@ -16,7 +16,11 @@
 #
 #
 
-mcf_cencored <- function(event_info,life_censored){
+mcf_cencored <- function(event_info,life_censored,days){
+  event_info$life <- ceiling(event_info$life/days)
+  life_censored$lifeS <- ceiling(life_censored$lifeS/days)
+  life_censored$lifeE <- ceiling(life_censored$lifeE/days)
+  
   uni_life <- sort(unique(c(event_info$life,life_censored$lifeS,life_censored$lifeE)))
   tableS <- melt(table(life_censored$lifeS))
   tableE <- melt(table(life_censored$lifeE))
@@ -46,12 +50,12 @@ mcf_cencored <- function(event_info,life_censored){
   return(mcf_life)
 }
 
-mcf_group <- function(event_info,life_censored,df_group,attr){
+mcf_group <- function(event_info,life_censored,df_group,attr,days = 1){
   df_group$tmp <- df_group[[attr]]
   event_info$tmp <- df_group$tmp[match(event_info$svrid,df_group$svrid)]
   life_censored$tmp <- df_group$tmp[match(life_censored$svrid,df_group$svrid)]
   r <- lapply(levels(df_group$tmp),function(id){
-    r1 <- mcf_cencored(subset(event_info, tmp == id),subset(life_censored, tmp == id))
+    r1 <- mcf_cencored(subset(event_info, tmp == id),subset(life_censored, tmp == id),days)
     r1[[attr]] <- id
     r1
   })
