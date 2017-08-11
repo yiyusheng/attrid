@@ -15,7 +15,7 @@
 #
 #
 
-rm(list = ls());source('~/rhead')
+rm(list = ls());setwd('~/Code/R/Disk_Workload/IO_statistic/');source('~/rhead')
 load(file.path(dir_data,'sta_cut.Rda'))
 load(file.path(dir_data,'sta_dcastClear.Rda'))
 

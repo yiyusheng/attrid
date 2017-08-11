@@ -1,4 +1,14 @@
 #@@@ FUNCTION @@@#
+
+# F3. cut fail time and shelf time into by 3 months
+cut3mon <- function(t,cutValue){
+  t1 <- floor(t*4)
+  t2 <- t1/4
+  # t2 <- t2 + 0.25
+  t2[t2 > cutValue] <- floor(t2[t2 > cutValue])
+  t2
+}
+
 # F0.data load
 dataLoadF1 <- function(fn,qu = 1){
   load(file.path(dir_data,fn))
@@ -21,7 +31,22 @@ dataLoadF1 <- function(fn,qu = 1){
   tmp.fTS <- subset(tmp.f,dev_class_id != 'C1')
   tmp.cmdbTS <- subset(tmp.cmdb,dev_class_id != 'C1')
   
-  list(tmp.fC,tmp.cmdbC,tmp.fTS,tmp.cmdbTS)
+  list(tmp.fC,tmp.cmdbC,tmp.fTS,tmp.cmdbTS,tmp.f,tmp.cmdb)
+}
+
+#F6. AFR calculate
+ioAFR <- function(io,f,attr,diskCount = 1){
+  t1 <- melt(table(io[,attr]))
+  t2 <- melt(table(f[,attr]))
+  if(length(attr) == 1){
+    names(t1)[1] <- attr
+    names(t2)[1] <- attr
+  }
+  tMerge <- merge(t1,t2,by = attr,all = T)
+  names(tMerge) <- c(attr,'count','fCount')
+  tMerge$fCount[is.na(tMerge$fCount)] <- 0
+  tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*100
+  tMerge <- subset(tMerge,!is.na(AFR))
 }
 
 # F1.plot
@@ -70,6 +95,41 @@ AFR_plot <- function(cm,title,attr){
   p
 }
 
+# F4. AFR for attr without time
+AFR_attr_notime <- function(f,io,attr,diskCount,dev = ""){
+  if(dev != ""){
+    f <- subset(f,grepl(dev,dClass))
+    io <- subset(io,grepl(dev,dClass))
+  }
+  # eval(parse(text = sprintf('tio <- tableX(io$%s)',attr2)))
+  # eval(parse(text = sprintf('tf <- tableX(f$%s)',attr1)))
+  tio <- setNames(melt(table(io[[attr]])),c('item','count'))
+  tf <- setNames(melt(table(f[[attr]])),c('item','count'))
+  tiof <- merge(tio,tf,by = 'item',all = T)
+  names(tiof) <- c('item','count_io','count_f')
+  
+  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*100
+  if(dev == 'C'){
+    tiof$class <- 'Non-Storage Servers'
+  }else if(dev == 'TS'){
+    tiof$class <- 'Storage Servers'
+  }else if(dev == 'TS1T'){
+    tiof$class <- 'Storage Servers[1T]'
+  }else if(dev == 'TS2T'){
+    tiof$class <- 'Storage Servers[2T]'
+  }else{
+    tiof$class <- attr
+  }
+  tiof <- tiof[,c('item','class','AFR','count_f','count_io')]
+  tiof
+}
+
+#F2. replace using Nserv and Sserv
+classExchg <- function(df){
+  df$class[grepl('[N|n]on',df$class)] <- 'Nserv'
+  df$class[!grepl('[N|n]on',df$class) & grepl('[S|s]torage',df$class)] <- 'Sserv'
+  df
+}
 
 #F1.5 AFR for warranty effect
 
@@ -106,54 +166,22 @@ AFR_plot_warranty <- function(cm,title){
   p
 }
 
-#F2. replace using Nserv and Sserv
-classExchg <- function(df){
-  df$class[grepl('[N|n]on',df$class)] <- 'Nserv'
-  df$class[!grepl('[N|n]on',df$class) & grepl('[S|s]torage',df$class)] <- 'Sserv'
-  df
-}
 
-# F3. cut fail time and shelf time into by 3 months
-cut3mon <- function(t,cutValue){
-  t1 <- floor(t*4)
-  t2 <- t1/4
-  # t2 <- t2 + 0.25
-  t2[t2 > cutValue] <- floor(t2[t2 > cutValue])
-  t2
-}
 
-# F4. AFR for attr without time
-AFR_attr_notime <- function(f,io,attr1,attr2,diskCount,dev = ""){
-  if(dev != ""){
-    f <- subset(f,grepl(dev,dClass))
-    io <- subset(io,grepl(dev,dClass))
-  }
-  eval(parse(text = sprintf('tio <- tableX(io$%s)',attr2)))
-  eval(parse(text = sprintf('tf <- tableX(f$%s)',attr1)))
-  tiof <- merge(tio,tf,by = 'item',all = T)
-  names(tiof) <- c('item','count_io','rate_io','count_f','rate_f')
-  tiof$AFR <- tiof$count_f/tiof$count_io/diskCount*100
-  if(dev == 'C'){
-    tiof$class <- 'Non-Storage Servers'
-  }else if(dev == 'TS'){
-    tiof$class <- 'Storage Servers'
-  }else if(dev == 'TS1T'){
-    tiof$class <- 'Storage Servers[1T]'
-  }else if(dev == 'TS2T'){
-    tiof$class <- 'Storage Servers[2T]'
-  }else{
-    tiof$class <- attr2
-  }
-  tiof <- tiof[,c('item','class','AFR','count_f','count_io','rate_f','rate_io')]
-  
-  item_num <- as.numeric(fct2ori(tiof$item))
-  if(all(!is.na(item_num))){
-    tiof$item <- item_num
-    tiof <- tiof[order(tiof$item),]
-    row.names(tiof) <- NULL
-  }
-  tiof
-}
+
+
+
+
+
+
+
+################################################################################################################################################
+
+
+
+
+
+
 
 # F5. virtualize server to multiple disks to compute AFR accurately
 # We add new disks when a failure disk in df take places.
@@ -225,17 +253,3 @@ virt_disk <- function(df,dc,lastTime){
   virtDC
 }
 
-#F6. AFR calculate
-ioAFR <- function(io,f,attr,diskCount = 1){
-  t1 <- melt(table(io[,attr]))
-  t2 <- melt(table(f[,attr]))
-  if(length(attr) == 1){
-    names(t1)[1] <- attr
-    names(t2)[1] <- attr
-  }
-  tMerge <- merge(t1,t2,by = attr,all = T)
-  names(tMerge) <- c(attr,'count','fCount')
-  tMerge$fCount[is.na(tMerge$fCount)] <- 0
-  tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*100
-  tMerge <- subset(tMerge,!is.na(AFR))
-}

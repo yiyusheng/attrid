@@ -31,7 +31,10 @@ get_intpoint_of_line <- function(ageS,dtS,ageE,dtE){
 get_table <- function(points,int1 = 1,int2 = 1){
   points[,1] <- round(points[,1]/int1)
   points[,2] <- round(points[,2]/int2)
-  melt_table(points[,1],points[,2])
+  r <- melt_table(points[,1],points[,2])
+  names(r) <- c('age','dt','count')
+  r$age <- factor(r$age)
+  r
 }
 
 ###### MAIN ######
@@ -39,7 +42,8 @@ life_censored <- setNames(merge(duty_censored[,c('svrid','lifeS','lifeE')],age_c
                                 by = c('svrid')),c('svrid','dtS','dtE','ageS','ageE'))
 points <- with(life_censored,mapply(get_intpoint_of_line,ageS,dtS,ageE,dtE,SIMPLIFY = F))
 points <- do.call(rbind,points)
-table30 <- setNames(get_table(points,30,30),c('age','dt','count'))
-table180 <- setNames(get_table(points,180,30),c('age','dt','count'))
+table30 <- get_table(points,30,30)
+table180 <- get_table(points,180,30)
+table365 <- get_table(points,365,30)
 
-ggplot(subset(table180,age == 1),aes(x = dt,y = count)) + geom_line() + geom_point()
+ggplot(subset(table365,age > 0),aes(x = dt,y = log2(count),group = age,color = age)) + geom_line() + geom_point()

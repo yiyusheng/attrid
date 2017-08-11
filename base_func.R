@@ -78,3 +78,8 @@ rate_data <- function(df,regstr = 'X\\d+'){
   df[,col_value] <- roundX(df[,col_value]/df$count)
   df
 }
+
+# F. expand server to disk based on the specified disk number in DT
+svrid_expand_disk <- function(DT,freq='numD'){
+  DT[rep(row.names(DT),DT[[freq]]),]
+}
