@@ -51,7 +51,7 @@ length_continue_dutycycle<- function(i){
   load(file.path(dir_dataset,fn))
   splitDT <- split(DT,DT$svrid)
   
-  r <- lapply(0:20,idle_thred,splitDT)
+  r <- lapply(seq(5,85,5),idle_thred,splitDT)
   cat(sprintf('[%s]\t END!!!\n',fn))
   return(r)
 }
@@ -61,5 +61,5 @@ dir_dataset <- dir_data14DC
 fname <- list.files(dir_dataset)
 idx <- seq_len(length(fname))
 r <- foreachX(idx,'length_continue_dutycycle',frac_cores = 0.9)
-r <- lapply(1:21,function(i)do.call(rbind,lapply(r,'[[',i)))
-save(r,file = file.path(dir_data,'average_legnth_idle_duty_cycle.Rda'))
+r <- lapply(seq_len(length(seq(5,85,5))),function(i)do.call(rbind,lapply(r,'[[',i)))
+save(r,file = file.path(dir_data,'average_legnth_idle_duty_cycle5.Rda'))

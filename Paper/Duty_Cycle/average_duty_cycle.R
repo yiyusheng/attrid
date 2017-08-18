@@ -70,8 +70,8 @@ rate_svrid$count_rate_cumsum <- cumsum(rate_svrid$count_rate)
 mean_util_all <- mean(expand_io$util)
 
 rate_svrid$count_rate[rate_svrid$count_rate>0.1] <- 0.1
-paper1 <- ggplot(rate_svrid,aes(x = util,y = count_rate)) + geom_bar(stat = 'identity') + 
-  xlab('Average Duty Cycle of Disk Drives(%)') + ylab('Percentage(%)') + annotate("text", x=12, y=0.095, size = 4,label= "(12.09%, 15.20%, 25.15%)")+
+paper1 <- ggplot(rate_svrid,aes(x = util,y = count_rate*100)) + geom_bar(stat = 'identity') + 
+  xlab('Average Duty Cycle of Disk Drives(%)') + ylab('Percentage(%)') + annotate("text", x=22, y=9.5, size = 8,label= "(12.09%, 15.20%, 25.15%)")+
   theme(axis.text = element_text(size = 24),axis.title = element_text(size = 26),
         legend.text = element_text(size = 26),legend.position = 'top')
 ggsave(file=file.path(dir_data,'Paper','Dist_duty_cycle.eps'), plot=paper1, width = 8, height = 6, dpi = 100)
@@ -88,8 +88,8 @@ level_svrid$rate <- array_rate(level_svrid$count)
 # S2. failure rate of difference utilization.
 util_fr_cmdb <- expand_io
 util_fr_cmdb$util_round <- round(util_fr_cmdb$util)
-util_fr_cmdb$util_round <- fct2num(cut(util_fr_cmdb$util,seq(0,100,2),seq(0,98,2),include.lowest = T))
-util_fr_cmdb$util_round[util_fr_cmdb$util_round>58] <- 58
+util_fr_cmdb$util_round <- fct2num(cut(util_fr_cmdb$util,seq(0,100,5),seq(0,95,5),include.lowest = T))
+# util_fr_cmdb$util_round[util_fr_cmdb$util_round>58] <- 58
 
 util_fr_f <- f201409
 util_fr_f$util_round <- util_fr_cmdb$util_round[match(util_fr_f$svrid,util_fr_cmdb$svrid)]
@@ -100,7 +100,7 @@ fr_all <- with(util_fr,sum(fCount)/sum(count))*600
 util_fr$count_rate <- array_rate(util_fr$count)
 util_fr$level <- 'low'
 util_fr$level[util_fr$AFR > 5] <- 'high'
-paper2 <- ggplot(util_fr,aes(x = util_round,y = AFR,fill = level)) + geom_bar(stat = 'identity') + geom_hline(yintercept=fr_all,linetype=2,color='red',size=1)+
+paper2 <- ggplot(util_fr,aes(x = util_round,y = AFR,fill = level)) + geom_bar(stat = 'identity') + 
   xlab('Average Duty Cycle of Disk Drives(%)') + ylab('Failure Rate(%)') + guides(fill = guide_legend(title=NULL)) +
   theme(axis.text = element_text(size = 24),axis.title = element_text(size = 26),
         legend.text = element_text(size = 26),legend.position = 'bottom')

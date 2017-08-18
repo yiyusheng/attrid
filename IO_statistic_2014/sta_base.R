@@ -28,28 +28,32 @@ sta_basic <- function(i){
   # DT <- smp_df(DT1,10000)
   DT$time <- as.Date(DT$time)
   
-  # per day
+  # sum per day
   sta_day <- aggregate(DT[,c('rps','wps','util')],by = list(DT$svrid,DT$time),sum)
   tmp_count <- aggregate(DT$util,by = list(DT$svrid,DT$time),length)
   sta_day <- merge(sta_day,tmp_count)
   names(sta_day) <- c('svrid','date','sum_rps','sum_wps','sum_util','count')
   
-  # per server
+  # sum per server
   sta_svrid <- aggregate(sta_day[,c('sum_rps','sum_wps','sum_util')],by = list(sta_day$svrid),sum)
   tmp_count <- aggregate(sta_day$count,by = list(sta_day$svrid),sum)
   sta_svrid <- merge(sta_svrid,tmp_count)
   names(sta_svrid) <- c('svrid','sum_rps','sum_wps','sum_util','count')
   
-  # per month
+  # sum per month
   sta_day$month <- floor_date(sta_day$date,'month')
   sta_month <- aggregate(sta_day[,c('sum_rps','sum_wps','sum_util')],by = list(sta_day$svrid,sta_day$month),sum)
   tmp_count <- aggregate(sta_day$count,by = list(sta_day$svrid,sta_day$month),sum)
   sta_month <- merge(sta_month,tmp_count)
   names(sta_month) <- c('svrid','month','sum_rps','sum_wps','sum_util','count')
   
-  sta_day$fn <- fname[i];sta_svrid$fn <- fname[i];sta_month$fn <- fname[i]
+  # sd 
+  sd_svrid <- aggregate(DT[,c('rps','wps','util')],by = list(DT$svrid),sd)
+  names(sd_svrid) <- c('svrid','sd_rps','sd_wps','sd_util')
+  
+  sta_day$fn <- fname[i];sta_svrid$fn <- fname[i];sta_month$fn <- fname[i];sd_svrid$fn <- fname[i]
   cat(sprintf('[%s]\t END!!!\n',fn))
-  list(sta_day,sta_svrid,sta_month)
+  list(sta_day,sta_svrid,sta_month,sd_svrid)
 }
 
 ###### STA:MAIN ######
@@ -61,8 +65,9 @@ r <- foreachX(idx,'sta_basic',frac_cores = 0.8)
 sta_day <- do.call(rbind,lapply(r,'[[',1))
 sta_svrid <- do.call(rbind,lapply(r,'[[',2))
 sta_month <- do.call(rbind,lapply(r,'[[',3))
+sd_svrid <- do.call(rbind,lapply(r,'[[',4))
 
-save(sta_day,sta_svrid,sta_month,file = file.path(dir_data,'sta_base14.Rda'))
+save(sta_day,sta_svrid,sta_month,sd_svrid,file = file.path(dir_data,'sta_base14.Rda'))
 
 
 # 

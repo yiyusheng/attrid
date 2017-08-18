@@ -50,13 +50,14 @@ model_svrid <- subset(sta_model,numD > 0 & !is.na(numD) & !is.na(mainModel),
 io14 <- replace_value(sta_svrid)
 io14$fn <- factor(io14$fn)
 io14 <- subset(io14, count > 5000)
-
+sd14 <- subset(sd_svrid,svrid %in% io14$svrid)
 
 # S5. Intersect
 its <- intersect(cmdbSMP$svrid,intersect(model_svrid$svrid,io14$svrid))
 cmdbSMP <- factorX(subset(cmdbSMP,svrid %in% its))
 io14 <- factorX(subset(io14,svrid %in% its))
+sd14 <- factorX(subset(sd14,svrid %in% its))
 model_svrid <- factorX(subset(model_svrid,svrid %in% its))
 f201409 <- factorX(subset(f201409,svrid %in% its))
 
-save(cmdbSMP,io14,model_svrid,f201409,file = file.path(dir_data,'uniform_data.Rda'))
+save(cmdbSMP,io14,sd14,model_svrid,f201409,file = file.path(dir_data,'uniform_data.Rda'))
