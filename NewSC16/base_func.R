@@ -32,7 +32,8 @@ ioAFR <- function(io,f,attr,diskCount = 1,timefactor = 6){
   tMerge <- merge(t1,t2,by = attr,all = T)
   names(tMerge) <- c(attr,'count','fCount')
   tMerge$AFR <- tMerge$fCount/tMerge$count/diskCount*100*timefactor
-  tMerge <- subset(tMerge,!is.na(AFR))
+  tMerge <- replace_value(tMerge)
+  return(tMerge)
 }
 
 #F4. replace using Nserv and Sserv

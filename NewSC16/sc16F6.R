@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: sc16F6.R
 #
-# Description: Correlate failure rate and utilization in each disk
+# Description: [Duty cycle]Correlate failure rate and utilization in each disk
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #

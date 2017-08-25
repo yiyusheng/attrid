@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: sc16F2.R
 #
-# Description: Correlate failure rate and the total amount of I/O workload and generate the pearson's coefficient
+# Description: [total amount of bandwidth]Correlate failure rate and the total amount of I/O workload and generate the pearson's coefficient
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #

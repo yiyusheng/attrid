@@ -22,24 +22,25 @@ average_duty_cycle_cut<- function(i){
   cat(sprintf('[%s]\t%s SATRT!!!\n',date(),fn))
   load(file.path(dir_dataset,fn))
   # cut_point <- seq(0,1,0.25)
-  cut_point <- seq(0,1,0.1)
-  # DT <- subsetX(DT,svrid %in% levels(DT$svrid)[1:100])
+  # cut_point <- seq(0,1,0.1)
+  cut_point <- c(0,0.05,0.1,0.2,0.8,0.9,0.95,1)
+  DT <- subsetX(DT,svrid %in% levels(DT$svrid)[1:100])
   r <- list2df(tapply(DT$util,DT$svrid,function(arr){
     quan5 <- quantile(arr,cut_point)
     # cat(sprintf('%d\n',length(unique(quan5))))
     sapply(2:length(quan5),function(i){
       p <- quan5[i-1];q <- quan5[i]
       if(i==2 | p==q){
-        # return(c(mean(arr[arr<=q]),mean(arr[arr>=p & arr<=q]),mean(arr[arr>=p])))
-        return(mean(arr[arr>=p & arr<=q]))
+        return(c(mean(arr[arr<=q]),mean(arr[arr>=p & arr<=q]),mean(arr[arr>=p])))
+        # return(mean(arr[arr>=p & arr<=q])
       }else {
-        # return(c(mean(arr[arr<=q]),mean(arr[arr>p & arr<=q]),mean(arr[arr>=p])))
-        return(mean(arr[arr>p & arr<=q]))
+        return(c(mean(arr[arr<=q]),mean(arr[arr>p & arr<=q]),mean(arr[arr>=p])))
+        # return(mean(arr[arr>p & arr<=q]))
       }
     })
   }))
   n <- paste('Q',cut_point[-length(cut_point)]*100,sep='')
-  # n <- paste(rep(n,each=3),rep(c('L','M','R'),3),sep='')
+  n <- paste(rep(n,each=3),rep(c('L','M','R'),3),sep='')
   names(r) <- c(n,'svrid')
   cat(sprintf('[%s]\t%s END!!!\n',date(),fn))
   return(r)
@@ -55,4 +56,4 @@ r <- do.call(rbind,r)
 r$svrid <- factor(r$svrid)
 r <- replace_value(r)
 
-save(r,file = file.path(dir_data,'average_duty_cycle_cut(0-10-100).Rda'))
+save(r,file = file.path(dir_data,'average_duty_cycle_cut(0-5-10-20-80-90-95-100).Rda'))

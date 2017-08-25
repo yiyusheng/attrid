@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: sc16F5.R
 #
-# Description: Correlate failure rate and strength of periodicity
+# Description: [periodicity]Correlate failure rate and strength of periodicity
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #

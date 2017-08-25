@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: sc16F3.R
 #
-# Description: Correlate failure rate and the rate of number of bytes written to number of bytes transffered.
+# Description: [Ratio of reading and writing]Correlate failure rate and the rate of number of bytes written to number of bytes transffered.
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #

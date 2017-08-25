@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: sc16F4.R
 #
-# Description: Correlate failure rate and vibration of io in each disk
+# Description: [vibration]Correlate failure rate and vibration of io in each disk
 #
 # Copyright (c) 2017, Yusheng Yi <yiyusheng.hust@gmail.com>
 #
