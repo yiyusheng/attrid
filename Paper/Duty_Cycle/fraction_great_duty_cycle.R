@@ -30,7 +30,8 @@ cut_point <- seq(0,100,1);  itv <- 1
 # cut_point <- seq(25,80,5);  itv <- 5
 
 # S2. get failure rate and pearson's correlation coefficient ------------------------------------
-get_result_fraction <- function(i){
+# Wrong code and see ../Bandwidth/bandwidth.R
+gen_result_fraction <- function(i){
   cat(sprintf('[%s]\t task %i SATRT!!!\n',date(),i))
   quanList <- get_fraction_on_count(cnt,cut_point[i])
   quanList$fraction <- ceiling(quanList$fraction/itv)*itv
@@ -43,7 +44,7 @@ get_result_fraction <- function(i){
 }
 
 idx <- seq_len(length(cut_point))
-system.time(r <- foreachX(idx,'get_result_fraction',frac_cores = 0.9,outname = NULL))
+system.time(r <- foreachX(idx,'gen_result_fraction',frac_cores = 0.9,outname = NULL))
 data_frList <- lapply(r,'[[',1)
 p_frList <- lapply(r,'[[',2)
 p_count <- lapply(r,'[[',3)

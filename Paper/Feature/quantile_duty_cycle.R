@@ -15,17 +15,20 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/IO_statistic_2014/');source('~/rhead')
+rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper/');source('~/rhead')
+source('dir_func.R')
 
 quantile_dutycycle<- function(i){
   fn <- fname[i]
   cat(sprintf('[%s]\t SATRT!!!\n',fn))
   load(file.path(dir_dataset,fn))
+  
   splitDT <- split(DT,DT$svrid)
-  r <- lapplyX(splitDT,function(df)quantileX(df$util))
+  r <- lapplyX(splitDT,function(df)c(mean(df$util),sd(df$util),quantileX(df$util)))
   r <- cbind(row.names(r),data.frame(r))
   names(r)[1] <- 'svrid'
   r$svrid <- fct2ori(r$svrid)
+  
   cat(sprintf('[%s]\t END!!!\n',fn))
   return(r)
 }
@@ -38,5 +41,6 @@ r <- foreachX(idx,'quantile_dutycycle',frac_cores = 0.9)
 
 r <- do.call(rbind,r)
 r$svrid <- factor(r$svrid)
-names(r) <- c('svrid',paste('X',0:100,sep = ''))
-save(r,file = file.path(dir_data,'quantile_dutycycle.Rda'))
+names(r) <- c('svrid','mean','sd',paste('Q',0:100,sep = ''))
+quantile_dutycycle <- r
+save(quantile_dutycycle,file = file.path(dir_data,'quantile_dutycycle.Rda'))

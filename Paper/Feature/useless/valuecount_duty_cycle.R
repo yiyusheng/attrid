@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# Filename: count_duty_cycle_value.R
+# Filename: valuecount_duty_cycle.R
 #
 # Description: count duty cycle value for each disk 
 #
@@ -10,7 +10,7 @@
 #
 # Initial created: 2017-08-21 22:07:12
 #
-# Last   modified: 2017-08-21 22:07:14
+# Last   modified: 2017-08-30 11:48:30
 #
 #
 #

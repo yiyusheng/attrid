@@ -24,7 +24,7 @@ load(file.path(dir_data,'uniform_data.Rda'))
 attr_bw <- data.frame(attr = c('rps','wps','xps'),maxlimit = c(4000,5000,9000))
 object_data <- add_average_bandwidth(io14, attr_bw)
 
-# S1. Distribution and Failure Rate (rps,wps,xps) ------------------------------------
+# S1. Generate Distribution and Failure Rate (rps,wps,xps) ------------------------------------
 data_fr_list <- list();p_fr_list <- list();p_count_list <- list();data_ob_list <- list()
 for (i in seq_len(nrow(attr_bw))){
   ave_level_name <- paste('average',attr_bw$attr[i],'level',sep='_')
@@ -55,3 +55,14 @@ p_amd_rps <- plot_amd_diff(expand_object_data,'average_rps_level')
 p_amd_wps <- plot_amd_diff(expand_object_data,'average_wps_level')
 p_amd_xps <- plot_amd_diff(expand_object_data,'average_xps_level')
 multiplot(plotlist=c(p_amd_rps[2:4],p_amd_wps[2:4],p_amd_xps[2:4]),layout=matrix(seq_len(9),nrow=3,byrow = F))
+
+# S4. plot figures in paper ------------------------------------------------------------------------
+
+# S4.1 distribution of bandwidth ----
+data_p1 <- setNames(melt(data_ob_list[[1]][c('average_rps_trunc','average_wps_trunc','average_xps_trunc')]),nm=c('class','value'))
+data_p1$class <- gsub('average_|_trunc','',data_p1$class)
+p1 <- ggplot(data_p1)+stat_ecdf(aes(x=value,group=class,color=class),linetype=1,size=1)+xlab('Bandwidth(kB/s)')+ylab('CDF')+
+  guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
+  theme(axis.text = element_text(size = 12),axis.title = element_text(size = 16),legend.text = element_text(size = 12),
+        legend.position = c(0.95,0.05),legend.justification = c(1,0),legend.background = element_rect(fill=alpha('grey',0.5)))
+print(p1)

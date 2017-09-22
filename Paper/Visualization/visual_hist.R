@@ -15,27 +15,34 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/IO_statistic_2014/');source('~/rhead')
+rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper/');source('~/rhead')
+source('dir_func.R')
 
-visual_hist<- function(i){
-  fn <- fname[i]
-  cat(sprintf('[%s]\t SATRT!!!\n',fn))
-  load(file.path(dir_dataset,fn))
-  splitDT <- split(DT,DT$svrid)
-  attr <- 'util'
-  
-  par(mfrow = c(5,5),mar=c(1,1,1,1))
-  for (i in sample(1:length(splitDT),25)) {
-    hist(splitDT[[i]][[attr]], breaks = 100,main = names(splitDT)[i])
-  }
-  
-  shape_levelcat(sprintf('[%s]\t END!!!\n',fn))
-  return(r)
-}
-
-###### STA:MAIN ######
+# S1. Load data ------------------------------------
+load(file.path(dir_data,'uniform_data.Rda'))
 dir_dataset <- dir_data14DC
 fname <- list.files(dir_dataset)
-idx <- seq_len(length(fname))
-r <- foreachX(idx,'visual_hist',frac_cores = 0.9)
-save(r,file = file.path(dir_data,'visual_hist'))
+fn <- fname[10]
+cat(sprintf('[%s]\t SATRT!!!\n',fn))
+load(file.path(dir_dataset,fn))
+
+# S2. Prepare data ------------------------------------
+DT <- format_bandwidth(DT)
+DT <- factorX(subset(DT,!is.na(xps) & xps>0 & svrid %in% io14$svrid))
+DT$rs <- with(DT,util/xps)
+splitDT <- split(DT,DT$svrid)
+
+# S3. Plot ------------------------------------
+attr <- 'rs'
+prow <- 4;pcol <- 4;pmar <- 2
+par(mfrow = c(prow,pcol),mar=c(pmar,pmar,pmar,pmar))
+
+smp_ind <- data.frame(ind=sample(1:length(splitDT),prow*pcol))
+smp_ind$numD <- sapply(splitDT[smp_ind$ind],function(df)df$numD[1])
+smp_ind <- smp_ind[order(smp_ind$numD),]
+for (i in smp_ind$numD) {
+  arr <- splitDT[[i]][[attr]][splitDT[[i]][[attr]]!=0]
+  title <- sprintf('%s[%d]',df$svrid[1],df$numD[1])
+  if(length(arr)==0)arr<-rep(0,1000)
+  hist(arr, breaks = 100,main = title,ylim = c(0,5e3))
+}

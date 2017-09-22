@@ -28,7 +28,7 @@ itv <- 5
 object_data$extreme <- ceiling(object_data$X100/itv)*itv 
 list[data_fr,p_fr,p_count] <- gen_fr(object_data,'extreme',prt=F,countLimit = 100)
 p1 <- p_count+xlab('extreme duty cycle(%)')
-p2 <- p_fr + xlab('extreme duty cycle(%)')+ geom_smooth(method='lm')
+p2 <- p_fr + xlab('extreme duty cycle(%)')+ geom_smooth(aes(y=AFR),method='lm',color='red',linetype=2)
 corr <- with(data_fr,cor(extreme,AFR))
 print(corr)
 summary(glm(AFR~extreme,data = data_fr,family = 'gaussian'))

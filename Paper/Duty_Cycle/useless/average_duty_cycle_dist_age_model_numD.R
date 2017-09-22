@@ -20,8 +20,6 @@
 #
 
 rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper');source('~/rhead');
-# source('~/Code/R/Load_Data_Config_Failure/loadFunc.R')
-# source('../NewSC16/base_func.R')
 source('dir_func.R')
 
 load(file.path(dir_data,'uniform_data.Rda'))
@@ -36,18 +34,6 @@ list[object_data,fail_data,fr_data] <- gen_data(object_data,'average_duty_cycle_
 p_amd_adc <- plot_amd_diff(object_data,'average_duty_cycle_level')
 multiplot(plotlist = p_amd_adc[2:4],cols=3)
 p_amd_adc[[2]]
-# io14$ave_duty_cycle <- floor(with(io14,sum_util/count))
-# io14$class <- 'Low-adc'
-# io14$class[io14$ave_duty_cycle > 30] <- 'Median-adc'
-# io14$class[io14$ave_duty_cycle > 45] <- 'High-adc'
-# io14$class <- floor(io14$ave_duty_cycle/20)*20;io14$class[io14$class==100] <- sort(unique(io14$class),decreasing = T)[2]
-# io14$class <- factor(io14$class)
-
-# col_quan <- paste('X',seq(0,100,5),sep='')
-# object_data <- r[,c('svrid',col_quan)]
-# object_data$class <- factor(io14$class[match(object_data$svrid,io14$svrid)])
-# # object_data[,col_quan] <- t(scale(t(object_data[,col_quan])))
-# list[object_data,fail_data,fr] <- gen_data(object_data,'class',io = io14,f=f201409)
 
 # S2. adc distribution ------------------------------------------------------------------------
 quantile_CDF <- function(df,col_quan,attr){
