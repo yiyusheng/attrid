@@ -68,12 +68,12 @@ data_corr <- data.frame(thred = thresholds[-1],corr=sapply(r,'[[',4)[-1])
 list[p_frac_fr50,p_frac_fr60,p_frac_fr70,p_frac_fr80] <- 
   lapply(c(50,60,70,80),function(i){
     p <- p_fr_list[[which(thresholds == i)]]
-    p+xlab('The Fraction of Large Duty Cycle(%)')+coord_cartesian(ylim=c(0,35))
+    p+xlab('Fraction of Large Duty Cycle (%)')+coord_cartesian(ylim=c(0,35))+
+      scale_fill_manual(values=c('grey60','grey20'))+ ylab('Failure Rate (%)')
   })
 
 p_frac_corr <- ggplot(data_corr,aes(x=thred,y=corr))+geom_line(size=0.5)+geom_point(size=2)+
-  xlab('The Duty Cycle Threshold(%)') + ylab("Pearson's Correlation Coefficient")+
-  gen_theme()
+  xlab('Duty Cycle Threshold (%)') + ylab("Correlation Coefficient")+gen_theme()
 
 
 save_fig(p_frac_fr50,'frac_fr50')

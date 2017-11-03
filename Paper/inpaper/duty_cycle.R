@@ -43,12 +43,15 @@ list[data_fr,p_fr,p_count,corr,data_adc] <- gen_result_feature(DT_quan,'mean',10
 # sum(data_fr$fCount[data_fr$mean_level<=60])/sum(data_fr$count[data_fr$mean_level<=60])*600
 
 # S3. Plot ------------------------------------
-p_adc_fr <- p_fr+xlab('The Average Duty Cycle(%)')+ylim(c(0,25))
+p_adc_fr <- p_fr+xlab('ADC (%)')+ylim(c(0,25))+scale_fill_manual(values=c('grey60','grey20'))+ ylab('Failure Rate (%)')
 
-p_adc_dist <- p_count+xlab('The Average Duty Cycle(%)')+coord_cartesian(ylim=c(0,10))+
-  annotate("text", x=20, y=10,label= '67.30%',size=6)+
-  geom_segment(aes(x = 12, y = 10, xend = 8, yend = 10.1), size=0.2,arrow = arrow(length = unit(0.2, "cm")))
-p_adc_abw <- plot_relationship(subset(data_adc,numD=='1'),'mean_level','abw')+xlab('The Average Duty Cycle(%)')+ylab('The Average Bandwidth(kB/s)')
+p_adc_dist <- p_count+xlab('ADC (%)')+coord_cartesian(ylim=c(0,10))+
+  annotate("text", x=22, y=10,label= '67.30%',size=10)+
+  geom_segment(aes(x = 12, y = 10, xend = 8, yend = 10), size=0.2,arrow = arrow(length = unit(0.2, "cm"))) + ylab('Percentage (%)')
+
+p_adc_abw <- plot_relationship(subset(data_adc,numD=='1'),'mean_level','abw')+xlab('ADC (%)')+ylab('ABW (KB/s)')
+p_adc_abw <- plot_relationship(subset(data_adc,1==1),'mean_level','abw')+xlab('ADC (%)')+ylab('ABW (KB/s)')
+
 
 save_fig(p_adc_fr,'adc_fr')
 save_fig(p_adc_dist,'adc_dist')

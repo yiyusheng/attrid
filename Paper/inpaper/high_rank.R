@@ -33,15 +33,12 @@ gen_corr <- function(i,only_corr=T){
   if(only_corr){
     return(data.frame(i,corr))
   }else{
-    return(list(data_fr,p_fr))
+    return(list(data_fr,p_fr,p_count))
   }
 }
 step <- 0.0001
-div <- c(seq(0,0.98,0.001),seq(0.99,1,step))
-# div <- c(seq(0.99,1,step))
-
+div <- c(seq(0,0.98,0.01),seq(0.99,1,step))
 idx <- div/step
-# system.time(r <- foreachX(idx,'gen_corr',frac_cores = 0.9))
 r <- lapply(idx,gen_corr)
 corr_largedc <- setNames(do.call(rbind,r),nm=c('level_adc','corr'))
 
@@ -50,15 +47,15 @@ data_fr_list <- lapply(r1,'[[',1)
 p_fr_list <- lapply(r1,'[[',2)
 p_count_list <- lapply(r1,'[[',3)
 
+# S2. test
+list[data_fr,p_fr,p_count] <- gen_corr(9998,only_corr = F)
+
 # S.plot ------------------------------------
 p_hr_corr <- ggplot(subset(corr_largedc,level_adc>0),aes(x=level_adc/100,y=corr))+geom_line(size=0.5)+geom_point(size=2)+
-  xlab('The Quantile(%)')+ylab('The Correlation Coefficient')+
-  guides(fill = guide_legend(title=NULL),color=guide_legend(title='interval')) +
-  theme(axis.text = element_text(size = 24),axis.title = element_text(size = 26),
-        legend.text = element_text(size = 26),legend.title = element_text(size=24),legend.position = 'bottom')
+  xlab('Duty Cycle Quantile (%)')+ylab('Correlation Coefficient')+gen_theme() + ylim(c(0,1))
 
-p_hr_q999 <- p_fr_list[[4]]+xlab('The Average Duty Cycle(%)')
-p_hr_q1000 <- p_fr_list[[5]]+xlab('The Average Duty Cycle(%)')
+p_hr_q999 <- p_fr_list[[4]]+xlab('ADC (%)')+scale_fill_manual(values=c('grey80','grey20'))
+p_hr_q1000 <- p_fr_list[[5]]+xlab('ADC (%)')+scale_fill_manual(values=c('grey80','grey20'))
 
 save_fig(p_hr_corr,'hr_corr')
 save_fig(p_hr_q999,'hr_q9990')

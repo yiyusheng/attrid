@@ -22,6 +22,7 @@ source('dir_func.R')
 load(file.path(dir_data,'uniform_data.Rda'))
 load(file.path(dir_data,'quantile_bandwidth.Rda'))
 load(file.path(dir_data,'quantile_dutycycle.Rda'))
+load(file.path(dir_data,'quantile_random_strength.Rda'))
 
 io14$numD <- model_svrid$numD[match(io14$svrid,model_svrid$svrid)]
 io14$adc <- quantile_dutycycle$mean[match(io14$svrid,quantile_dutycycle$svrid)]
@@ -118,3 +119,14 @@ p <- lapply(1:100,function(i)
 png(filename = file.path(dir_data,'Paper','jpg','distribution.jpg'),width = 1920*2, height = 1080*2, bg = "white")
 multiplot(plotlist = p,layout = matrix(1:100,nrow=10,byrow = T))
 dev.off()
+
+# abw and adc with ratio
+load(file.path(dir_data,'quantile_dutycycle_nozero.Rda'))
+DT_quan <- gen_data(quan_random[,c('svrid','mean')],expand=T)
+DT_quan$adc <- quantile_dutycycle$mean[match(DT_quan$svrid_old,quantile_dutycycle$svrid)]
+DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
+list[data_fr,p_fr,p_count,corr,data_rs,data_f] <- gen_result_feature(subset(DT_quan,numD=='1'),'mean',500,balanced_binning = F,bin_count = 5000)
+p_rs_abw_sng <- plot_relationship(subset(data_rs,numD=='1'),'mean_level','abw')+xlab('The Sequential Strength')+ylab('The Average Bandwidth(kB/s)')
+p_rs_abw_mtp <- plot_relationship(subset(data_rs,numD=='12'),'mean_level','abw')+xlab('The Sequential Strength')+ylab('The Average Bandwidth(kB/s)')
+p_rs_adc_sng <- plot_relationship(subset(data_rs,numD=='1'),'mean_level','adc')+xlab('The Sequential Strength')+ylab('The Average Bandwidth(kB/s)')
+p_rs_adc_mtp <- plot_relationship(subset(data_rs,numD=='12'),'mean_level','adc')+xlab('The Sequential Strength')+ylab('The Average Bandwidth(kB/s)')

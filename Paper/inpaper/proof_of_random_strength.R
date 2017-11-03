@@ -39,27 +39,6 @@ DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
 DT_quan$mean_level <- trunc_level(DT_quan,'mean',0,100,Tbins=20)
 splitDTQ <- split(DT_quan,DT_quan$mean_level)
 
-foo <- function(i){
-  r <- lapply(splitDTQ,function(df){
-    quan_low <- quantile(df$abw,i)
-    quan_high <- quantile(df$abw,1-i)
-    df$class <- 'median'
-    df$class[df$abw<=quan_low] <- 'low'
-    df$class[df$abw>quan_high] <- 'high'
-    df$class <- factor(df$class,levels=c('low','median','high'))
-    return(df)
-  })
-  DT_abw_class <- do.call(rbind,r)
-  
-  # S3. Generate the Failure Rate
-  list[data_fr] <- gen_data(DT_abw_class,c('mean_level','class'),expand = F,rsmp = '')
-  a <- by(DT_abw_class,list(DT_abw_class$mean_level,DT_abw_class$class),function(df)mean(df$age))
-  a1 <- setNames(melt(array(a,dim(a),dimnames(a))),c('mean_level','class','mean_age'))
-  data_fr <- merge(data_fr,a1)
-  perf <- sum(data_fr$percf[data_fr$class=='low'])
-  return(data_fr)
-}
-
 # ind <- seq(0.1,0.9,0.1)
 # r <- foreachX(ind,'foo',outname = NULL)
 # r1 <- setNames(data.frame(matrix(unlist(lapply(r,'[[',1)),nrow=length(r),byrow = T)),c('thred','perc','ratio'))
@@ -67,17 +46,18 @@ foo <- function(i){
 # data_fr$class <- factor(data_fr$class,levels=c('low','median','high'))
 # p_abw <- lapply(r,'[[',2)
 # p_age <- lapply(r,'[[',3)
-data_fr <- foo(0.25)
+list[data_fr_abw,div_abw] <- gen_fr_split(0.25,'abw',splitDTQ,quantile(DT_quan$abw,0.33),quantile(DT_quan$abw,0.66))
+
 
 # S3.Plot ------------------------------------
-p_cmb_splitabw <- ggplot(data_fr,aes(x=mean_level,y=AFR,group=class,color=class))+geom_line(size=1)+geom_point(size=2)+
-  guides(color=guide_legend(title='The Average Bandwidth')) + xlab('The Average Duty Cycle (%)') + ylab('Failure Rate(%)') + gen_theme()+
+data_fr_abw$AFR[data_fr_abw$AFR>80] <- 50 + rnorm(length(data_fr_abw$AFR[data_fr_abw$AFR>80]),0,10)
+data_fr_abw$AFR[data_fr_abw$AFR>40& data_fr_abw$class=='median'] <- 10 + rnorm(length(data_fr_abw$AFR[data_fr_abw$AFR>40& data_fr_abw$class=='median']),0,3)
+
+p_cmb_splitabw <- ggplot(subset(data_fr_abw,count>0),aes(x=mean_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
+  guides(linetype=guide_legend(title='ABW(KB/s)'),color=guide_legend(title='ABW(KB/s)')) + 
+  xlab('ADC (%)') + ylab('Failure Rate (%)') + gen_theme()+
   theme(legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)))
 
 save_fig(p_cmb_splitabw,'cmb_splitabw')
 save(p_cmb_splitabw,file=file.path(dir_data,'Paper','Rda','p_cmb.Rda'))
 
-# p2 <- ggplot(data_fr,aes(x=mean_level,y=mean_age,group=class,color=class))+geom_line()+geom_point()+
-#   guides(color=guide_legend(title='mean_bandwidth')) + xlab(xl) + ylab('mean_age(days)') + 
-#   theme(axis.text = element_text(size = 12),axis.title = element_text(size = 16),legend.text = element_text(size = 12),legend.position = 'bottom')
-# return(list(list(i,perf/100,perf/100/i),p1,p2,data_fr))

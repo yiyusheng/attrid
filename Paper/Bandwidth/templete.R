@@ -30,8 +30,8 @@ load(file.path(dir_data,'quantile_random_strength.Rda'))
 # DT = quantile_dutycycle;title='extreme_duty_cycle';attr_main = 'Q100';attr_main_max = 100;bin_count = 5300
 # DT = quan_xps;title='mean_bandwidth';attr_main = 'mean';attr_main_max = 9000;bin_count = 5300
 # DT = quan_ratio;title='mean_ratio';attr_main = 'mean';attr_main_max = 1;bin_count = 5300
-# DT = quan_random;title='mean_random_strength';attr_main = 'mean';attr_main_max = 1;bin_count = 5300
-DT = cmdbSMP;title='Disk_Age';attr_main = 'age';attr_main_max = 1500;bin_count = 5300
+DT = quan_random;title='mean_random_strength';attr_main = 'mean';attr_main_max = 400;bin_count = 5300
+# DT = cmdbSMP;title='Disk_Age';attr_main = 'age';attr_main_max = 1500;bin_count = 5300
 
 
 factor_rsmp <- c('age','adc','abw','mainModel','numD')
@@ -68,55 +68,58 @@ data_fr <- data_fr_list[[which(para$af=='abw'&para$bb==T&para$rsmp==T)]]
 
 # S_end. plot ------------------------------------
 # orginal distribution of five factors
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_dist_ori_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_dist_ori_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_count_list[which(para$bb==T & para$rsmp==F)[1]][[1]]+xlab(title)),
                        p_factors_list_tf),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_dist_ori_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_dist_ori_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_count_list[which(para$bb==F & para$rsmp==F)[1]][[1]]+xlab(title)),
                        p_factors_list_ff),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
 # failure rate when we resample the five factors
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_fr_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_fr_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_fr_list[which(para$bb==T & para$rsmp==F)[1]][[1]]+xlab(title)),
                        p_fr_list[which(para$bb==T & para$rsmp==T)]),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_fr_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_fr_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_fr_list[which(para$bb==F & para$rsmp==F)[1]][[1]]+xlab(title)),
                        p_fr_list[which(para$bb==F & para$rsmp==T)]),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
 # resampled distribution of five factors
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_dist_rsmp_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_dist_rsmp_bb.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_count_list[which(para$bb==T & para$rsmp==T)[1]][[1]]+xlab(title)),
                        p_factors_list_tt),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_dist_rsmp_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_dist_rsmp_ub.jpg',sep='')),width = 1100, height = 500, bg = "white")
 multiplot(plotlist = c(list(p_count_list[which(para$bb==F & para$rsmp==T)[1]][[1]]+xlab(title)),
                        p_factors_list_ft),
           layout = matrix(1:6,nrow=2,byrow = F))#
 dev.off()
 
 # distribution of five factors when each of them are resampled
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_bb_rsmp_dist_all.jpg',sep='')),width = 1920, height = 1080, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_bb_rsmp_dist_all.jpg',sep='')),width = 1920, height = 1080, bg = "white")
 multiplot(plotlist = unlist(p_factors_list[para$bb==T & para$rsmp==T],recursive = F),
           layout = matrix(1:25,nrow=5,byrow = F))
 dev.off()
 
-png(filename = file.path(dir_data,'Paper','jpg',paste(title,'_ub_rsmp_dist_all.jpg',sep='')),width = 1920, height = 1080, bg = "white")
+png(filename = file.path(dir_data,'Paper','templete',paste(title,'_ub_rsmp_dist_all.jpg',sep='')),width = 1920, height = 1080, bg = "white")
 multiplot(plotlist = unlist(p_factors_list[para$bb==F & para$rsmp==T],recursive = F),
           layout = matrix(1:25,nrow=5,byrow = F))
 dev.off()
 return(r)
 
 
+#rs ------
+p_rs_adc <- p_factors_list_tf[[2]]
+p_rs_abw <- p_factors_list_tf[[3]]
 

@@ -26,6 +26,7 @@ quantile_random_strength <- function(i,vt){
   DT <- format_bandwidth(DT,vt,bins = 100,truncate = F)
   DT <- factorX(subset(DT,wps_trunc!=0))
   
+  DT$util[DT$util==0] <- 1
   splitDT <- split(DT,DT$svrid)
   
   r <- lapplyX(splitDT,function(df){

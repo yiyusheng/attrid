@@ -167,15 +167,36 @@ gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,bal
   return(list(fr,p_fr,p_count,p_countF,object_data,fail_data))
 }
 
+gen_fr_split <- function(i,attr,splitDTQ=splitDTQ,quan_low=NULL,quan_high=NULL){
+  # generate failure rate cut by attr at quantile i and quantile 1-i
+  r <- lapply(splitDTQ,function(df){
+    if(is.null(quan_low))quan_low <- quantile(df[[attr]],i)
+    if(is.null(quan_high))quan_high <- quantile(df[[attr]],1-i)
+    df$class <- 'median'
+    df$class[df[[attr]]<=quan_low] <- 'low'
+    df$class[df[[attr]]>quan_high] <- 'high'
+    df$class <- factor(df$class,levels=c('low','median','high'))
+    return(list(df,data.frame(level = df$mean_level[1],mean = mean(df[[attr]]),low = quan_low,high = quan_high)))
+  })
+  DT_class <- do.call(rbind,lapply(r,'[[',1))
+  DT_div <- do.call(rbind,lapply(r,'[[',2))
+  list[data_fr] <- gen_data(DT_class,c('mean_level','class'),expand = F,rsmp = '')
+  # a <- by(DT_class,list(DT_class$mean_level,DT_class$class),function(df)mean(df$age))
+  # a1 <- setNames(melt(array(a,dim(a),dimnames(a))),c('mean_level','class','mean_age'))
+  # data_fr <- merge(data_fr,a1)
+  # perf <- sum(data_fr$percf[data_fr$class=='low'])
+  return(list(data_fr,DT_div))
+}
+
 gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,bin_count=1000,has_level=F,rsmp='age',maxy=1.2){
   # get result for a special attr in DT
   attr_level <- paste(attr,'level',sep='_')
   if(is.null(attr_max))attr_max<- quantile(DT[[attr]],0.99,na.rm = T)
   if(has_level==F)DT <- binning_data(DT,attr,attr_max,balanced_binning,bins,bin_count)
-  list[data_fr,p_fr,p_count,p_countf,object_data] <- gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,rsmp=rsmp,maxy=maxy)
+  list[data_fr,p_fr,p_count,p_countf,object_data,f_data] <- gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,rsmp=rsmp,maxy=maxy)
   corr <- cor(data_fr[,1],data_fr$AFR)
   cat(sprintf('[%s]\t %s corr:%.4f\tEND!!!\n',date(),attr_level,corr))
-  return(list(data_fr,p_fr,p_count,corr,object_data))
+  return(list(data_fr,p_fr,p_count,corr,object_data,f_data))
 }
 
 gen_result_feature_all <- function(DT,attr,attr_max,attr_flat,attrf_max,balanced_binning,
@@ -308,7 +329,7 @@ plot_relationship <- function(object_data,attr1,attr2,type1='numeric',type2='num
       p_rls <- ggplot(table_2attr,aes(x=attr1,y=rate,fill=factor(attr2))) + geom_bar(stat='identity',position='fill')+
         xlab(attr1)+ylab('Percentage(%)')+
         guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
-        gen_theme()
+        gen_theme()+theme(legend.position = 'bottom',legend.text = element_text(size = 18))
     }else{
       table_2attr_rect <- gen_rect_metric(table_2attr,'attr1','rate','attr2')
       p_rls <- ggplot(table_2attr_rect)+
@@ -316,7 +337,7 @@ plot_relationship <- function(object_data,attr1,attr2,type1='numeric',type2='num
         xlab(attr1)+ylab('Percentage(%)')+
         geom_smooth(aes(x=xmedian,y=ymax),span=0.3,color='red',linetype=2)+
         guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
-        gen_theme()+
+        gen_theme()+theme(legend.position = 'bottom',legend.text = element_text(size = 18))+
         coord_cartesian(ylim=c(0,maxy*1.1))      
     }
 
@@ -517,7 +538,10 @@ save_fig <- function(p,title){
 }
 
 gen_theme <- function(){
-  theme(axis.text = element_text(size = 16),axis.title = element_text(size = 24),legend.text = element_text(size = 28),
+  theme(axis.text = element_text(size = 28),axis.title = element_text(size = 32),
+        axis.text.x = element_text(margin = margin(t=5)),axis.text.y = element_text(margin = margin(r=5)),
+        axis.title.x = element_text(margin = margin(t=20)),axis.title.y = element_text(margin = margin(r=20)),
+        legend.text = element_text(size = 32),legend.title = element_text(size = 36),
         legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)),
         legend.key.width = unit(2.5,units = 'line'),legend.key.height = unit(2.5,units = 'line'))
 }

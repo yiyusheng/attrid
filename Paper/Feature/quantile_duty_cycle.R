@@ -23,6 +23,7 @@ quantile_dutycycle<- function(i){
   cat(sprintf('[%s]\t SATRT!!!\n',fn))
   load(file.path(dir_dataset,fn))
   
+  DT$util[DT$util==0] <- 1
   splitDT <- split(DT,DT$svrid)
   r <- lapplyX(splitDT,function(df)c(mean(df$util),sd(df$util),quantileX(df$util)))
   r <- cbind(row.names(r),data.frame(r))
@@ -43,4 +44,4 @@ r <- do.call(rbind,r)
 r$svrid <- factor(r$svrid)
 names(r) <- c('svrid','mean','sd',paste('Q',0:100,sep = ''))
 quantile_dutycycle <- r
-save(quantile_dutycycle,file = file.path(dir_data,'quantile_dutycycle.Rda'))
+save(quantile_dutycycle,file = file.path(dir_data,'quantile_dutycycle_nozero.Rda'))

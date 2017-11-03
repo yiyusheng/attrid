@@ -31,13 +31,16 @@ DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
 list[data_fr,p_fr,p_count,data_corr,data_abw]<- gen_result_feature(DT_quan,attr_main,9000)
 
 # S_end. plot ------------------------------------
-p_abw_fr <- p_fr+xlab('The Average Bandwidth(kB/s)')+ylim(c(0,6))+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))
+p_abw_fr <- p_fr+xlab('ABW (KB/s)')+ylim(c(0,6))+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
+  scale_fill_manual(values=c('grey60','grey20'))+ ylab('Failure Rate (%)')
 
-p_abw_dist <- p_count+xlab('The Average Bandwidth(kB/s)')+coord_cartesian(ylim=c(0,12))+
-  annotate("text", x=2100, y=12,label= '62.32%',size=6)+
-  geom_segment(aes(x = 1500, y = 12, xend = 800, yend = 12.1), size=0.2,arrow = arrow(length = unit(0.2, "cm")))
+p_abw_dist <- p_count+xlab('ABW (KB/s)')+coord_cartesian(ylim=c(0,15))+
+  annotate("text", x=2300, y=14,label= '62.32%',size=10)+
+  geom_segment(aes(x = 1500, y = 14, xend = 800, yend = 14), size=0.2,arrow = arrow(length = unit(0.2, "cm"))) + ylab('Percentage (%)')
 
-p_abw_adc <- plot_relationship(subset(data_abw,1==1),'mean_level','adc')+ylab('The Average Duty Cycle(%)')+xlab('The Average Bandwidth(kB/s)')
+# p_abw_adc <- plot_relationship(subset(data_abw,numD==12),'mean_level','adc')+ylab('Average Duty Cycle(%)')+xlab('Average Bandwidth(KB/s)')
+
+p_abw_adc <- plot_relationship(subset(data_abw,1==1),'mean_level','adc')+ylab('ADC (%)')+xlab('ABW (KB/s)')
 
 save_fig(p_abw_fr,'abw_fr')
 save_fig(p_abw_dist,'abw_dist')

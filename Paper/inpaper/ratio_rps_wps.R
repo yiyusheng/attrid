@@ -35,9 +35,11 @@ list[data_fr,p_fr,p_count,data_corr,data_ratio]<- gen_result_feature(DT_quan,att
 
 
 # S_end. plot ------------------------------------
-p_ratio_fr <- p_fr+xlab('The Ratio(%)')+ylim(c(0,6))
-p_ratio_dist <- p_count+xlab('The Ratio(%)')+coord_cartesian(ylim=c(0,35))
-p_ratio_abw <- plot_relationship(data_ratio,'mean_level','abw')+xlab('The Ratio(%)')+ylab('The Average Bandwidth(kB/s)')
+p_ratio_fr <- p_fr+xlab('ART (%)')+ylim(c(0,6))+scale_fill_manual(values=c('grey60','grey20'))+ ylab('Failure Rate (%)')
+
+p_ratio_dist <- p_count+xlab('ART (%)')+coord_cartesian(ylim=c(0,35))  + ylab('Percentage (%)')
+
+p_ratio_abw <- plot_relationship(data_ratio,'mean_level','abw')+xlab('Ratio (%)')+ylab('ABW (KB/s)')
 
 save_fig(p_ratio_fr,'ratio_fr')
 save_fig(p_ratio_dist,'ratio_dist')
