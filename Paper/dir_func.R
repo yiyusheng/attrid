@@ -71,17 +71,21 @@ ioAFR <- function(io,f,attr,diskCount = 1,timefactor = 6){
   return(tMerge)
 }
 
-gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp=''){
+gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp='',add_io = T){
   # generate failure rate based on a attributes
   # expand is only used for expand and no expand generate the failure rate with a expanded data
   if(expand==T){
     object_data <- subset(object_data,svrid %in% io$svrid)
+    
     object_data <- mchAttr(object_data,model_svrid,'svrid','svrid',c('numD','mainModel'))
     object_data$age <- cmdbSMP$age[match(object_data$svrid,cmdbSMP$svrid)]
     
-    object_data$adc <- quantile_dutycycle$mean[match(object_data$svrid,quantile_dutycycle$svrid)]
-    object_data$abw <- quan_xps$mean[match(object_data$svrid,quan_xps$svrid)]
-    object_data$dcq100 <- quantile_dutycycle$Q100[match(object_data$svrid,quantile_dutycycle$svrid)]
+    if(add_io){
+      object_data$adc <- quantile_dutycycle$mean[match(object_data$svrid,quantile_dutycycle$svrid)]
+      object_data$abw <- quan_xps$mean[match(object_data$svrid,quan_xps$svrid)]
+      object_data$dcq100 <- quantile_dutycycle$Q100[match(object_data$svrid,quantile_dutycycle$svrid)]
+    }
+    
     object_data <- svrid_expand_disk(object_data)
     object_data$numD <- factor(object_data$numD,levels = c('1','12'))
     return(object_data)
@@ -123,18 +127,20 @@ gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,bal
   list[fr,object_data,fail_data] <- gen_data(object_data,attr,io = io14,f=f201409,expand = F,rsmp=rsmp)
   
   if(balanced_binning){
+    fr <- fr[fr[[attr]]!=0,]
+    bin_width <- min(fr[[attr]])
     p_fr <- ggplot(subset(fr,count>countLimit),aes_string(x = attr)) + 
-      geom_bar(aes(y=AFR,fill=level),stat = 'identity')+ylab('Failure Rate(%)')+
+      geom_bar(aes(y=AFR,fill=level),stat = 'identity',position=position_nudge(x=-bin_width/2))+ylab('Failure Rate(%)')+
       geom_smooth(aes(y=AFR),color='red',linetype=2,se=F)+
       guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
       gen_theme()
     
-    p_count <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percentage),stat = 'identity')+ylab('Percentage(%)')+
-      guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
+    p_count <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percentage),stat = 'identity',position=position_nudge(x=-bin_width/2))+
+      ylab('Percentage(%)')+guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
       gen_theme()
     
-    p_countF <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percf),stat = 'identity')+ylab('Percentage(%)')+
-      guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
+    p_countF <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percf),stat = 'identity',position=position_nudge(x=-bin_width/2))+
+      ylab('Percentage(%)')+guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
       gen_theme()
     
   }else{
@@ -193,7 +199,8 @@ gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,
   attr_level <- paste(attr,'level',sep='_')
   if(is.null(attr_max))attr_max<- quantile(DT[[attr]],0.99,na.rm = T)
   if(has_level==F)DT <- binning_data(DT,attr,attr_max,balanced_binning,bins,bin_count)
-  list[data_fr,p_fr,p_count,p_countf,object_data,f_data] <- gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,rsmp=rsmp,maxy=maxy)
+  list[data_fr,p_fr,p_count,p_countf,object_data,f_data] <- 
+    gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,rsmp=rsmp,maxy=maxy)
   corr <- cor(data_fr[,1],data_fr$AFR)
   cat(sprintf('[%s]\t %s corr:%.4f\tEND!!!\n',date(),attr_level,corr))
   return(list(data_fr,p_fr,p_count,corr,object_data,f_data))
@@ -363,11 +370,15 @@ plot_relationship_factors <- function(object_data,attr,balanced_binning=T,maxy=1
 }
 
 # F4. generate fraction feature ------------------------------------
-get_quan_percentage <- function(DT,x){
+get_quan_percentage <- function(DT,x,leq = T){
   # convert percentage to fraction based on the quantile table
   #get the fraction of duty cycle which is larger than x
   col_Q <- paste('Q',1:100,sep='')
-  flag_Q <- DT[,col_Q]>=x
+  if(leq){
+    flag_Q <- DT[,col_Q]>=x
+  }else{
+    flag_Q <- DT[,col_Q]<=x
+  }
   Q <- melt(rowSums(flag_Q)/100)
   Q$svrid <- row.names(Q)
   names(Q) <- c('fraction','svrid')
@@ -434,6 +445,18 @@ format_bandwidth <- function(DT,bt=c(4000,5000,9000)*2,bins=100,truncate=F){
     DT$xps_level <- ceiling(DT$xps_trunc/(bt[3]/bins))*(bt[3]/bins)
   }
   
+  return(DT)
+}
+
+format_smart <- function(DT){
+  col_raw <- col_smart[c(4,15)]
+  col_value <- col_smart[-c(4,15)]
+  for(n in col_raw){
+    DT[[n]][DT[[n]]>=1e5] <- -1
+  }
+  for(n in col_value){
+    DT[[n]][DT[[n]] >= 252] <- -1
+  }
   return(DT)
 }
 
@@ -528,6 +551,18 @@ binning_data <- function(DT,attr,attr_max,balanced_binning=T,bins=20,bin_count=5
   DT[[attr_level]] <- gen_binned_array(DT,attr,binning_point = bp)
   # return(DT[,c('svrid','numD','mainModel','age',attr_level)])
   return(DT)
+}
+
+gen_corr_high_rank <- function(i,only_corr=T){
+  cat(sprintf('[%s] No.%f START!!!\n',date(),i))
+  col_attr <- paste('L',i,sep='')
+  list[data_fr,p_fr,p_count] <- gen_result_feature(DT_quan,col_attr,100)
+  corr <- cor(data_fr[,1],data_fr$AFR)
+  if(only_corr){
+    return(data.frame(i,corr))
+  }else{
+    return(list(data_fr,p_fr,p_count))
+  }
 }
 
 save_fig <- function(p,title){

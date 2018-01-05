@@ -36,7 +36,7 @@ load(file.path(dir_data,'quantile_bandwidth.Rda'))
 load(file.path(dir_data,'quantile_random_strength.Rda'))
 
 DT_raw <- quan_random
-
+am <- 400
 thresholds<- c(10,20,50,100,200)
 attr_main <- paste('T',thresholds,sep='')
 for(i in seq_len(length(thresholds))){
@@ -48,6 +48,7 @@ col_name <- setdiff(names(DT_raw),c('svrid','count'))
 DT_quan <- gen_data(DT_raw[,c('svrid','mean')],expand=T)
 DT_quan$adc <- quantile_dutycycle$mean[match(DT_quan$svrid_old,quantile_dutycycle$svrid)]
 DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
+DT_quan <- subset(DT_quan,numD==12) # update 2018-01-04
 
 # S2. generate result ------
 # idx <- seq_len(length(col_name))
@@ -57,11 +58,10 @@ DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
 # corr <- unlist(r)
 # plot(corr)
 
-list[data_fr,p_fr,p_count,corr,data_ob,data_f] <- gen_result_feature(DT_quan,'mean',bins = 20,attr_max = 400)
+list[data_fr,p_fr,p_count,corr,data_ob,data_f] <- gen_result_feature(DT_quan,'mean',bins = 20,attr_max = am)
 
 # S3. divide by quantile
-# DT_quan <- binning_data(DT_quan,'mean',400,balanced_binning=F,bin_count = 10000)
-DT_quan <- binning_data(DT_quan,'mean',400,bins=20)
+DT_quan <- binning_data(DT_quan,'mean',am,bins=20)
 splitDTQ <- split(DT_quan,DT_quan$mean_level)
 list[data_fr_adc,div_adc] <- gen_fr_split(0.25,'adc',splitDTQ,quantile(DT_quan$adc,0.33),quantile(DT_quan$adc,0.66))
 list[data_fr_abw,div_abw] <- gen_fr_split(0.25,'abw',splitDTQ,quantile(DT_quan$abw,0.33),quantile(DT_quan$abw,0.66))
@@ -81,9 +81,9 @@ summary(lr)
 
 # S_plot ------
 p_rs_fr <- p_fr +xlab('ASI')+gen_theme()+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
-  scale_fill_manual(values=c('grey60','grey20')) + xlim(c(0,399)) + ylab('Failure Rate (%)')
+  scale_fill_manual(values=c('grey60','grey20')) + xlim(c(0,am-1)) + ylab('Failure Rate (%)')
 
-p_rs_dist <- p_count+xlab('ASI')+ xlim(c(0,399)) + ylab('Percentage (%)')
+p_rs_dist <- p_count+xlab('ASI')+ xlim(c(0,am-1)) + ylab('Percentage (%)')
 
 p_rs_splitadc <- ggplot(data_fr_adc,aes(x=mean_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
   guides(linetype=guide_legend(title='ADC (%)'),color=guide_legend(title='ADC (%)')) + 

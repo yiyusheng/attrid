@@ -21,14 +21,26 @@ source('dir_func.R')
 # S1. Load data ------------------------------------
 load(file.path(dir_data,'uniform_data.Rda'))
 dir_dataset <- dir_data14DC
+flag_rs <- F
 fname <- list.files(dir_dataset)
-fn <- fname[which(fname=='data108.Rda')]
-flag_rs <- T
-cat(sprintf('[%s]\t SATRT!!!\n',fn))
-load(file.path(dir_dataset,fn))
+io14$util <- with(io14,sum_util/count)
+
+load(file.path(dir_data,'fraction_reduction_svrid.Rda'))
+svrid.t80_frac60 <- c(fct2ori(t80_frac70$svrid_old),fct2ori(t80_frac90$svrid_old))
+
+load_allfile <- function(i){
+  load(file.path(dir_dataset,fname[i]))
+  DT <- subset(DT,svrid %in% svrid.t80_frac60)
+  DT$svrid <- fct2ori(DT$svrid)
+  DT
+}
+idx <- seq_len(length(fname))
+r <- foreachX(idx,'load_allfile',outname = -1)
+r <- do.call(rbind,r)
+r$svrid <- factor(r$svrid)
 
 # S2. Prepare data ------------------------------------
-DT <- format_bandwidth(DT)
+DT <- format_bandwidth(r)
 DT <- factorX(subset(DT,!is.na(xps) & xps>0 & svrid %in% io14$svrid))
 if(flag_rs == T){
   DT$utilX <- DT$util
@@ -40,10 +52,14 @@ if(flag_rs == T){
   quan_random <- quan_random[,c('svrid','count','mean','sd','Q100')]
   quan_random <- gen_data(quan_random,expand = T)
 }
-io14$util <- with(io14,sum_util/count)
-a1 <- subset(io14,util>60 & util<80)
-DT <- subset(DT,DT %in% a1$svrid)
-splitDT <- split(DT,DT$svrid)
+DT.frac70 <- factorX(subset(DT,svrid %in% t80_frac70$svrid_old))
+DT.frac90 <- factorX(subset(DT,svrid %in% t80_frac90$svrid_old))
+
+splitDT.frac70 <- split(DT.frac70,DT.frac70$svrid)
+splitDT.frac90 <- split(DT.frac90,DT.frac90$svrid)
+splitDT <- splitDT.frac90
+
+
 
 # S3. Plot ------------------------------------
 attr <- 'util'
@@ -51,18 +67,15 @@ prow <- 4;pcol <- 4;pmar <- 2
 par(mfrow = c(prow,pcol),mar=c(pmar,pmar,pmar,pmar))
 
 smp_ind <- data.frame(ind=sample(1:length(splitDT),prow*pcol))
+smp_ind$svrid <- names(splitDT)[smp_ind$ind]
 smp_ind$numD <- sapply(splitDT[smp_ind$ind],function(df)df$numD[1])
-smp_ind <- smp_ind[order(smp_ind$numD),]
+smp_ind$adc <- io14$util[match(smp_ind$svrid,io14$svrid)]
+smp_ind <- smp_ind[order(smp_ind$adc),]
 for (i in smp_ind$ind) {
   df <- splitDT[[i]]
-  arr <- df[[attr]]
-  arr <- arr[arr < quantile(arr,0.95)]
-  # title <- sprintf('%s[%d]\n[%.2f][%.1f]',df$svrid[1],df$numD[1],sum(df$util==0)/nrow(df),mean(df$si))
+  uni.date <- sort(unique(as.Date(df$time)))
+  start.date <- uni.date[round(length(uni.date)*0.2)]
+  df <- subset(df,as.Date(time)>start.date & as.Date(time) <= start.date+10)
   title <- sprintf('%s[%d]\n[%.2f]',df$svrid[1],df$numD[1],mean(df$util))
-  if(length(arr)==0)arr<-rep(0,1000)
-  if(df$svrid[1] %in% f201409$svrid){
-    hist(arr, breaks = 100,main = title,color = 'red')
-  }else{
-    hist(arr, breaks = 100,main = title)
-  }
+  plot(df$time,df[[attr]],ylim=c(0,105),main=title)
 }

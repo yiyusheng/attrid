@@ -24,6 +24,7 @@ load(file.path(dir_data,'quantile_dutycycle.Rda'))
 load(file.path(dir_data,'quantile_bandwidth.Rda'))
 attr_main <- 'mean'
 DT_quan <- gen_data(quan_xps[,c('svrid',attr_main)],expand=T)
+DT_quan <- subset(DT_quan,numD==12) # update 2018-01-04
 DT_quan$adc <- quantile_dutycycle$mean[match(DT_quan$svrid_old,quantile_dutycycle$svrid)]
 DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
 
