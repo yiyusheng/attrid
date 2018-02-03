@@ -34,8 +34,8 @@ load(file.path(dir_data,'uniform_data.Rda'))
 load(file.path(dir_data,'quantile_dutycycle.Rda'))
 load(file.path(dir_data,'quantile_bandwidth.Rda'))
 load(file.path(dir_data,'quantile_random_strength.Rda'))
-
 DT_raw <- quan_random
+
 am <- 400
 thresholds<- c(10,20,50,100,200)
 attr_main <- paste('T',thresholds,sep='')
@@ -46,61 +46,69 @@ for(i in seq_len(length(thresholds))){
 col_name <- setdiff(names(DT_raw),c('svrid','count'))
 
 DT_quan <- gen_data(DT_raw[,c('svrid','mean')],expand=T)
-DT_quan$adc <- quantile_dutycycle$mean[match(DT_quan$svrid_old,quantile_dutycycle$svrid)]
-DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
 DT_quan <- subset(DT_quan,numD==12) # update 2018-01-04
 
 # S2. generate result ------
-# idx <- seq_len(length(col_name))
-# r <- foreachX(idx,'gen_result_random_strength',outname = -1)
-# idx <- which(col_name %in% c('mean','sd',attr_main,paste('Q',c(1:3,20,95),sep='')))
-# r <- lapply(idx,gen_result_random_strength,all=T)
-# corr <- unlist(r)
-# plot(corr)
-
 list[data_fr,p_fr,p_count,corr,data_ob,data_f] <- gen_result_feature(DT_quan,'mean',bins = 20,attr_max = am)
+list[data_fr.abw,p_fr.abw,p_count.abw,corr.abw,data_all.abw] <- gen_result_feature(DT_quan,'abw',bins = 40,attr_max = 9000)
+list[data_fr.adc,p_fr.adc,p_count.adc,corr.adc,data_all.adc] <- gen_result_feature(DT_quan,'adc',bins = 40,attr_max = 100)
+
+# tmp.adc <- melt(tapply(data_all.adc$mean,data_all.adc$adc_level,mean))
+# data_fr.adc$asi <- tmp.adc$value[match(data_fr.adc$adc_level,tmp.adc$Var1)]
+# dist.adc <- with(data_fr.adc,mean(AFR)*mean(asi))
+# ggplot(data_fr.adc,aes(x=adc_level))+geom_line(aes(y=1/asi*dist.adc))+geom_line(aes(y=AFR),linetype=2)
+# 
+# tmp.abw <- melt(tapply(data_all.abw$mean,data_all.abw$abw_level,mean))
+# data_fr.abw$asi <- tmp.abw$value[match(data_fr.abw$abw_level,tmp.abw$Var1)]
+# dist.abw <- with(data_fr.abw,mean(AFR)*mean(asi))
+# ggplot(data_fr.abw,aes(x=abw_level))+geom_line(aes(y=1/asi*dist.abw))+geom_line(aes(y=AFR),linetype=2)
+
 
 # S3. divide by quantile
 DT_quan <- binning_data(DT_quan,'mean',am,bins=20)
 splitDTQ <- split(DT_quan,DT_quan$mean_level)
-list[data_fr_adc,div_adc] <- gen_fr_split(0.25,'adc',splitDTQ,quantile(DT_quan$adc,0.33),quantile(DT_quan$adc,0.66))
-list[data_fr_abw,div_abw] <- gen_fr_split(0.25,'abw',splitDTQ,quantile(DT_quan$abw,0.33),quantile(DT_quan$abw,0.66))
-
-list[data_fr_adc,div_adc] <- gen_fr_split(0.25,'adc',splitDTQ)
-list[data_fr_abw,div_abw] <- gen_fr_split(0.25,'abw',splitDTQ)
-
-# S4. change in bin [160-180]
-a <- subset(data_ob,mean_level==140)
-b <- subset(data_ob,mean_level==180 )
-ggplot(a,aes(x=abw,fill=numD))+geom_histogram()+xlim(c(0,10000))
-ggplot(b,aes(x=abw,fill=numD))+geom_histogram()+xlim(c(0,10000))
-
-# S5. linear regression
+list[data_fr_adc,div_adc] <- gen_fr_split(splitDTQ=splitDTQ,attrQ='adc',attrX='mean',Q=0.25)
+list[data_fr_abw,div_abw] <- gen_fr_split(splitDTQ=splitDTQ,attrQ='abw',attrX='mean',Q=0.25)
 lr <- glm(AFR~mean_level,data = data_fr,family = 'gaussian')
 summary(lr)
 
+# S4. change in bin [160-180]
+# a <- subset(data_ob,mean_level==140)
+# b <- subset(data_ob,mean_level==180 )
+# ggplot(a,aes(x=abw,fill=numD))+geom_histogram()+xlim(c(0,10000))
+# ggplot(b,aes(x=abw,fill=numD))+geom_histogram()+xlim(c(0,10000))
+
+
 # S_plot ------
 p_rs_fr <- p_fr +xlab('ASI')+gen_theme()+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
-  scale_fill_manual(values=c('grey60','grey20')) + xlim(c(0,am-1)) + ylab('Failure Rate (%)')
+  scale_fill_manual(values=c('grey60','grey20')) + xlim(c(0,am-1)) + ylab('AFR (%)')
 
 p_rs_dist <- p_count+xlab('ASI')+ xlim(c(0,am-1)) + ylab('Percentage (%)')
 
 p_rs_splitadc <- ggplot(data_fr_adc,aes(x=mean_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
-  guides(linetype=guide_legend(title='ADC (%)'),color=guide_legend(title='ADC (%)')) + 
-  xlab('ASI') + ylab('Failure Rate (%)') + gen_theme()+
+  guides(linetype=guide_legend(title='ADC (%)',keywidth = 5),color=guide_legend(title='ADC (%)')) + 
+  xlab('ASI') + ylab('AFR (%)') + gen_theme()+
   theme(legend.position = c(0.95,0.95),legend.justification = c(1,1),legend.background = element_rect(fill = alpha('grey',0.5)))
 
 p_rs_splitabw <- ggplot(data_fr_abw,aes(x=mean_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
   guides(linetype=guide_legend(title='ABW (KB/s)'),color=guide_legend(title='ABW (KB/s)')) + 
-  xlab('ASI') + ylab('Failure Rate (%)') + gen_theme()+
+  xlab('ASI') + ylab('AFR (%)') + gen_theme()+
   theme(legend.position = c(0.95,0.95),legend.justification = c(1,1),legend.background = element_rect(fill = alpha('grey',0.5)))
 
+p_rs_adc.quantile <- plot_relationship_quantile(data_all.adc,'adc_level','mean')+
+  ylab('ASI')+xlab('ADC (%)')+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
+  scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))##
+
+p_rs_abw.quantile <- plot_relationship_quantile(data_all.abw,'abw_level','mean')+
+  ylab('ASI')+xlab('ABW (KB/s)')+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
+  scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))##
+
 save_fig(p_rs_fr,'rs_fr')
-
 save_fig(p_rs_dist,'rs_dist')
+save_fig(p_rs_splitadc,'rs_fr_adc')
+save_fig(p_rs_splitabw,'rs_fr_abw')
+save_fig(p_rs_abw.quantile,'rs_dist_abw')
+save_fig(p_rs_adc.quantile,'rs_dist_adc')
 
-save_fig(p_rs_splitadc,'rs_splitadc')
-
-save_fig(p_rs_splitabw,'rs_splitabw')
 
 save(p_rs_fr,p_rs_dist,file = file.path(dir_data,'Paper','Rda','p_rs.Rda'))

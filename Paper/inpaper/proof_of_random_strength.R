@@ -25,40 +25,51 @@ load(file.path(dir_data,'quantile_dutycycle.Rda'))
 load(file.path(dir_data,'quantile_bandwidth.Rda'))
 
 attr_main <- 'mean'
-# attr_main_max <- 100
-# bin_count <- 530*2
-# maxy <- bin_count/5300
-# factor_rsmp <- c('age','adc','abw','mainModel','numD')
-
 DT_quan <- gen_data(quantile_dutycycle[,c('svrid',attr_main)],expand=T)
 DT_quan <- subset(DT_quan,numD==12) # update 2018-01-04
-DT_quan$adc <- quantile_dutycycle$mean[match(DT_quan$svrid_old,quantile_dutycycle$svrid)]
-DT_quan$abw <- quan_xps$mean[match(DT_quan$svrid_old,quan_xps$svrid)]
-# title <- 'mean_duty_cycle'
+DT_quan$abw[DT_quan$abw>9000] <- 9000
 
 # S2. Get data and the quantile of abw ------------------------------------
-DT_quan$mean_level <- trunc_level(DT_quan,'mean',0,100,Tbins=20)
-splitDTQ <- split(DT_quan,DT_quan$mean_level)
+DT_quan$adc_level <- trunc_level(DT_quan,'adc',0,100,Tbins=20)
+DT_quan$abw_level <- trunc_level(DT_quan,'abw',0,9000,Tbins=20)
 
-# ind <- seq(0.1,0.9,0.1)
-# r <- foreachX(ind,'foo',outname = NULL)
-# r1 <- setNames(data.frame(matrix(unlist(lapply(r,'[[',1)),nrow=length(r),byrow = T)),c('thred','perc','ratio'))
-# data_fr <- lapply(r,'[[',4)[[which(ind==0.8)]]
-# data_fr$class <- factor(data_fr$class,levels=c('low','median','high'))
-# p_abw <- lapply(r,'[[',2)
-# p_age <- lapply(r,'[[',3)
-list[data_fr_abw,div_abw] <- gen_fr_split(0.25,'abw',splitDTQ,quantile(DT_quan$abw,0.33),quantile(DT_quan$abw,0.66))
+splitDTQ_adc <- split(DT_quan,DT_quan$adc_level)
+splitDTQ_abw <- split(DT_quan,DT_quan$abw_level)
+
+list[data_fr_adc,div_adc] <- gen_fr_split(splitDTQ=splitDTQ_adc,attrQ='abw',attrX='adc',Q=0.33,Qlow=NULL,Qhigh=NULL)
+list[data_fr_abw,div_abw] <- gen_fr_split(splitDTQ=splitDTQ_adc,attrQ='adc',attrX='abw',Q=0.33,Qlow=NULL,Qhigh=NULL)
+list[data_fr.adc,p_fr.adc,p_count.adc,data_corr.adc,data.adc]<- gen_result_feature(DT_quan,'adc',100,bins=20)
+list[data_fr.abw,p_fr.abw,p_count.abw,data_corr.abw,data.abw]<- gen_result_feature(DT_quan,'abw',9000,bins=20)
+
+
 
 
 # S3.Plot ------------------------------------
-data_fr_abw$AFR[data_fr_abw$AFR>80] <- 50 + rnorm(length(data_fr_abw$AFR[data_fr_abw$AFR>80]),0,10)
-data_fr_abw$AFR[data_fr_abw$AFR>40& data_fr_abw$class=='median'] <- 10 + rnorm(length(data_fr_abw$AFR[data_fr_abw$AFR>40& data_fr_abw$class=='median']),0,3)
+# data_fr_adc$AFR[data_fr_adc$AFR>80] <- 50 + rnorm(length(data_fr_adc$AFR[data_fr_adc$AFR>80]),0,10)
+# data_fr_adc$AFR[data_fr_adc$AFR>40& data_fr_adc$class=='median'] <- 10 + rnorm(length(data_fr_adc$AFR[data_fr_adc$AFR>40& data_fr_adc$class=='median']),0,3)
 
-p_cmb_splitabw <- ggplot(subset(data_fr_abw,count>0),aes(x=mean_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
+p_cmb_fr_adc <- ggplot(subset(data_fr_adc,adc_level>0),aes(x=adc_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
   guides(linetype=guide_legend(title='ABW(KB/s)'),color=guide_legend(title='ABW(KB/s)')) + 
-  xlab('ADC (%)') + ylab('Failure Rate (%)') + gen_theme()+
+  xlab('ADC (%)') + ylab('AFR (%)') + gen_theme()+
   theme(legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)))
 
-save_fig(p_cmb_splitabw,'cmb_splitabw')
-save(p_cmb_splitabw,file=file.path(dir_data,'Paper','Rda','p_cmb.Rda'))
+p_cmb_fr_abw <- ggplot(subset(data_fr_abw,abw_level>0),aes(x=abw_level,y=AFR,group=class,linetype=class,color=class))+geom_line(size=1)+geom_point(size=2)+
+  guides(linetype=guide_legend(title='ABW(KB/s)'),color=guide_legend(title='ABW(KB/s)')) + 
+  xlab('ABW (KB/s)') + ylab('AFR (%)') + gen_theme()+
+  theme(legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)))
+
+
+p_adc_abw.quantile <- plot_relationship_quantile(data.adc,'adc_level','abw')+
+  xlab('ADC (%)')+ylab('ABW (KB/s)')+scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))+
+  theme(legend.position = c(0.0,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)),legend.text = element_text(size=30))##
+
+p_abw_adc.quantile <- plot_relationship_quantile(data.abw,'abw_level','adc')+
+  xlab('ABW (KB/s)')+ylab('ADC (%)')+theme(legend.position = c(0.95,0.05),legend.justification = c(1,0))+
+  scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))##
+
+
+
+save_fig(p_cmb_fr_adc,'cmb_fr_adc')
+save_fig(p_adc_abw.quantile,'cmb_adc')
+save(p_cmb_fr_adc,p_adc_abw.quantile,file=file.path(dir_data,'Paper','Rda','p_cmb.Rda'))
 

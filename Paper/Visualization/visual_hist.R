@@ -23,9 +23,10 @@ load(file.path(dir_data,'uniform_data.Rda'))
 dir_dataset <- dir_data14DC
 fname <- list.files(dir_dataset)
 fn <- fname[which(fname=='data108.Rda')]
-flag_rs <- T
+flag_rs <- F
 cat(sprintf('[%s]\t SATRT!!!\n',fn))
 load(file.path(dir_dataset,fn))
+io14$util <- with(io14,sum_util/count)
 
 # S2. Prepare data ------------------------------------
 DT <- format_bandwidth(DT)
@@ -40,29 +41,29 @@ if(flag_rs == T){
   quan_random <- quan_random[,c('svrid','count','mean','sd','Q100')]
   quan_random <- gen_data(quan_random,expand = T)
 }
-io14$util <- with(io14,sum_util/count)
-a1 <- subset(io14,util>60 & util<80)
-DT <- subset(DT,DT %in% a1$svrid)
-splitDT <- split(DT,DT$svrid)
+a1 <- subset(io14,util<=5)
+DT_truncate <- factorX(subset(DT,svrid %in% a1$svrid))
+splitDT <- split(DT_truncate,DT_truncate$svrid)
 
-# S3. Plot ------------------------------------
+# S3. Plot hist------------------------------------
+
+
+
+# S4. Plot line------------------------------------
 attr <- 'util'
 prow <- 4;pcol <- 4;pmar <- 2
 par(mfrow = c(prow,pcol),mar=c(pmar,pmar,pmar,pmar))
 
 smp_ind <- data.frame(ind=sample(1:length(splitDT),prow*pcol))
-smp_ind$numD <- sapply(splitDT[smp_ind$ind],function(df)df$numD[1])
-smp_ind <- smp_ind[order(smp_ind$numD),]
-for (i in smp_ind$ind) {
-  df <- splitDT[[i]]
-  arr <- df[[attr]]
-  arr <- arr[arr < quantile(arr,0.95)]
-  # title <- sprintf('%s[%d]\n[%.2f][%.1f]',df$svrid[1],df$numD[1],sum(df$util==0)/nrow(df),mean(df$si))
-  title <- sprintf('%s[%d]\n[%.2f]',df$svrid[1],df$numD[1],mean(df$util))
-  if(length(arr)==0)arr<-rep(0,1000)
-  if(df$svrid[1] %in% f201409$svrid){
-    hist(arr, breaks = 100,main = title,color = 'red')
-  }else{
-    hist(arr, breaks = 100,main = title)
-  }
+smp_ind$svrid <- names(splitDT)[smp_ind$ind]
+smp_ind$numD <- model_svrid$numD[match(smp_ind$svrid,model_svrid$svrid)]
+smp_ind$adc <- io14$util[match(smp_ind$svrid,io14$svrid)]
+smp_ind <- smp_ind[order(smp_ind$adc),]
+for (i in seq_len(prow*pcol)) {
+  df <- splitDT[[smp_ind$ind[i]]]
+  uni.date <- sort(unique(as.Date(df$time)))
+  start.date <- uni.date[round(length(uni.date)*0.2)]
+  df <- subset(df,as.Date(time)>start.date & as.Date(time) <= start.date+2)
+  title <- sprintf('%s[%s]\n[%.2f]',df$svrid[1],df$numD[1],mean(df$util))
+  plot(df$time,df[[attr]],ylim=c(0,20),main=title,type='l')
 }

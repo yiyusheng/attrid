@@ -122,13 +122,14 @@ gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp='',add_i
   }
 }
 
-gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,balanced_binning=T,rsmp='',maxy){
+gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,
+                   balanced_binning=T,rsmp='',maxy,remove_zero=T){
   # generate figure
   list[fr,object_data,fail_data] <- gen_data(object_data,attr,io = io14,f=f201409,expand = F,rsmp=rsmp)
   
   if(balanced_binning){
-    fr <- fr[fr[[attr]]!=0,]
-    bin_width <- min(fr[[attr]])
+    if(remove_zero)fr <- fr[fr[[attr]]!=0,]
+    bin_width <- diff(sort(fr[[attr]])[c(1,2)])
     p_fr <- ggplot(subset(fr,count>countLimit),aes_string(x = attr)) + 
       geom_bar(aes(y=AFR,fill=level),stat = 'identity',position=position_nudge(x=-bin_width/2))+ylab('Failure Rate(%)')+
       geom_smooth(aes(y=AFR),color='red',linetype=2,se=F)+
@@ -173,20 +174,21 @@ gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,bal
   return(list(fr,p_fr,p_count,p_countF,object_data,fail_data))
 }
 
-gen_fr_split <- function(i,attr,splitDTQ=splitDTQ,quan_low=NULL,quan_high=NULL){
+gen_fr_split <- function(splitDTQ=splitDTQ,attrQ,attrX,Q,Qlow=NULL,Qhigh=NULL){
   # generate failure rate cut by attr at quantile i and quantile 1-i
+  attr_level <- paste(attrX,'level',sep='_')
   r <- lapply(splitDTQ,function(df){
-    if(is.null(quan_low))quan_low <- quantile(df[[attr]],i)
-    if(is.null(quan_high))quan_high <- quantile(df[[attr]],1-i)
+    if(is.null(Qlow))Qlow <- quantile(df[[attrQ]],Q)
+    if(is.null(Qhigh))Qhigh <- quantile(df[[attrQ]],1-Q)
     df$class <- 'median'
-    df$class[df[[attr]]<=quan_low] <- 'low'
-    df$class[df[[attr]]>quan_high] <- 'high'
+    df$class[df[[attrQ]]<=Qlow] <- 'low'
+    df$class[df[[attrQ]]>Qhigh] <- 'high'
     df$class <- factor(df$class,levels=c('low','median','high'))
-    return(list(df,data.frame(level = df$mean_level[1],mean = mean(df[[attr]]),low = quan_low,high = quan_high)))
+    return(list(df,data.frame(level = df[[attr_level]][1],mean = mean(df[[attrQ]]),low = Qlow,high = Qhigh)))
   })
   DT_class <- do.call(rbind,lapply(r,'[[',1))
   DT_div <- do.call(rbind,lapply(r,'[[',2))
-  list[data_fr] <- gen_data(DT_class,c('mean_level','class'),expand = F,rsmp = '')
+  list[data_fr] <- gen_data(DT_class,c(attr_level,'class'),expand = F,rsmp = '')
   # a <- by(DT_class,list(DT_class$mean_level,DT_class$class),function(df)mean(df$age))
   # a1 <- setNames(melt(array(a,dim(a),dimnames(a))),c('mean_level','class','mean_age'))
   # data_fr <- merge(data_fr,a1)
@@ -194,13 +196,21 @@ gen_fr_split <- function(i,attr,splitDTQ=splitDTQ,quan_low=NULL,quan_high=NULL){
   return(list(data_fr,DT_div))
 }
 
-gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,bin_count=1000,has_level=F,rsmp='age',maxy=1.2){
+gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,bin_count=1000,
+                               has_level=F,rsmp='age',maxy=1.2,remove_zero=T,attr_min=0){
+  
   # get result for a special attr in DT
   attr_level <- paste(attr,'level',sep='_')
   if(is.null(attr_max))attr_max<- quantile(DT[[attr]],0.99,na.rm = T)
-  if(has_level==F)DT <- binning_data(DT,attr,attr_max,balanced_binning,bins,bin_count)
+  
+  if(has_level==F)DT <- binning_data(DT = DT,attr = attr,attr_max = attr_max,
+                                     balanced_binning = balanced_binning,bins = bins,
+                                     bin_count = bin_count,attr_min = attr_min)
+  
   list[data_fr,p_fr,p_count,p_countf,object_data,f_data] <- 
-    gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,rsmp=rsmp,maxy=maxy)
+    gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,
+           rsmp=rsmp,maxy=maxy,remove_zero=remove_zero)
+  
   corr <- cor(data_fr[,1],data_fr$AFR)
   cat(sprintf('[%s]\t %s corr:%.4f\tEND!!!\n',date(),attr_level,corr))
   return(list(data_fr,p_fr,p_count,corr,object_data,f_data))
@@ -352,7 +362,29 @@ plot_relationship <- function(object_data,attr1,attr2,type1='numeric',type2='num
   return(p_rls)
 }
 
-
+plot_relationship_quantile <- function(object_data,attr1,attr2,type1='numeric',type2='numeric',balanced_binning = F,maxy=1.2){
+  step <- 0.01
+  table_2attr <- list2df(tapply(object_data[[attr2]],object_data[[attr1]],
+                                function(arr)c(mean(arr),sd(arr),quantile(arr,seq(0,1,step)))),
+                         n = c('mean_attr2','sd_attr2',paste('Q',seq(0,100,step*100),sep=''),'attr1'))
+  table_2attr$attr1 <- as.numeric(table_2attr$attr1)
+  table_2attr <- table_2attr[-nrow(table_2attr),]
+  
+  # ribbonA <- melt(table_2attr[,c('attr1','Q1','Q20','Q50','Q80')],id.vars = 'attr1')
+  # ribbonB <- melt(table_2attr[,c('attr1','Q20','Q50','Q80','Q99')],id.vars = 'attr1')
+  ribbonA <- melt(table_2attr[,c('attr1','Q10','Q30','Q50','Q70')],id.vars = 'attr1')
+  ribbonB <- melt(table_2attr[,c('attr1','Q30','Q50','Q70','Q90')],id.vars = 'attr1')
+  levels(ribbonA$variable) <- c('Q10_Q30','Q30_Q50','Q50_Q70','Q70_Q90')
+  levels(ribbonB$variable) <- c('Q10_Q30','Q30_Q50','Q50_Q70','Q70_Q90')
+  ribbon <- setNames(merge(ribbonA,ribbonB,by=c('attr1','variable')),c('attr1','Qtag','ymin','ymax'))
+  ribbon$mean_attr2 <- table_2attr$mean_attr2[match(ribbon$attr1,table_2attr$attr1)]
+  
+  p_rls <- ggplot(ribbon,aes(x=attr1))+  #remove the last bin
+    geom_ribbon(aes(ymin = ymin, ymax = ymax,fill = Qtag))+
+    geom_line(aes(y=mean_attr2),color='red',size=1.5)+geom_point(aes(y=mean_attr2),color='red',size=3)+
+    guides(fill = guide_legend(title=NULL))+
+    gen_theme()+xlab(attr1)+ylab(attr2)
+}
 
 plot_relationship_factors <- function(object_data,attr,balanced_binning=T,maxy=1.2){
   p_adc_errorbar <- plot_relationship(object_data,attr,'adc',type2='numeric',balanced_binning = balanced_binning,maxy=maxy)
@@ -505,7 +537,7 @@ trunc_test <- function(DT,attr,startvalue,step,bins=20,limit_count_bin=100){
   return(trunc_value)
 }
 
-gen_unbalanced_binning_point <- function(DT,attr,min_value=0,max_value,bin_count=1000){
+gen_unbalanced_binning_point <- function(DT,attr,max_value,bin_count=1000,min_value=0){
   # truncate value and generate binning point without fixed interval but with finxed sample count in the bin
   attr_value <- DT[[attr]]
   attr_value[attr_value>max_value] <- max_value
@@ -539,14 +571,14 @@ gen_binned_array <- function(DT,attr,binning_point){
   return(level)
 }
 
-binning_data <- function(DT,attr,attr_max,balanced_binning=T,bins=20,bin_count=5300){
+binning_data <- function(DT,attr,attr_max,balanced_binning=T,bins=20,bin_count=5300,attr_min=0){
   # binning data
   attr_level <- paste(attr,'level',sep='_')
   if(balanced_binning){
-    bp <- gen_balanced_binning_point(0,attr_max,bins)
+    bp <- gen_balanced_binning_point(attr_min,attr_max,bins)
   }else{
     # attr_max <- quantile(DT[[attr]],0.99)
-    bp <- gen_unbalanced_binning_point(DT,attr,0,attr_max,bin_count = bin_count)
+    bp <- gen_unbalanced_binning_point(DT,attr,attr_min,attr_max,bin_count = bin_count)
   }
   DT[[attr_level]] <- gen_binned_array(DT,attr,binning_point = bp)
   # return(DT[,c('svrid','numD','mainModel','age',attr_level)])
@@ -572,11 +604,11 @@ save_fig <- function(p,title){
   ggsave(file=file.path(dir_data,'Paper','jpg',jpg_title), plot=p, width = 10, height = 6, dpi = 100)#
 }
 
-gen_theme <- function(){
-  theme(axis.text = element_text(size = 28),axis.title = element_text(size = 32),
+gen_theme <- function(p=0){
+  theme(axis.text = element_text(size = 28+p),axis.title = element_text(size = 32+p),
         axis.text.x = element_text(margin = margin(t=5)),axis.text.y = element_text(margin = margin(r=5)),
         axis.title.x = element_text(margin = margin(t=20)),axis.title.y = element_text(margin = margin(r=20)),
-        legend.text = element_text(size = 32),legend.title = element_text(size = 36),
+        legend.text = element_text(size = 32+p),legend.title = element_text(size = 36+p),
         legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)),
         legend.key.width = unit(2.5,units = 'line'),legend.key.height = unit(2.5,units = 'line'))
 }
