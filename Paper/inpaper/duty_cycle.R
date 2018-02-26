@@ -15,7 +15,7 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper');source('~/rhead');
+rm(list = ls());source('~/rhead');setwd(file.path(dir_c,'Disk_Workload/Paper'));
 source('dir_func.R')
 
 # S1. Load Data ------------------------------------
@@ -33,18 +33,18 @@ list[data_fr,p_fr,p_count,corr,data_adc] <- gen_result_feature(DT_quan,'mean',10
 list[data_fr_cv,p_fr1,p_count_cv,corr_cv,data_adc_cv] <- gen_result_feature(subset(DT_quan,is.numeric(cv) & cv > 0.04),'cv',1)
 
 # S3. Plot ------------------------------------
-p_adc_fr <- p_fr+xlab('ADC (%)')+ylim(c(0,25))+scale_fill_manual(values=c('grey60','grey20'))+ ylab('AFR (%)')
+p_adc_fr <- p_fr+xlab('ADC (%)')+ylim(c(0,25))
 
-p_fr_cv <- p_fr1+xlab('Coefficient of Variation')+scale_fill_manual(values=c('grey60','grey20'))+ ylab('AFR (%)')
+p_fr_cv <- p_fr1+xlab('CV')
 
 
 p_adc_dist <- p_count+xlab('ADC (%)')+coord_cartesian(ylim=c(0,10))+
-  annotate("text", x=22, y=10,label= '67.30%',size=10)+
+  annotate("text", x=22, y=10,label= paste(max(data_fr$percentage),'%',sep=''),size=10)+
   geom_segment(aes(x = 12, y = 10, xend = 8, yend = 10), size=0.2,arrow = arrow(length = unit(0.2, "cm"))) + ylab('Percentage (%)')
 
 
 save_fig(p_adc_fr,'adc_fr')
 save_fig(p_adc_dist,'adc_dist')
-save_fig(p_fr_cv,'cvdc_fr')
+save_fig(p_fr_cv,'adc_cv_fr')
 
-save(p_adc_fr,p_adc_dist,p_adc_abw,p_fr_cv,file=file.path(dir_data,'Paper','Rda','p_adc.Rda'))
+save(p_adc_fr,p_adc_dist,p_fr_cv,file=file.path(dir_data,'Paper','Rda','p_adc.Rda'))

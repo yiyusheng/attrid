@@ -15,7 +15,7 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper');source('~/rhead');
+rm(list = ls());source('~/rhead');setwd(file.path(dir_c,'Disk_Workload/Paper'));
 source('dir_func.R')
 
 # S1. Load Data ------------------------------------
@@ -33,8 +33,7 @@ list[data_fr,p_fr,p_count,data_corr,data_abw]<- gen_result_feature(DT_quan,attr_
 p_count+scale_y_log10()
 
 # S_end. plot ------------------------------------
-p_abw_fr <- p_fr+xlab('ABW (KB/s)')+ylim(c(0,6))+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))+
-  scale_fill_manual(values=c('grey60','grey20'))+ ylab('AFR (%)')
+p_abw_fr <- p_fr+xlab('ABW (KB/s)')+ylim(c(0,6))+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))
 
 p_abw_dist <- p_count+xlab('ABW (KB/s)')+coord_cartesian(ylim=c(0,15))+
   annotate("text", x=2300, y=14,label= sprintf('%.2f%%',data_fr$percentage[which.min(data_fr$mean_level)]),size=10)+

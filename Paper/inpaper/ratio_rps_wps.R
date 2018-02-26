@@ -15,7 +15,7 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper');source('~/rhead');
+rm(list = ls());source('~/rhead');setwd(file.path(dir_c,'Disk_Workload/Paper'));
 source('dir_func.R')
 
 # S1. Load Data ------------------------------------
@@ -45,20 +45,19 @@ list[data_fr.cr,p_fr.cr,p_count.cr,data_corr.cr,data_ratio.cr]<- gen_result_feat
 
 
 # S_end. plot ------------------------------------
-p_ratio_fr <- p_fr+xlab('ART (%)')+ylim(c(0,6))+scale_fill_manual(values=c('grey60','grey20'))+ ylab('AFR (%)')##
+p_ratio_fr <- p_fr+xlab('ART (%)')+ylim(c(0,6))##
 # p_ratio_dist <- p_count+xlab('ART (%)')+coord_cartesian(ylim=c(0,25))  + ylab('Percentage (%)')
-p_cr_fr <- p_fr.cr+xlab('Change of Ratio (%)')+scale_fill_manual(values=c('grey60','grey20'))##
+p_cr_fr <- p_fr.cr+xlab('Change of Ratio (%)')##
 
 p_abw_ratio.quantile <- plot_relationship_quantile(data.abw,'abw_level','mean_individual')+
-  xlab('ABW (KB/s)')+ylab('ART (%)')+theme(legend.position = c(0.95,0.05),legend.justification = c(1,0))+
-  scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))##
+  xlab('ABW (KB/s)')+ylab('ART (%)')+theme(legend.position = c(0.95,0.05),legend.justification = c(1,0))##
 
 data_ratio <- binning_data(DT = data_ratio,attr = 'abw',attr_max = 9000,bins = 3)
 table_ratio <- setNames(melt_table(data_ratio$mean_individual_level,data_ratio$abw_level),c('ratio','abw','count'))
 table_ratio$rate <- table_ratio$count/sum(table_ratio$count)*100
 bin_width <- diff(sort(unique(table_ratio$ratio))[c(1,2)])
 p_ratio_dist <- ggplot(table_ratio,aes(x=ratio))+geom_bar(aes(y=rate,fill=factor(abw)),stat = 'identity',position=position_nudge(x=-bin_width/2))+
-  xlab('ART (%)') + ylab('Percentage(%)')+guides(fill = guide_legend(title='ABW (KB/S)')) + gen_theme()+scale_fill_manual(values=c('grey70','grey40','grey10')) ##
+  xlab('ART (%)') + ylab('Percentage(%)')+guides(fill = guide_legend(title='ABW (KB/S)')) + gen_theme()+scale_fill_manual(values=colr3)
 
 save_fig(p_ratio_fr,'ratio_fr')
 save_fig(p_ratio_dist,'ratio_dist')

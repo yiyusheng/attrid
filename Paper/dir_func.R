@@ -123,20 +123,28 @@ gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp='',add_i
 }
 
 gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,
-                   balanced_binning=T,rsmp='',maxy,remove_zero=T){
+                   balanced_binning=T,rsmp='',maxy,remove_zero=T,smooth=F){
   # generate figure
   list[fr,object_data,fail_data] <- gen_data(object_data,attr,io = io14,f=f201409,expand = F,rsmp=rsmp)
   
   if(balanced_binning){
     if(remove_zero)fr <- fr[fr[[attr]]!=0,]
     bin_width <- diff(sort(fr[[attr]])[c(1,2)])
-    p_fr <- ggplot(subset(fr,count>countLimit),aes_string(x = attr)) + 
-      geom_bar(aes(y=AFR,fill=level),stat = 'identity',position=position_nudge(x=-bin_width/2))+ylab('Failure Rate(%)')+
-      geom_smooth(aes(y=AFR),color='red',linetype=2,se=F)+
-      guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
-      gen_theme()
+    if(smooth){
+      p_fr <- ggplot(subset(fr,count>countLimit),aes_string(x = attr)) + 
+        geom_bar(aes(y=AFR,fill=level),stat = 'identity',position=position_nudge(x=-bin_width/2))+ylab('AFR (%)')+
+        geom_smooth(aes(y=AFR),color='red',linetype=2,se=F)+
+        guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
+        gen_theme()+scale_fill_manual(values=colr2)+geom_smooth(aes(y=AFR),method='lm',formula=y~x)
+    }else{
+      p_fr <- ggplot(subset(fr,count>countLimit),aes_string(x = attr)) + 
+        geom_bar(aes(y=AFR,fill=level),stat = 'identity',position=position_nudge(x=-bin_width/2))+ylab('AFR (%)')+
+        geom_smooth(aes(y=AFR),color='red',linetype=2,se=F)+
+        guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
+        gen_theme()+scale_fill_manual(values=colr2)
+    }
     
-    p_count <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percentage),stat = 'identity',position=position_nudge(x=-bin_width/2))+
+    p_count <- ggplot(fr,aes_string(x=attr))+geom_bar(aes(y=percentage),fill=colr1[4],stat = 'identity',position=position_nudge(x=-bin_width/2))+
       ylab('Percentage(%)')+guides(fill = guide_legend(title=NULL),color=guide_legend(title=NULL)) +
       gen_theme()
     
@@ -197,7 +205,7 @@ gen_fr_split <- function(splitDTQ=splitDTQ,attrQ,attrX,Q,Qlow=NULL,Qhigh=NULL){
 }
 
 gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,bin_count=1000,
-                               has_level=F,rsmp='age',maxy=1.2,remove_zero=T,attr_min=0){
+                               has_level=F,rsmp='age',maxy=1.2,remove_zero=T,attr_min=0,...){
   
   # get result for a special attr in DT
   attr_level <- paste(attr,'level',sep='_')
@@ -209,7 +217,7 @@ gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,
   
   list[data_fr,p_fr,p_count,p_countf,object_data,f_data] <- 
     gen_fr(DT,attr_level,prt=F,balanced_binning=balanced_binning,
-           rsmp=rsmp,maxy=maxy,remove_zero=remove_zero)
+           rsmp=rsmp,maxy=maxy,remove_zero=remove_zero,...)
   
   corr <- cor(data_fr[,1],data_fr$AFR)
   cat(sprintf('[%s]\t %s corr:%.4f\tEND!!!\n',date(),attr_level,corr))
@@ -374,8 +382,8 @@ plot_relationship_quantile <- function(object_data,attr1,attr2,type1='numeric',t
   # ribbonB <- melt(table_2attr[,c('attr1','Q20','Q50','Q80','Q99')],id.vars = 'attr1')
   ribbonA <- melt(table_2attr[,c('attr1','Q10','Q30','Q50','Q70')],id.vars = 'attr1')
   ribbonB <- melt(table_2attr[,c('attr1','Q30','Q50','Q70','Q90')],id.vars = 'attr1')
-  levels(ribbonA$variable) <- c('Q10_Q30','Q30_Q50','Q50_Q70','Q70_Q90')
-  levels(ribbonB$variable) <- c('Q10_Q30','Q30_Q50','Q50_Q70','Q70_Q90')
+  levels(ribbonA$variable) <- c('Q10_Q29','Q30_Q49','Q50_Q69','Q70_Q90')
+  levels(ribbonB$variable) <- c('Q10_Q29','Q30_Q49','Q50_Q69','Q70_Q90')
   ribbon <- setNames(merge(ribbonA,ribbonB,by=c('attr1','variable')),c('attr1','Qtag','ymin','ymax'))
   ribbon$mean_attr2 <- table_2attr$mean_attr2[match(ribbon$attr1,table_2attr$attr1)]
   
@@ -383,7 +391,7 @@ plot_relationship_quantile <- function(object_data,attr1,attr2,type1='numeric',t
     geom_ribbon(aes(ymin = ymin, ymax = ymax,fill = Qtag))+
     geom_line(aes(y=mean_attr2),color='red',size=1.5)+geom_point(aes(y=mean_attr2),color='red',size=3)+
     guides(fill = guide_legend(title=NULL))+
-    gen_theme()+xlab(attr1)+ylab(attr2)
+    gen_theme()+xlab(attr1)+ylab(attr2)+scale_fill_manual(values=colr1)
 }
 
 plot_relationship_factors <- function(object_data,attr,balanced_binning=T,maxy=1.2){

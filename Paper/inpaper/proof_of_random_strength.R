@@ -16,7 +16,7 @@
 #
 #
 
-rm(list = ls());setwd('~/Code/R/Disk_Workload/Paper');source('~/rhead');
+rm(list = ls());source('~/rhead');setwd(file.path(dir_c,'Disk_Workload/Paper'));
 source('dir_func.R')
 
 # S1. Load Data ------------------------------------
@@ -41,9 +41,6 @@ list[data_fr_abw,div_abw] <- gen_fr_split(splitDTQ=splitDTQ_adc,attrQ='adc',attr
 list[data_fr.adc,p_fr.adc,p_count.adc,data_corr.adc,data.adc]<- gen_result_feature(DT_quan,'adc',100,bins=20)
 list[data_fr.abw,p_fr.abw,p_count.abw,data_corr.abw,data.abw]<- gen_result_feature(DT_quan,'abw',9000,bins=20)
 
-
-
-
 # S3.Plot ------------------------------------
 # data_fr_adc$AFR[data_fr_adc$AFR>80] <- 50 + rnorm(length(data_fr_adc$AFR[data_fr_adc$AFR>80]),0,10)
 # data_fr_adc$AFR[data_fr_adc$AFR>40& data_fr_adc$class=='median'] <- 10 + rnorm(length(data_fr_adc$AFR[data_fr_adc$AFR>40& data_fr_adc$class=='median']),0,3)
@@ -59,13 +56,11 @@ p_cmb_fr_abw <- ggplot(subset(data_fr_abw,abw_level>0),aes(x=abw_level,y=AFR,gro
   theme(legend.position = c(0.05,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)))
 
 
-p_adc_abw.quantile <- plot_relationship_quantile(data.adc,'adc_level','abw')+
-  xlab('ADC (%)')+ylab('ABW (KB/s)')+scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))+
+p_adc_abw.quantile <- plot_relationship_quantile(data.adc,'adc_level','abw')+xlab('ADC (%)')+ylab('ABW (KB/s)')+
   theme(legend.position = c(0.0,0.95),legend.justification = c(0,1),legend.background = element_rect(fill = alpha('grey',0.5)),legend.text = element_text(size=30))##
 
-p_abw_adc.quantile <- plot_relationship_quantile(data.abw,'abw_level','adc')+
-  xlab('ABW (KB/s)')+ylab('ADC (%)')+theme(legend.position = c(0.95,0.05),legend.justification = c(1,0))+
-  scale_fill_manual(values=c('grey70','grey50','grey30','grey20'))##
+p_abw_adc.quantile <- plot_relationship_quantile(data.abw,'abw_level','adc')+ xlab('ABW (KB/s)')+ylab('ADC (%)')+
+  theme(legend.position = c(0.95,0.05),legend.justification = c(1,0))##
 
 
 

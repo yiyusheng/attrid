@@ -1,6 +1,10 @@
 ###### VARIABLES ######
 dirName <- 'Disk_Workload'
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#CC6666", "#9999CC", "#66CC99","#000000")
+colr1 <- c('#41e0d0','#00ced1','#86cefb','#0099cd')
+colr2 <- colr1[c(2,4)]
+colr3 <- colr1[c(1,3,4)]
+
 attrNameAll <- c('util','rps','iopsr','wps','iopsw');attrNameDis <- attrNameAll[c(2,4,1)]
 attrNameExtend <- c('util','rps','wps',paste('iopsr_',1:24,sep=''),paste('iopsw_',1:24,sep=''))
 dir_code <- file.path(dir_c,dirName)
