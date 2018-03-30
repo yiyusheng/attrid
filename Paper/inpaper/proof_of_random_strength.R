@@ -38,6 +38,8 @@ splitDTQ_abw <- split(DT_quan,DT_quan$abw_level)
 
 list[data_fr_adc,div_adc] <- gen_fr_split(splitDTQ=splitDTQ_adc,attrQ='abw',attrX='adc',Q=0.33,Qlow=NULL,Qhigh=NULL)
 list[data_fr_abw,div_abw] <- gen_fr_split(splitDTQ=splitDTQ_adc,attrQ='adc',attrX='abw',Q=0.33,Qlow=NULL,Qhigh=NULL)
+
+
 list[data_fr.adc,p_fr.adc,p_count.adc,data_corr.adc,data.adc]<- gen_result_feature(DT_quan,'adc',100,bins=20)
 list[data_fr.abw,p_fr.abw,p_count.abw,data_corr.abw,data.abw]<- gen_result_feature(DT_quan,'abw',9000,bins=20)
 

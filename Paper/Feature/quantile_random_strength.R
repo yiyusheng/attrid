@@ -31,10 +31,11 @@ quantile_random_strength <- function(i,vt){
   
   r <- lapplyX(splitDT,function(df){
     arr <- with(subset(df,util>0),xps/util)
+    arr_inv <- with(subset(df,xps>0),util/xps)
     if(length(arr)==0){
-      return(c(rep(0,1004)))
+      return(c(rep(0,1005)))
     }else{
-      return(c(length(arr),mean(arr),sd(arr),quantile(arr,seq(0,1,0.001))))
+      return(c(length(arr),mean(arr),mean(arr_inv),sd(arr),quantile(arr,seq(0,1,0.001))))
     }
   })
   r <- cbind(row.names(r),data.frame(r))
@@ -55,5 +56,5 @@ idx <- seq_len(length(fname))
 r <- foreachX(idx,'quantile_random_strength',frac_cores = 0.9,vt=value_trunc)
 quan_random <- do.call(rbind,r)
 quan_random$svrid <- factor(quan_random$svrid)
-names(quan_random) <- c('svrid','count','mean','sd',paste('Q',0:1000,sep = ''))
+names(quan_random) <- c('svrid','count','mean','mean_inv','sd',paste('Q',0:1000,sep = ''))
 save(quan_random,file = file.path(dir_data,'quantile_random_strength.Rda'))
