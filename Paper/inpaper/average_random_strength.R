@@ -50,6 +50,9 @@ DT_quan <- subset(DT_quan,numD==12) # update 2018-01-04
 
 # S2. generate result ------
 list[data_fr,p_fr,p_count,corr,data_ob,data_f] <- gen_result_feature(DT_quan,'mean',bins = 20,attr_max = am,smooth=T)
+p <- plot_result_feature_addmodel(DT_quan,'mean',400)+xlab('ASI');print(p)
+
+
 list[data_fr.abw,p_fr.abw,p_count.abw,corr.abw,data_all.abw] <- gen_result_feature(DT_quan,'abw',bins = 40,attr_max = 9000)
 list[data_fr.adc,p_fr.adc,p_count.adc,corr.adc,data_all.adc] <- gen_result_feature(DT_quan,'adc',bins = 40,attr_max = 100)
 

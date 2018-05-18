@@ -30,7 +30,8 @@ DT_quan <- subset(DT_quan_all,numD==12) # update 2018-01-04
 
 # S2. Failure rate ------------------------------------
 list[data_fr,p_fr,p_count,data_corr,data_abw]<- gen_result_feature(DT_quan,attr_main,9000,bins=20)
-p_count+scale_y_log10()
+p <- plot_result_feature_addmodel(DT_quan,attr_main,9000)+xlab('ABW');print(p)
+
 
 # S_end. plot ------------------------------------
 p_abw_fr <- p_fr+xlab('ABW (KB/s)')+ylim(c(0,6))+theme(legend.position = c(0.95,0.95),legend.justification = c(1,1))

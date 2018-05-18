@@ -84,6 +84,8 @@ gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp='',add_i
       object_data$adc <- quantile_dutycycle$mean[match(object_data$svrid,quantile_dutycycle$svrid)]
       object_data$abw <- quan_xps$mean[match(object_data$svrid,quan_xps$svrid)]
       object_data$dcq100 <- quantile_dutycycle$Q100[match(object_data$svrid,quantile_dutycycle$svrid)]
+      object_data$adc_age <- with(object_data,adc*age)
+      object_data$abw_age <- with(object_data,abw*age)
     }
     
     object_data <- svrid_expand_disk(object_data)
@@ -123,7 +125,7 @@ gen_data <- function(object_data,attr,io = io14,f=f201409,expand=F,rsmp='',add_i
 }
 
 gen_fr <- function(object_data,attr,io = io14,f=f201409,prt=F,countLimit=100,
-                   balanced_binning=T,rsmp='',maxy,remove_zero=T,smooth=F){
+                   balanced_binning=T,rsmp='',maxy,remove_zero=T,smooth=F,add_model=T){
   # generate figure
   list[fr,object_data,fail_data] <- gen_data(object_data,attr,io = io14,f=f201409,expand = F,rsmp=rsmp)
   
@@ -222,6 +224,29 @@ gen_result_feature <- function(DT,attr,attr_max=NULL,balanced_binning=T,bins=20,
   corr <- cor(data_fr[,1],data_fr$AFR)
   cat(sprintf('[%s]\t %s corr:%.4f\tEND!!!\n',date(),attr_level,corr))
   return(list(data_fr,p_fr,p_count,corr,object_data,f_data))
+}
+
+plot_result_feature_addmodel <- function(DT,attr,attr_max,maxy=20,adjust_diff = c(0,0,0,0)){
+  # plot AFR of all and AFR of four main models
+  list[data_fr,p_fr,p_count,corr,data_return] <- gen_result_feature(DT,attr,attr_max)
+  list[fr,object_data,fail_data] <- gen_data(data_return,c(paste(attr,'level',sep='_'),'mainModel'),io = io14,f=f201409,expand = F)
+  d1 <- data_fr
+  d2 <- factorX(subset(fr,AFR>0 & AFR < maxy & mainModel != 'None'))
+  d1$mainModel <- 'main'
+  d2$mean_age <- 0
+  
+  d3 <- d1[,c('mean_level','AFR')]
+  d4 <- rbind(d1,d2)
+  d5 <- merge(d2[,c('mean_level','AFR','mainModel')],d1[,c('mean_level','AFR','mainModel')],by = 'mean_level')
+  names(d5) <- c('mean_level','AFR_model','model','AFR','x1')
+  d5$count <- unlist(tapply(d5$mean_level,d5$mean_level,function(x)rep(length(x),length(x))))
+  
+  p <- ggplot(subset(d5,mean_level !=0),aes(x=mean_level))+
+    geom_bar(aes(y=AFR/count),stat = 'identity')+
+    geom_line(aes(y=AFR_model,group=model,color = model))+
+    gen_theme()
+
+  return(p)
 }
 
 gen_result_feature_all <- function(DT,attr,attr_max,attr_flat,attrf_max,balanced_binning,

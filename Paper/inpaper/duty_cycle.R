@@ -29,7 +29,15 @@ DT_quan <- subset(DT_quan,numD==12) #add 2018-01-04
 
 # S2. analysis ------------------------------------
 # gen_failure
-list[data_fr,p_fr,p_count,corr,data_adc] <- gen_result_feature(DT_quan,'mean',100)
+list[data_fr,p_fr,p_count,corr,data_adc] <- gen_result_feature(DT_quan,'mean',100,add_model=T)
+p <- plot_result_feature_addmodel(DT_quan,'mean',100)+xlab('ADC');
+
+
+# list[data_fr_adcage,p_fr_adcage,p_count_adcage,corr_adcage,data_adc_adcage] <- gen_result_feature(DT_quan,'adc_age',3e4)
+# list[data_fr_abwage,p_fr_abwage,p_count_abwage,corr_abwage,data_adc_abwage] <- gen_result_feature(DT_quan,'abw_age',5e6)
+# list[data_fr_age,p_fr_age,p_count_age,corr_age,data_adc_age] <- gen_result_feature(DT_quan,'age',1500)
+
+
 list[data_fr_cv,p_fr1,p_count_cv,corr_cv,data_adc_cv] <- gen_result_feature(subset(DT_quan,is.numeric(cv) & cv > 0.04),'cv',1)
 
 # S3. Plot ------------------------------------
